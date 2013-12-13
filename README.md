@@ -1,4 +1,7 @@
-Moba
-====
+#Moba
+##A browser based Moba
 
-A browser based moba
+To use:
+
+Install grunt:
+    npm install -g grunt-cli

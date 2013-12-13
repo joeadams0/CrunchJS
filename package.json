@@ -1,0 +1,22 @@
+{
+  "name": "Moba",
+  "version": "0.0.0",
+  "description": "A browser based Moba",
+  "main": "server.js",
+  "dependencies": {
+    "node-static": "~0.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall" : "sudo npm install forever -g",
+    "start-webserve": "forever start server.js",
+    "end-webserve" : "forever end server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jadmz/Moba.git"
+  },
+  "author": "Joe Adams",
+  "license": "BSD"
+}
