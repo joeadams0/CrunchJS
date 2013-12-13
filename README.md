@@ -1,7 +1,9 @@
 #Moba
 ##A browser based Moba
 
-To use:
+###Installation
 
 Install grunt:
+```
     npm install -g grunt-cli
+```
