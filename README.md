@@ -4,8 +4,24 @@ An application made with [Closure Library][closure-library].
 
 ## Getting Started
 
+Install from the package.json
 ```shell
-npm install moba --save-dev
+npm install
+```
+
+Get Grunt
+```shell
+npm install -g yo grunt-cli
+```
+
+Get Google Closure Library
+```shell
+git clone https://code.google.com/p/closure-library/ app/closure-library
+```
+
+Get local dependancies
+```shell
+bower install
 ```
 
 ## Table Of Contents
