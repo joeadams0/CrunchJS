@@ -67,9 +67,9 @@ grunt build
 ```
 
 Compiles all of the source files into an optimized, minimized, single script (this also generates the documentation). To run the compiled code:
-1. Run the build command
-2. Run the server 
-3. Go to the /compile.html page to run the compiled code.
+    1. Run the build command
+    2. Run the server 
+    3. Go to the /compile.html page to run the compiled code.
 
 ### Generate Documentation
 
