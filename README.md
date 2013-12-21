@@ -44,6 +44,8 @@ bower install
 
 ## Usage
 
+Note: I have only run this on my Mac. I think it should work no problem on linux, but I haven't tested it on Windows.
+
 ### Run the server
 
 ```
@@ -78,7 +80,7 @@ Compiles all of the source files into an optimized, minimized, single script (th
 grunt jsdoc
 ```
 
-Generates the documentation for the project.
+Generates the documentation for the project. The documentation is taken from annotations in the source code. The generated documentation is in the /doc folder.
 
 For more info on the commands or the dev environment, see [Closure Generator][closure-gen].
 
