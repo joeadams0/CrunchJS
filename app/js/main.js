@@ -1,12 +1,3 @@
-/**
- * @fileoverview Master bootstrap file.
- */
-goog.provide('app');
+goog.provide('main');
+goog.require('Moba');
 
-// sequence matters
-goog.require('ssd.vendor');
-goog.require('ssd.debug');
-
-goog.require('app.Core');
-
-goog.require('app.exports');

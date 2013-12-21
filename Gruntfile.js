@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     externsPath: 'build/externs/',
 
     // define the main namespace of your app.
-    entryPoint: 'app',
+    entryPoint: 'main',
 
     // The path to the closure library
     closureLibrary: process.env.CLOSURE_PATH || 'app/closure-library',
@@ -35,7 +35,7 @@ module.exports = function (grunt) {
     componentPath: 'app/components',
 
     // the compiled file
-    destCompiled: 'app/jsc/app.js',
+    destCompiled: 'app/jsc/game.js',
 
     // define the path to the app
     appPath: 'app/js/',
@@ -53,9 +53,6 @@ module.exports = function (grunt) {
   CONF.vendorFiles = [
       // all files JS in vendor folder
       CONF.appPath + '/vendor/*.js',
-
-      // and do not include jQuery, we'll use a CDN for it.
-      '!' + CONF.appPath + '/vendor/jQuery*'
     ];
 
 
@@ -68,7 +65,19 @@ module.exports = function (grunt) {
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+
   grunt.initConfig({
+
+    jsdoc : {
+        dist : {
+            src: ['app/js/game/*', 'app/js/engine/*'], 
+            options: {
+                destination: 'doc',
+                configure:"./jsdocConf.json"
+            }
+        }
+    },
+
     watch: {
       livereload: {
         options: {
@@ -300,7 +309,8 @@ module.exports = function (grunt) {
           strict: true
         }
       }
-    }
+    },
+
   }); // end grunt.initConfig();
 
 
@@ -340,7 +350,8 @@ module.exports = function (grunt) {
     'clean:dist',
     'uglify:vendor',
     'closureBuilder:app',
-    'concat:production'
+    'concat:production',
+    'jsdoc'
   ]);
 
   grunt.registerTask('deps', [
@@ -360,4 +371,6 @@ module.exports = function (grunt) {
   grunt.registerTask('fixstyle', [
     'closureFixStyle:app'
   ]);
+
+  
 };
