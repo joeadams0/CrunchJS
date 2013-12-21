@@ -80,6 +80,7 @@ grunt jsdoc
 
 Generates the documentation for the project.
 
+For more info on the commands or the dev environment, see [Closure Generator][closure-gen].
 
 ## Release History
 - **v0.0.1**, *Mid Dec 2013*
@@ -99,3 +100,4 @@ Licensed under the [MIT](LICENSE-MIT).
 [Gruntfile]: https://github.com/gruntjs/grunt/wiki/Sample-Gruntfile "Grunt's Gruntfile.js"
 [yeoman]: http://yeoman.io/ "yeoman Modern Workflows for Modern Webapps"
 [bower]:http://twitter.github.com/bower/ "THE BROWSER PACKAGE MANAGER html, css, and javascript"
+[closure-gen]:https://github.com/closureplease/generator-closure
