@@ -1,1 +1,0 @@
-// This file is here because if this dir is empty then building the app throws an error

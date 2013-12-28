@@ -239,7 +239,7 @@ module.exports = function (grunt) {
 
     // clean, uglify and concat aid in building
     clean: {
-      dist: ['temp'],
+      dist: ['temp', 'doc'],
       server: 'temp'
     },
     uglify: {

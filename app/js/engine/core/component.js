@@ -5,12 +5,12 @@
 goog.provide('Engine.Component');
 
 /**
- * This class shows the basic template of a component. Components are designed to only store data. No logic should be performed in them. That is what Systems are for.
+ * This class shows the basic template of a component. Components are added to entities to store state. They are best used to only store data, and to not perform logic. Systems are desgined to perform all logic for components. This distinction makes syncing data much easier.
  * All a component needs is the __identifer property. Warning: DO NOT INSTANTIATE
  * @class The Component Template
  * @example
  * // Create the engine
- * var engine = new Engine();
+ * var engine = new Engine.Core();
  *
  * // Set the __identifier property, so the engine knows what type of component it is
  * var positionComponent = {
@@ -30,7 +30,7 @@ goog.provide('Engine.Component');
  *
  * @example
  * // Create the engine
- * var engine = new Engine();
+ * var engine = new Engine.Core();
  *
  * // Create a Position Component Constructor to create the components for us
  * var PositionComponent = function(x,y){

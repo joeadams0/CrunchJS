@@ -10,7 +10,7 @@ goog.provide('Engine.System');
  * @class The Sytem Template
  * @example
  * // Create the engine
- * var engine = new Engine();
+ * var engine = new Engine.Core();
  *
  * // Create a system
  * var physicsSystem = {
@@ -26,7 +26,7 @@ goog.provide('Engine.System');
 Engine.System = {}
 /**
  * A function to update all entities in the system. Called every simulation frame.
- * @param  {Frame} frame The current frame
+ * @param  {Engine.Core.Frame} frame The current frame
  */
 Engine.System.prototype.update = function(frame) {};
 
