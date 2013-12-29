@@ -3,6 +3,5 @@ dist
 temp
 .sass-cache
 closure-library
-app/jsc
 npm-debug.log
 doc
