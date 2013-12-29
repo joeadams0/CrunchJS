@@ -64,7 +64,7 @@ Engine.SystemManager.prototype.addSystem = function(system) {
  * @param  {String} systemName The identifer of the System
  */
 Engine.SystemManager.prototype.removeSystem = function(systemName) {
-	goog.array.removelf(this.systems, function(system) {
+	goog.array.removeIf(this.systems, function(system) {
 		return system.__identifier == systemName;
 	});
 };
