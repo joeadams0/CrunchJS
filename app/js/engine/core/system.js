@@ -5,7 +5,7 @@
 goog.provide('Engine.System');
 
 /**
- * This class shows the all of the possible properties a system could have. Systems are designed to perform all of the game logic. 
+ * This class shows all of the possible properties a system could have. Systems are designed to perform all of the game logic. 
  * Please note, unlike Java, you can implement as many of these functions as you like. You do not need to implement them all. The only required property is the __identifier property. Warning: DO NOT INSTANTIATE.
  * @class The Sytem Template
  * @example
