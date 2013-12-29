@@ -16,12 +16,14 @@ Engine.EntityManager = function() {
 	/**
 	 * The array of all entities
 	 * @type {Array}
+	 * @protected
 	 */
 	this.entities = [];
 
 	/**
 	 * The array of the keys of the freed entities. Stores the unused spots in the entities array
 	 * @type {Array}
+	 * @protected
 	 */
 	this.entityPool = [];
 };

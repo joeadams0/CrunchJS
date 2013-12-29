@@ -1,6 +1,6 @@
 # Moba
 
-An HTML5 MOBA
+An HTML5 MOBA.
 
 ## Table Of Contents
 
@@ -11,6 +11,7 @@ An HTML5 MOBA
   - [Build the Project](#build-the-project)
   - [Generate Documentation](#generate-documentation)
 * About
+  - [Engine](#engine)
   - [Release History](#release-history)
   - [License](#license)
 
@@ -84,6 +85,8 @@ Generates the documentation for the project. The documentation is taken from ann
 
 For more info on the commands or the dev environment, see [Closure Generator][closure-gen].
 
+## Engine
+The engine is a Entity Component System. For more information, see the article by Adam Martin [here][ecs-article].
 ## Release History
 - **v0.0.1**, *Mid Dec 2013*
   - Big Bang
@@ -103,3 +106,4 @@ Licensed under the [MIT](LICENSE-MIT).
 [yeoman]: http://yeoman.io/ "yeoman Modern Workflows for Modern Webapps"
 [bower]:http://twitter.github.com/bower/ "THE BROWSER PACKAGE MANAGER html, css, and javascript"
 [closure-gen]:https://github.com/closureplease/generator-closure
+[ecs-article]:http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/

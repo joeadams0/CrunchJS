@@ -19,7 +19,17 @@ Moba = function(){
 		webworker : false
 	});
 
-	console.log("Moba was created");
+	var simpleSystem = {
+		update : function(frame) {
+			if(frame.id%5 ==0)
+				console.log("Simple System Update: ", frame.id);
+		},
+
+		__identifier : "simpleSystem"
+
+	};
+
+	this.engine.addSystem(simpleSystem);
 
 	this.engine.run();
 

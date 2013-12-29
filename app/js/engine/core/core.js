@@ -109,6 +109,9 @@ Engine.Core.prototype.pause = function() {
  */
 Engine.Core.prototype.step = function() {
 	var frame = this.frameManager.nextFrame();
+
+	// Update all of the systems
+	this.systemManager.update(frame);
 };
 
 /**
@@ -126,15 +129,17 @@ Engine.Core.prototype.step = function() {
  * 
  */
 Engine.Core.prototype.addSystem = function(system) {
-
+	this.systemManager.addSystem(system);
 };
 
 /** 
  * Removes the system from the world.	
  * @final
- * @param  {string} systemId The system identifier
+ * @param  {string} systemName The system identifier
  */
-Engine.Core.prototype.removeSystem = function(systemId) {};
+Engine.Core.prototype.removeSystem = function(systemName) {
+	this.systemManager.removeSystem(systemName)
+};
 
 /**
  * Creates an entity 
