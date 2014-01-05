@@ -44,6 +44,9 @@ Engine.Core = function(config) {
 		webworker : true
 	};
 
+	if(config == undefined)
+		config = {};
+	
 	// Copy default values if passed in config has empty fields
 	goog.object.forEach(defaultConfigs, function(el, index, object) {
 		if(!goog.object.containsKey(config, index)){

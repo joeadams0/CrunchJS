@@ -2,6 +2,7 @@
 // Generated on 2013-12-18 using generator-closure 0.1.12
 //
 var compiler = require('superstartup-closure-compiler');
+var _ = require('underscore');
 var mountFolder = function (connect, dir) {
   return connect.static(require('path').resolve(dir));
 };
@@ -15,47 +16,91 @@ module.exports = function (grunt) {
   //
   //
   var CONF = {
-    // the base file of your project. The full path will result by concatenating
-    // appPath + bootstrapFile
-    bootstrapFile: 'main.js',
-
-    // The folder that contains all the externs files.
-    externsPath: 'build/externs/',
-
-    // define the main namespace of your app.
-    entryPoint: 'main',
-
     // The path to the closure library
     closureLibrary: process.env.CLOSURE_PATH || 'app/closure-library',
-
+    
     // The path to the closure linter.
     closureLinter: 'app/closure-linter/closure_linter',
 
-    // The path to the installed bower components
-    componentPath: 'app/components',
-
-    // the compiled file
-    destCompiled: 'app/jsc/game.js',
 
     // define the path to the app
     appPath: 'app/js/',
 
-    // The location of the source map
-    sourceMap: 'app/jsc/sourcemap.js.map',
 
-    // This sting will wrap your code marked as %output%
-    // Take care to edit the sourcemap path
-    outputWrapper: '(function(){%output%}).call(this);' +
-      '//@sourceMappingURL=app/jsc/sourcemap.js.map'
+    main : {
+
+      // the base file of your project. The full path will result by concatenating
+      // appPath + bootstrapFile
+      bootstrapFile: 'main.js',
+
+      // The folder that contains all the externs files.
+      externsPath: 'build/externs/main/',
+
+      // define the main namespace of your app.
+      entryPoint: 'main',
+      
+      // The path to the installed bower components
+      componentPath: 'app/components',
+
+      // the compiled file
+      destCompiled: 'app/jsc/game.js',
+
+      // define the path to the app
+      appPath: 'app/js/',
+
+      // The location of the source map
+      sourceMap: 'app/jsc/sourcemap.js.map',
+
+      // This string will wrap your code marked as %output%
+      // Take care to edit the sourcemap path
+      outputWrapper: '(function(){%output%}).call(this);' +
+        '//@sourceMappingURL=app/jsc/sourcemap.js.map'
+    },
+
+    sim : {
+
+      // the base file of your project. The full path will result by concatenating
+      // appPath + bootstrapFile
+      bootstrapFile: '/game/simulation/simulation.js',
+
+      // The folder that contains all the externs files.
+      externsPath: 'build/externs/sim',
+
+      // define the main namespace of your app.
+      entryPoint: 'Simulation',
+      
+      // The path to the installed bower components
+      componentPath: 'app/components',
+
+      // the compiled file
+      destCompiled: 'app/jsc/sim.js',
+
+      // define the path to the app
+      appPath: 'app/js/',
+
+      // The location of the source map
+      sourceMap: 'app/jsc/sourcemap.js.map',
+
+      // This string will wrap your code marked as %output%
+      // Take care to edit the sourcemap path
+      outputWrapper: '(function(){%output%}).call(this);' +
+        '//@sourceMappingURL=app/jsc/sourcemap.js.map'
+
+    },
   };
 
   // the file globbing pattern for vendor file uglification.
-  CONF.vendorFiles = [
+  CONF.main.vendorFiles = [
       // all files JS in vendor folder
-      CONF.appPath + '/vendor/*.js',
+      CONF.main.appPath + '/vendor/main/*.js',
     ];
 
 
+  // the file globbing pattern for vendor file uglification.
+  CONF.sim.vendorFiles = [
+      // all files JS in vendor folder
+      CONF.sim.appPath + '/vendor/sim/*.js',
+    ];
 
   //
   //
@@ -163,21 +208,31 @@ module.exports = function (grunt) {
       options: {
         closureLibraryPath: CONF.closureLibrary
       },
-      app: {
+      main: {
         options: {
           root_with_prefix: [
-            '"' + CONF.appPath + ' ../../../js"',
-            '"' + CONF.componentPath + ' ../../../components"'
+            '"' + CONF.main.appPath + ' ../../../js"',
+            '"' + CONF.main.componentPath + ' ../../../components"'
           ]
         },
-        dest: '' + CONF.appPath + '/deps.js'
+        src : CONF.sim.appPath + '/main.js',
+        dest: '' + CONF.main.appPath + 'deps.js'
+      },
+      sim : {
+        src : [
+          CONF.appPath+'engine/*.js',
+          CONF.appPath+'engine/core/**/*.js',
+          CONF.appPath+'shared/**.js',
+          CONF.appPath+'game/{simulation,systems}/**/*.js'
+        ],
+        dest: '' + CONF.sim.appPath + 'deps-sim.js'
       },
       bddTest: {
         options: {
           root_with_prefix: [
             '"test ../../../../../test"',
-            '"' + CONF.appPath + ' ../../../js"',
-            '"' + CONF.componentPath + ' ../../../components"'
+            '"' + CONF.main.appPath + ' ../../../js"',
+            '"' + CONF.main.componentPath + ' ../../../components"'
           ]
         },
         dest: 'test/bdd/deps-test-bdd.js'
@@ -186,8 +241,8 @@ module.exports = function (grunt) {
         options: {
           root_with_prefix: [
             '"test ../../../../../test"',
-            '"' + CONF.appPath + ' ../../../js"',
-            '"' + CONF.componentPath + ' ../../../components"'
+            '"' + CONF.main.appPath + ' ../../../js"',
+            '"' + CONF.main.componentPath + ' ../../../components"'
           ]
         },
         dest: 'test/unit/deps-test-tdd.js'
@@ -195,13 +250,12 @@ module.exports = function (grunt) {
     },
     closureBuilder: {
       options: {
+        inputs: [CONF.main.appPath + CONF.main.bootstrapFile],
         closureLibraryPath: CONF.closureLibrary,
-        inputs: [CONF.appPath + CONF.bootstrapFile],
         compile: true,
         compilerFile: compiler.getPathSS(),
         compilerOpts: {
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
-          externs: [CONF.externsPath + '*.js'],
           define: [
             '\'goog.DEBUG=false\''
           ],
@@ -209,20 +263,39 @@ module.exports = function (grunt) {
           jscomp_off: ['checkTypes', 'fileoverviewTags'],
           summary_detail_level: 3,
           only_closure_dependencies: null,
-          closure_entry_point: CONF.entryPoint,
-          create_source_map: CONF.sourceMap,
           source_map_format: 'V3',
-          output_wrapper: CONF.outputWrapper
 
         }
       },
-      app: {
-        src: [
-          CONF.appPath,
+      main: {
+        src: [  
+          CONF.main.appPath,
           CONF.closureLibrary,
-          CONF.componentPath
+          CONF.main.componentPath
         ],
-        dest: 'temp/compiled.js'
+        dest: 'temp/compiledMain.js',
+
+        compilerOpts : {
+          closure_entry_point: CONF.main.entryPoint,
+          externs: [CONF.main.externsPath + '*.js'],
+          output_wrapper: CONF.main.outputWrapper,
+          create_source_map: CONF.main.sourceMap,
+        }
+      },
+      sim : {
+        src: [  
+          CONF.sim.appPath,
+          CONF.closureLibrary,
+          CONF.sim.componentPath
+        ],
+        dest: 'temp/compiledSim.js',
+
+        compilerOpts : {
+          closure_entry_point: CONF.sim.entryPoint,
+          externs: [CONF.sim.externsPath + '*.js'],
+          output_wrapper: CONF.sim.outputWrapper,
+          create_source_map: CONF.sim.sourceMap,
+        }
       },
       debug: {
         options: {
@@ -239,20 +312,30 @@ module.exports = function (grunt) {
 
     // clean, uglify and concat aid in building
     clean: {
-      dist: ['temp', 'doc'],
-      server: 'temp'
+      dist: ['temp'],
+      server: 'temp',
+      doc: 'doc'
     },
     uglify: {
-      vendor: {
+      vendorMain: {
         files: {
-          'temp/vendor.js': CONF.vendorFiles
+          'temp/vendorMain.js': CONF.main.vendorFiles
+        }
+      },
+      vendorSim : {
+        files: {
+          'temp/vendorSim.js': CONF.sim.vendorFiles
         }
       }
     },
     concat: {
-      production: {
-        src: ['temp/vendor.js', 'temp/compiled.js'],
-        dest: CONF.destCompiled
+      main: {
+        src: ['temp/vendorMain.js', 'temp/compiledMain.js'],
+        dest: CONF.main.destCompiled
+      },
+      sim: {
+        src: ['temp/vendorSim.js', 'temp/compiledSim.js'],
+        dest: CONF.sim.destCompiled
       }
     },
 
@@ -314,7 +397,6 @@ module.exports = function (grunt) {
   }); // end grunt.initConfig();
 
 
-
   //
   //
   // initConfig END
@@ -346,19 +428,69 @@ module.exports = function (grunt) {
     'mocha'
   ]);
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'uglify:vendor',
-    'closureBuilder:app',
-    'concat:production',
-    'jsdoc'
-  ]);
+  grunt.registerTask('build', function(target){
+    switch(target){
+      // The simulation
+      case 'sim':
+        // Overwrite the default options with new ones for compiling the simulation
+        overwriteCompilerOpts(grunt.config('closureBuilder.sim.compilerOpts'));
+        setBootstrapFile(CONF.sim.bootstrapFile);
 
-  grunt.registerTask('deps', [
-    'closureDepsWriter:app',
-    'closureDepsWriter:bddTest',
-    'closureDepsWriter:unitTest'
-  ]);
+        grunt.task.run([
+          'clean:dist',
+          'uglify:vendorSim',
+          'closureBuilder:sim',
+          'concat:sim',
+        ]);
+        break;
+
+      // Main - main window app
+      case 'main':
+        // Overwrite the default options with new ones for compiling the main window
+        overwriteCompilerOpts(grunt.config('closureBuilder.main.compilerOpts'));
+        setBootstrapFile(CONF.main.bootstrapFile);
+
+        grunt.task.run([
+          'clean:dist',
+          'uglify:vendorMain',
+          'closureBuilder:main',
+          'concat:main',
+        ]);
+        break;
+
+      default:
+        grunt.task.run([
+          'build:sim',
+          'build:main',
+          'clean:doc',
+          'jsdoc'
+        ]);
+        break;
+    }
+    
+  });
+
+  grunt.registerTask('deps', function(target) {
+    switch (target){
+      case 'main':
+        grunt.task.run([
+          'closureDepsWriter:main'
+        ]);
+        break;
+      case 'sim':
+        grunt.task.run([
+          'closureDepsWriter:sim'
+        ]);
+        break;
+
+      default:
+        grunt.task.run([
+          'closureDepsWriter:main',
+          'closureDepsWriter:sim'
+        ]);
+        break;
+    } 
+  });
 
   grunt.registerTask('default', [
     'deps'
@@ -372,5 +504,14 @@ module.exports = function (grunt) {
     'closureFixStyle:app'
   ]);
 
+  function overwriteCompilerOpts (opts) {
+    _.each(opts, function(opt, name) {
+      grunt.config('closureBuilder.options.compilerOpts.'+name, opt);
+    });
+  };
+
+  function setBootstrapFile (file) {
+    grunt.config('closureBuilder.options.inputs', [CONF.appPath+file]);
+  }
   
 };
