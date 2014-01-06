@@ -4,8 +4,9 @@ An HTML5 MOBA.
 
 ## Table Of Contents
 
+* [About](#about)
 * [Getting Started](#getting-started)
-* [Usage](#usage)
+* [Grunt Tasks](#grunt-tasks)
   - [Run the Server](#run-the-server)
   - [Update the Dependancies](#update-the-dependancies)
   - [Build the Project](#build-the-project)
@@ -17,6 +18,17 @@ An HTML5 MOBA.
 
 
 <sup>[↑ Back to TOC](#table-of-contents)</sup>
+
+## About
+
+This project's goal is to build an HTML5 Massive Online Battle Arena. For this project, this team decided This team has researched many existing HTML5 game engines, and found them all lacking in some area or another. The specific goals of this game and game engine are listed below.
+
+1. Use a Component, Entity, System Game Engine Design Pattern. For more info, see [here][ecs-article].
+2. Utilize Web Workers to do the game simulation, allowing for greater frame rate and a better user experience.
+3. Use Peer-to-Peer networking for syncronization. 
+
+
+NOTE: Below we refer to sim and main when running the development tools. sim means that the operation will be run on the Simulation code (inside a webworker), and main means that the operation will be run on the code that runs in the normal window environment.
 
 
 ## Getting Started
@@ -43,7 +55,7 @@ bower install
 
 <sup>[↑ Back to TOC](#table-of-contents)</sup>
 
-## Usage
+## Grunt Tasks
 
 Note: I have only run this on my Mac. I think it should work no problem on linux, but I haven't tested it on Windows.
 
@@ -61,7 +73,23 @@ The server will start and open up the page in your web browser. The page that is
 grunt deps
 ```
 
-Calculates the dependancies for the project. This allows the scripts to load in the correct order. Whenever you add a new file to the file system, you need to calculate the dependancies again using this command.
+Calculates the dependancies for the project. This will run "grunt deps:main" and "grunt deps:sim" for you.
+
+#### Update the Simulation Dependacies
+
+```
+grunt deps:sim
+```
+
+Calculates all of the dependancies for the Simulation and puts them in app/js/deps-sim.js.
+
+#### Update the Main Dependancies
+
+```
+grunt deps:main
+```
+
+Calculates all of the dependancies for the main window and puts them in app/js/deps.js.
 
 ### Build the Project
 
@@ -69,11 +97,27 @@ Calculates the dependancies for the project. This allows the scripts to load in 
 grunt build
 ```
 
-Compiles all of the source files into an optimized, minimized, single script (this also generates the documentation). To run the compiled code:
+Runs "grunt build:sim" and "grunt build:main" (this also generates the documentation). To run the compiled code:
 
 1. Run the build command
 2. Run the server 
 3. Go to the /compile.html page to run the compiled code.
+
+#### Build Simulation
+
+```
+grunt build:sim
+```
+
+Compiles all of the source files for the simultation into an optimized, minimized, single script located at app/jsc/sim.js
+
+#### Build Main
+
+```
+grunt build:main
+```
+
+Compiles all of the source files for the main window into an optimized, minimized, single script located at app/jsc/game.js
 
 ### Generate Documentation
 
