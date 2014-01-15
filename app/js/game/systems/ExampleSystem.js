@@ -14,9 +14,9 @@ ExampleSystem = function() {
 };
 
 ExampleSystem.prototype.update = function(frame) {
-	if(frame.id%5 ==0){
+	//if(frame.id%5 ==0){
 		goog.global.engine.mainChannel.postEvent('message', "Simple System Update: "+frame.id);
-	}
+	//}
 };
 
 ExampleSystem.prototype.__identifier = 'ExampleSystem';

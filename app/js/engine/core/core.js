@@ -73,6 +73,13 @@ Engine.Core = function(config) {
 	this.isSim = false;
 
 	/**
+	 * True if the engine has a simulation
+	 * @type {Boolean}
+	 * @public
+	 */
+	this.hasSim = false;
+
+	/**
 	 * The web worker simulation
 	 * @type {Worker}
 	 */
@@ -144,6 +151,10 @@ Engine.Core = function(config) {
 
 			this.setMainChannel(channel);
 
+			this.mainChannel.addListener(this.Commands.run, goog.bind(this.run, this));
+			this.mainChannel.addListener(this.Commands.pause, goog.bind(this.pause, this));
+			this.mainChannel.addListener(this.Commands.step, goog.bind(this.step, this));
+
 		}
 	}
 	
@@ -171,6 +182,17 @@ Engine.Core = function(config) {
 };
 
 /**
+ * The commands that can be sent to the simulation engine
+ * @enum {string}
+ * @public
+ */
+Engine.Core.prototype.Commands = {
+	run : 'run',
+	pause : 'pause',
+	step : 'step'
+};
+
+/**
  * Runs the engine. After this is called, all Systems will have update called every frame.
  * @final
  * @this {Engine.Core}
@@ -178,6 +200,11 @@ Engine.Core = function(config) {
 Engine.Core.prototype.run = function() {
 	this.isRunning = true;
 	this._clock.start();
+
+	if(this.hasSim){
+		// Tell the simulation to start
+		this.simChannel.postEvent(this.Commands.run);
+	}
 };
 
 /**
@@ -187,7 +214,12 @@ Engine.Core.prototype.run = function() {
  */
 Engine.Core.prototype.pause = function() {
 	this.isRunning = false;
-	this._clock.start();
+	this._clock.stop();
+
+	if(this.hasSim){
+		// Tell the simulation to pause
+		this.simChannel.postEvent(this.Commands.pause);
+	}
 };
 
 /**
@@ -320,6 +352,7 @@ Engine.Core.prototype.setMainChannel = function(channel) {
  */
 Engine.Core.prototype.setSimChannel = function(channel) {
 	this.simChannel = channel;
+	this.hasSim = true;
 };
 
 /**

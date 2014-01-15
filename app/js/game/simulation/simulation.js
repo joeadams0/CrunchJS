@@ -24,8 +24,6 @@ Simulation = function() {
 	// Load the simulation
 	SimulationConfig(this.engine);
 
-
-	this.engine.run();
 };
 
 

@@ -22,8 +22,6 @@ Moba = function(){
 		renderer:{}
 	});
 
-	engine.run();
-
 	if(!COMPILED)
 		simulation = new Worker('/js/game/simulation/simulation-bootstrap.js');
 	else
@@ -37,6 +35,9 @@ Moba = function(){
 	engine.simChannel.addListener('message', function(event) {
 		console.log(event.data.data);
 	});
+
+	
+	engine.run();
 };
 
 var moba = new Moba();
