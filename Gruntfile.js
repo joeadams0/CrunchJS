@@ -221,7 +221,7 @@ module.exports = function (grunt) {
       sim : {
         src : [
           CONF.appPath+'engine/*.js',
-          CONF.appPath+'engine/core/**/*.js',
+          CONF.appPath+'engine/**/*.js',
           CONF.appPath+'shared/**.js',
           CONF.appPath+'game/{simulation,systems}/**/*.js'
         ],

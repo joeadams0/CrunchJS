@@ -34,7 +34,7 @@ Engine.FrameManager = function() {
  * @this {Engine.FrameManager}
  */
 Engine.FrameManager.prototype.nextFrame = function() {
-	var time = new Date().getTime();
+	var time = goog.now();
 
 	var delta = null;
 	if(this.frame != null){	

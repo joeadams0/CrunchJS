@@ -13,11 +13,11 @@ goog.require('Engine.EntityManager');
 goog.require('Engine.FrameManager');
 
 /**
- * Creates a new instance of the Core Engine
+ * Creates a new instance of the Core Engine. Should be a singleton, global access at Engine.engine.
  * @param {(Object|string)=} config The configurations for the engine.
  * @param {Number=} config.fps The frames per second to run at. Usually leave this undefined so that the engine can pick the optimal rate.
- * 
- * @class The Game Engine object
+ * @param {Engine.Renderer} config.renderer The renderer for the engine. If this is left undefined, the engine will become a simulation.
+ * @class The Game Engine Object
  * @constructor
  * @this {Engine.Core}
  *
@@ -26,6 +26,82 @@ goog.require('Engine.FrameManager');
  * var engine = new Engine.Core();
  */
 Engine.Core = function(config) {
+	// Private vars
+
+	/**
+	 * Manages the System
+	 * @type {Engine.SystemManager}
+	 * @private
+	 */
+	this.systemManager = null;
+
+	/**
+	 * Manages the Entities
+	 * @type {Engine.EntityManager}
+	 * @private
+	 */
+	this.entityManager = null;
+
+	/**
+	 * Manages the frames
+	 * @type {Engine.FrameManager}
+	 * @private
+	 */
+	this.frameManager = null;
+	
+	/**
+	 * The clock for the updates
+	 * @type {goog.Timer}
+	 * @private
+	 */
+	this._clock = null;
+
+	// Public vars 
+	
+	/**
+	 * The Engine configs	
+	 * @type {Object}
+	 * @public
+	 */
+	this.config = null;
+
+	/**
+	 * True if the engine is a simulation
+	 * @type {Boolean}
+	 * @public
+	 */
+	this.isSim = false;
+
+	/**
+	 * The web worker simulation
+	 * @type {Worker}
+	 */
+	this.sim = null;
+
+	/**
+	 * Is the engine running
+	 * @type {Boolean}
+	 * @public
+	 */
+	this.isRunning = false;
+
+	/**
+	 * The chanel to the main engine. Null if not in a simulation
+	 * @type {Engine.IChannel}
+	 * @public
+	 */
+	this.mainChannel = null;
+
+	/**
+	 * The channel to communicate to the simulation
+	 * @type {Engine.IChannel	}
+	 */
+	this.simChannel = null;
+
+
+
+
+
 	/**
 	 * The Default Configurations
 	 * @type {Object}
@@ -38,10 +114,11 @@ Engine.Core = function(config) {
 		fps : 60,
 
 		/**
-		 * Whether to use a web worker for the simulation
-		 * @type {Boolean}
+		 * The renderer for the game
+		 * @type {Engine.Renderer}
 		 */
-		webworker : true
+		renderer : null
+
 	};
 
 	if(config == undefined)
@@ -54,34 +131,41 @@ Engine.Core = function(config) {
 		}
 	});
 
-
-	// Manages the Systems
-	this.systemManager = new Engine.SystemManager();
-
-	// Manages the Entities
-	this.entityManager = new Engine.EntityManager();
-
-	// Manages the Frames
-	this.frameManager = new Engine.FrameManager();
-
-	/**
-	 * Is the engine running
-	 * @type {Boolean}
-	 */
-	this.isRunning = false;
+	this.config = config;
 
 	
+	this.isSim = !goog.isDefAndNotNull(this.config.renderer);
 
-	/**
-	 * The clock for the updates
-	 * @type {goog.Timer}
-	 * @private
-	 */
+	// Create the main channel if a sim and if in a webworker
+	if(this.isSim){
+		if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+		    
+			var channel = new Engine.WebWorkerChannel();
+
+			this.setMainChannel(channel);
+
+		}
+	}
+	
+
+	this.systemManager = new Engine.SystemManager();
+	this.entityManager = new Engine.EntityManager();
+	this.frameManager = new Engine.FrameManager();
+
 	this._clock = new goog.Timer(1000/config.fps);
 
 
 	// Step the engine on each tick
 	goog.events.listen(this._clock, goog.Timer.TICK, goog.bind(this.step, this));
+
+
+	goog.provide('Engine.engine');
+	
+	/**
+	 * The instance of the engine
+	 * @type {Engine.Core}
+	 */
+	Engine.engine = this;
 
 	return this;
 };
@@ -220,5 +304,36 @@ Engine.Core.prototype.getComponent = function(entityId, compName) {
  */
 Engine.Core.prototype.getComponents = function(entityId) {
 	return this.entityManager.getComponents(entityId);
+};
+
+/**
+ * Adds a channel to talk to the Main Window
+ * @param {Engine.IChannel} channel The Channel to add
+ */
+Engine.Core.prototype.setMainChannel = function(channel) {
+	this.mainChannel = channel;
+};
+
+/**
+ * Sets the channel to talk to the simulation
+ * @param {Engine.IChannel} channel The chanel 
+ */
+Engine.Core.prototype.setSimChannel = function(channel) {
+	this.simChannel = channel;
+};
+
+/**
+ * Sets the simulation and creates the WebWorkerChannel to communicate to the simulation. Only works if not in a simulation currently.
+ * @param {Worker} sim The WebWorker that the simulation is running in
+ */
+Engine.Core.prototype.setSimulation = function(sim) {
+	if(!this.isSim){
+		this.sim = sim;
+
+		var channel = new Engine.WebWorkerChannel(sim);
+
+		this.setSimChannel(channel);
+	}
+
 };
 

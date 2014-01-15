@@ -15,8 +15,7 @@ ExampleSystem = function() {
 
 ExampleSystem.prototype.update = function(frame) {
 	if(frame.id%5 ==0){
-		goog.global.postMessage("Simple System Update: "+frame.id);
-		console.log('here');
+		goog.global.engine.mainChannel.postEvent('message', "Simple System Update: "+frame.id);
 	}
 };
 

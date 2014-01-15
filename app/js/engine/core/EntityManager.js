@@ -2,14 +2,20 @@
  * @author Joe Adams
  */
 
+/**
+ * @namespace Entity Manager
+ * @name {Engine.EntityManager}
+ */
 goog.provide("Engine.EntityManager");
 
 goog.require('goog.array');
 
 /**
- * Creates a new System Manager. 
+ * Creates a new System Manager.
  * @this {Engine.EntityManager}
  * @constructor
+ *
+ * 
  * @class  Manages all of the Entities for the game (for internal use)
  */
 Engine.EntityManager = function() {
@@ -26,7 +32,10 @@ Engine.EntityManager = function() {
 	 * @protected
 	 */
 	this.entityPool = [];
+
+
 };
+
 
 /**
  * Creates an Entity

@@ -6,6 +6,7 @@ goog.provide('Simulation');
 
 goog.require('Engine');
 goog.require('SimulationConfig');
+goog.require('Engine.WebWorkerChannel');
 
 /**
  * Creates a Simulation object in a web worker.
@@ -14,11 +15,15 @@ goog.require('SimulationConfig');
  * @this {Simulation}
  */
 Simulation = function() {
+
 	// Create the engine
 	this.engine = new Engine.Core();
 
+	goog.global.engine = this.engine;
+
 	// Load the simulation
 	SimulationConfig(this.engine);
+
 
 	this.engine.run();
 };

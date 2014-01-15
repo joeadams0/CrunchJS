@@ -2,8 +2,10 @@
  * @author  Joe Adams
  */
 
+/**
+ * @ignore
+ */
 var CLOSURE_BASE_PATH = '/../../../closure-library/closure/goog/';
-var blah = typeof COMPILED;
 if(typeof COMPILED == "undefined"){
 	var imp = importScripts;
 
