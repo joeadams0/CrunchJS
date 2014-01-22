@@ -28,12 +28,6 @@ Engine.WebWorkerChannel = function(worker) {
 	else
 		this.worker = goog.global;
 
-	/**
-	 * A map of actions to arrays of listeners 
-	 * @type {Object}
-	 * @private
-	 */
-	this._listeners = {};
 
 	var fun = goog.bind(this.onMessage, this);
 
@@ -43,16 +37,17 @@ Engine.WebWorkerChannel = function(worker) {
 goog.inherits(Engine.WebWorkerChannel, Engine.IChannel);
 
 /**
- * Recieves messages and forwards them to the listeners
+ * Recieves messages and fires the event into the engine
  * @param  {Object} event The message event
  */
 Engine.WebWorkerChannel.prototype.onMessage = function(event) {
-	if(goog.isDefAndNotNull(event.data) && goog.isDefAndNotNull(event.data["eventName"]) && event.data["eventName"] in this._listeners)
+	if(goog.isDefAndNotNull(event.data) && goog.isDefAndNotNull(event.data["eventName"]) ){
 		var eventName = event.data["eventName"];
-		goog.array.forEach(this._listeners[eventName], function(el, index, array) {
-			if(goog.isFunction(el))
-				el(event);
-		});
+		// Fire the evetn in the engine
+		console.log("Recieved :",event);
+		Engine.engine.fireEvent(eventName, event.data['data']);
+	}
+		
 };
 
 /**
@@ -63,48 +58,10 @@ Engine.WebWorkerChannel.prototype.onMessage = function(event) {
 Engine.WebWorkerChannel.prototype.postEvent = function(eventName, data) {
 	var newData = {
 		"eventName" : eventName,
-		data : data
+		"data" : data
 	};
 
+	console.log("Posting: ",newData);
+
 	this.worker.postMessage(newData);
-};
-
-/**
- * Listens for an event from the other side of the channel.
- * @param  {string} eventName The name of the event to listen for
- * @param  {Function} fun     The function to call when the event happens
- */
-Engine.WebWorkerChannel.prototype.addListener = function(eventName, fun) {
-	if(!(eventName in this._listeners))
-		this._listeners[eventName] = [];
-
-	this._listeners[eventName].push(fun);
-};
-
-/**
- * Removes a listener for an event.
- * @param  {string} eventName The name of the event
- * @param  {Function} fun       The listener to remove
- */
-Engine.WebWorkerChannel.prototype.removeListener = function(eventName, fun) {
-	if(eventName in this._listeners){
-		goog.array.remove(this._listeners[eventName], fun);
-	}
-};
-
-/**
- * Gets the Listeners for an event.
- * @param  {string} eventName The name of the event
- * @return {Array<Function>}           An array of listeners
- */
-Engine.WebWorkerChannel.prototype.getListeners = function(eventName) {
-	return this._listeners[eventName];
-};
-
-/**
- * Removes all of the listeners for an event
- * @param  {string} eventName The name of the event
- */
-Engine.WebWorkerChannel.prototype.removeAllListeners = function(eventName) {
-	this._listeners[eventName] = [];
 };

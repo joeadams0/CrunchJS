@@ -11,12 +11,12 @@ goog.require('goog.object');
 goog.require('Engine.SystemManager');
 goog.require('Engine.EntityManager');
 goog.require('Engine.FrameManager');
+goog.require('Engine.EventManager');
 
 /**
  * Creates a new instance of the Core Engine. Should be a singleton, global access at Engine.engine.
  * @param {(Object|string)=} config The configurations for the engine.
  * @param {Number=} config.fps The frames per second to run at. Usually leave this undefined so that the engine can pick the optimal rate.
- * @param {Engine.Renderer} config.renderer The renderer for the engine. If this is left undefined, the engine will become a simulation.
  * @class The Game Engine Object
  * @constructor
  * @this {Engine.Core}
@@ -26,6 +26,15 @@ goog.require('Engine.FrameManager');
  * var engine = new Engine.Core();
  */
 Engine.Core = function(config) {
+
+	goog.provide('Engine.engine');
+	
+	/**
+	 * The instance of the engine
+	 * @type {Engine.Core}
+	 */
+	Engine.engine = this;
+
 	// Private vars
 
 	/**
@@ -48,6 +57,19 @@ Engine.Core = function(config) {
 	 * @private
 	 */
 	this.frameManager = null;
+
+	/**
+	 * Manages the events
+	 * @type {Engine.EventManager}
+	 * @private
+	 */
+	this.eventManager = null;
+
+	/**
+	 * The renderer
+	 * @type {Engine.IRenderer}
+	 */
+	this.renderer = null;
 	
 	/**
 	 * The clock for the updates
@@ -70,7 +92,7 @@ Engine.Core = function(config) {
 	 * @type {Boolean}
 	 * @public
 	 */
-	this.isSim = false;
+	this.isSim = true;
 
 	/**
 	 * True if the engine has a simulation
@@ -93,6 +115,13 @@ Engine.Core = function(config) {
 	this.isRunning = false;
 
 	/**
+	 * Is the script running in a webworker
+	 * @type {Boolean}
+	 * @public
+	 */
+	this.isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+	/**
 	 * The chanel to the main engine. Null if not in a simulation
 	 * @type {Engine.IChannel}
 	 * @public
@@ -108,7 +137,6 @@ Engine.Core = function(config) {
 
 
 
-
 	/**
 	 * The Default Configurations
 	 * @type {Object}
@@ -118,13 +146,7 @@ Engine.Core = function(config) {
 		 * The FPS of the Engine
 		 * @type {Number}
 		 */
-		fps : 60,
-
-		/**
-		 * The renderer for the game
-		 * @type {Engine.Renderer}
-		 */
-		renderer : null
+		fps : 60
 
 	};
 
@@ -140,29 +162,6 @@ Engine.Core = function(config) {
 
 	this.config = config;
 
-	
-	this.isSim = !goog.isDefAndNotNull(this.config.renderer);
-
-	// Create the main channel if a sim and if in a webworker
-	if(this.isSim){
-		if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-		    
-			var channel = new Engine.WebWorkerChannel();
-
-			this.setMainChannel(channel);
-
-			this.mainChannel.addListener(this.Commands.run, goog.bind(this.run, this));
-			this.mainChannel.addListener(this.Commands.pause, goog.bind(this.pause, this));
-			this.mainChannel.addListener(this.Commands.step, goog.bind(this.step, this));
-
-		}
-	}
-	
-
-	this.systemManager = new Engine.SystemManager();
-	this.entityManager = new Engine.EntityManager();
-	this.frameManager = new Engine.FrameManager();
-
 	this._clock = new goog.Timer(1000/config.fps);
 
 
@@ -170,13 +169,23 @@ Engine.Core = function(config) {
 	goog.events.listen(this._clock, goog.Timer.TICK, goog.bind(this.step, this));
 
 
-	goog.provide('Engine.engine');
+
+	this.eventManager = new Engine.EventManager();
+	this.systemManager = new Engine.SystemManager();
+	this.entityManager = new Engine.EntityManager();
+	this.frameManager = new Engine.FrameManager();
 	
-	/**
-	 * The instance of the engine
-	 * @type {Engine.Core}
-	 */
-	Engine.engine = this;
+	// Create the main channel if a sim and if in a webworker
+	if(this.isSim && this.isWebWorker){
+	    
+		var channel = new Engine.WebWorkerChannel();
+
+		this.setMainChannel(channel);
+
+		this.addListener(this.Commands.run, goog.bind(this.run, this));
+		this.addListener(this.Commands.pause, goog.bind(this.pause, this));
+		this.addListener(this.Commands.step, goog.bind(this.step, this));
+	}
 
 	return this;
 };
@@ -187,9 +196,9 @@ Engine.Core = function(config) {
  * @public
  */
 Engine.Core.prototype.Commands = {
-	run : 'run',
-	pause : 'pause',
-	step : 'step'
+	run : 'engine_run',
+	pause : 'engine_pause',
+	step : 'engine_step'
 };
 
 /**
@@ -231,6 +240,10 @@ Engine.Core.prototype.step = function() {
 
 	// Update all of the systems
 	this.systemManager.update(frame);
+
+	this.entityManager.update(frame);
+
+	this.frameManager.frameOver();
 };
 
 /**
@@ -338,6 +351,10 @@ Engine.Core.prototype.getComponents = function(entityId) {
 	return this.entityManager.getComponents(entityId);
 };
 
+Engine.Core.prototype.findEntities = function(compName) {
+	return this.entityManager.findEntities(compName);
+};
+
 /**
  * Adds a channel to talk to the Main Window
  * @param {Engine.IChannel} channel The Channel to add
@@ -356,17 +373,59 @@ Engine.Core.prototype.setSimChannel = function(channel) {
 };
 
 /**
- * Sets the simulation and creates the WebWorkerChannel to communicate to the simulation. Only works if not in a simulation currently.
+ * Sets the simulation and creates the WebWorkerChannel to communicate to the simulation.
  * @param {Worker} sim The WebWorker that the simulation is running in
  */
 Engine.Core.prototype.setSimulation = function(sim) {
-	if(!this.isSim){
-		this.sim = sim;
+	this.sim = sim;
 
-		var channel = new Engine.WebWorkerChannel(sim);
+	var channel = new Engine.WebWorkerChannel(sim);
 
-		this.setSimChannel(channel);
-	}
+	this.setSimChannel(channel);
 
 };
+
+/**
+ * Add a listener for an event
+ * @param {String} eventName The name of the event
+ * @param {Function} fun       The function to call when the event is heard
+ */
+Engine.Core.prototype.addListener = function(eventName, fun) {
+	this.eventManager.addListener(eventName, fun);
+};
+
+/**
+ * Removes a listener from an event
+ * @param  {String} eventName The name of the event
+ * @param  {Function} fun       The function to remove
+ */
+Engine.Core.prototype.removeListener = function(eventName, fun) {
+	this.eventManager.removeListener(eventName, fun);
+};
+
+/**
+ * Returns an array of listeners for the event
+ * @param  {String} eventName The name of the event
+ * @return {Array<Function>}           The array of listeners
+ */
+Engine.Core.prototype.getListeners = function(eventName) {
+	return this.eventManager.getListeners(eventName);
+};
+
+/**
+ * Removes all the listeners from an event
+ * @param  {String} eventName The name of the event */
+Engine.Core.prototype.removeAllListeners = function(eventName){
+	this.eventManager.removeAllListeners(eventName);
+}
+
+/**
+ * Fires an event
+ * @param  {String} eventName The name of the event to fire
+ * @param  {Object} eventData The event object
+ */
+Engine.Core.prototype.fireEvent = function(eventName, eventData) {
+	this.eventManager.fireEvent(eventName, eventData);
+};
+
 

@@ -223,7 +223,8 @@ module.exports = function (grunt) {
           CONF.appPath+'engine/*.js',
           CONF.appPath+'engine/**/*.js',
           CONF.appPath+'shared/**.js',
-          CONF.appPath+'game/{simulation,systems}/**/*.js'
+          CONF.appPath+'game/**/*.js',
+          '!'+ CONF.appPath+'game/systems/render/**/*.js'
         ],
         dest: '' + CONF.sim.appPath + 'deps-sim.js'
       },

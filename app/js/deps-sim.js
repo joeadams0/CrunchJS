@@ -3,14 +3,16 @@
 goog.addDependency('app/js/engine/channels/ichannel.js', ['Engine.IChannel'], []);
 goog.addDependency('app/js/engine/channels/webworker-channel.js', ['Engine.WebWorkerChannel'], ['Engine.IChannel', 'goog.array']);
 goog.addDependency('app/js/engine/core/Component.js', ['Engine.Component'], []);
-goog.addDependency('app/js/engine/core/Core.js', ['Engine.Core', 'Engine.engine'], ['Engine.EntityManager', 'Engine.FrameManager', 'Engine.SystemManager', 'goog.Timer', 'goog.events', 'goog.object']);
 goog.addDependency('app/js/engine/core/EntityManager.js', ['Engine.EntityManager'], ['goog.array']);
+goog.addDependency('app/js/engine/core/EventManager.js', ['Engine.EventManager'], ['goog.array']);
 goog.addDependency('app/js/engine/core/Frame.js', ['Engine.Frame'], []);
 goog.addDependency('app/js/engine/core/FrameManager.js', ['Engine.FrameManager'], ['Engine.Frame']);
 goog.addDependency('app/js/engine/core/System.js', ['Engine.System'], []);
 goog.addDependency('app/js/engine/core/SystemManager.js', ['Engine.SystemManager'], ['goog.array']);
+goog.addDependency('app/js/engine/core/core.js', ['Engine.Core', 'Engine.engine'], ['Engine.EntityManager', 'Engine.EventManager', 'Engine.FrameManager', 'Engine.SystemManager', 'goog.Timer', 'goog.events', 'goog.object']);
 goog.addDependency('app/js/engine/core/engine.js', ['Engine'], ['Engine.Core']);
+goog.addDependency('app/js/game/core/core.js', ['Moba', 'Moba.Core'], ['Engine', 'Engine.WebWorkerChannel', 'Moba.SimpleRenderer']);
 goog.addDependency('app/js/game/simulation/simulation-bootstrap.js', ['SimulationBootstrap'], ['Simulation']);
 goog.addDependency('app/js/game/simulation/simulation.js', ['Simulation'], ['Engine', 'Engine.WebWorkerChannel', 'SimulationConfig']);
-goog.addDependency('app/js/game/systems/ExampleSystem.js', ['ExampleSystem'], []);
+goog.addDependency('app/js/game/systems/example/ExampleSystem.js', ['ExampleSystem'], []);
 goog.addDependency('app/js/shared/simulation-config.js', ['SimulationConfig'], ['ExampleSystem']);

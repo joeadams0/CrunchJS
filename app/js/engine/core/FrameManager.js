@@ -29,6 +29,14 @@ Engine.FrameManager = function() {
 };
 
 /**
+ * Updates the endTime of the current frame
+ */
+Engine.FrameManager.prototype.frameOver = function() {
+	var time = goog.now();
+	this.frame.endTime = time;
+};
+
+/**
  * Creates a new frame
  * @return {Engine.Frame} The new Frame
  * @this {Engine.FrameManager}
@@ -38,7 +46,6 @@ Engine.FrameManager.prototype.nextFrame = function() {
 
 	var delta = null;
 	if(this.frame != null){	
-		this.frame.endTime = time;
 		delta = time - this.frame.startTime;
 	}
 

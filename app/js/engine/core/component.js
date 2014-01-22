@@ -6,7 +6,7 @@ goog.provide('Engine.Component');
 
 /**
  * This class shows the basic template of a component. Components are added to entities to store state. They are best used to only store data, and to not perform logic. Systems are desgined to perform all logic for components. This distinction makes syncing data much easier.
- * All a component needs is the __identifer property. Warning: DO NOT INSTANTIATE
+ * All a component needs is the __identifer property, and all components will be given a _entity field which will be the entity that contains it. Warning: DO NOT INSTANTIATE
  * @class The Component Template
  * @example
  * // Create the engine

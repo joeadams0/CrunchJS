@@ -2,9 +2,11 @@
  * @author Joe Adams
  */
 goog.provide('Moba');
+goog.provide('Moba.Core');
 
 goog.require('Engine')
 goog.require('Engine.WebWorkerChannel');
+goog.require('Moba.SimpleRenderer');
 
 /**
  * The Game Object
@@ -12,7 +14,7 @@ goog.require('Engine.WebWorkerChannel');
  * @constructor
  * @this {Moba}
  */
-Moba = function(){
+Moba.Core = function(){
 	var simulation, 
 		engine;
 
@@ -32,12 +34,22 @@ Moba = function(){
 
 	this.sim = simulation;
 
-	engine.simChannel.addListener('message', function(event) {
-		console.log(event.data.data);
+	engine.addListener('message', function(event) {
+		console.log(event);
 	});
 
+	engine.addSystem(new Moba.SimpleRenderer());
 	
 	engine.run();
+
+	var entity = engine.createEntity();
+
+	engine.addComponent(entity, {
+		
+		'__identifier' : 'renderable',
+
+		'count' : 0
+	});
 };
 
-var moba = new Moba();
+var moba = new Moba.Core();

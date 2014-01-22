@@ -34,6 +34,47 @@ Engine.EntityManager = function() {
 	this.entityPool = [];
 
 
+	// Set up the listener for the sync 
+	Engine.engine.addListener(this.Events.sync, goog.bind(this.incomingSync, this));
+
+};
+
+/**
+ * Syncs data with main window or sim if applicable
+ * @param  {Engine.Frame} frame The current frame
+ */
+Engine.EntityManager.prototype.update = function(frame) {
+	var channel = null;
+	// If we are in the simulation engine
+	if(Engine.engine.isSim && Engine.engine.isWebWorker){
+		// Send data to the main window
+		channel = Engine.engine.mainChannel;
+	}
+	// If it is in the main window and we have a sim
+	else if(Engine.engine.hasSim){
+		// Send it to the sim
+		channel = Engine.engine.simChannel
+	}
+
+	if(channel != null)
+		channel.postEvent(this.Events.sync, this.entities);
+
+};
+
+/**
+ * Syncs the incoming data with its own data
+ * @param  {Array} entities The entities to sync
+ */
+Engine.EntityManager.prototype.incomingSync = function(entities) {
+	this.entities = entities;
+};
+
+/**
+ * The Events for talking back and forth with the other entity manager
+ * @type {Object}
+ */
+Engine.EntityManager.prototype.Events = {
+	sync : "entity_manager_sync"
 };
 
 
@@ -47,17 +88,23 @@ Engine.EntityManager.prototype.createEntity = function() {
 	 * The id of the new entity
 	 * @type {Number}
 	 */
-	var id = -1;
+	var id = -1,
+		entity = [];
 
 	// Checks if we have unused spots in the entities array. If we do, use them
-	if(this.entityPool.length > 0)
+	if(this.entityPool.length > 0){
 		id = this.entityPool.pop();
+	}
 
 	// If no free spots, add an entity to the array
 	else{
 		this.entities.push([]);
 		id = this.entities.length - 1;
 	}
+
+	entity['_id'] = id;
+	this.entities[id] = entity;
+
 	return id;
 };
 
@@ -77,14 +124,14 @@ Engine.EntityManager.prototype.destroyEntity = function(id) {
  * @return {Array}           An array of Entity Ids
  */
 Engine.EntityManager.prototype.findEntities = function(compName) {
-	var ents = [],
-		// A function that returns true if the Entity has the component specified
-		entSearcher = this.entitySearchGen(compName);
+	if(compName === undefined)
+		return this.entities;
 
-	goog.array.forEach(this.entities, function(entity, index) {
+	// A function that returns true if the Entity has the component specified
+	var entSearcher = this.entitySearchGen(compName);
 
-		if(entSearcher(entity))
-			goog.array.insert(ents, index);
+	var ents = goog.array.filter(this.entities, function(entity, index) {
+		return entSearcher(entity);
 	});
 
 	return ents;
