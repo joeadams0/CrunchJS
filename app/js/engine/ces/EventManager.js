@@ -2,17 +2,19 @@
  * @author Joe Adams
  */
 
-goog.provide('Engine.EventManager');
+goog.provide('CrunchJS.EventManager');
 
 goog.require('goog.array');
-
+goog.require('CrunchJS.Manager')
 
 /**
  * Creates an Event Manager object
  * @constructor
  * @class The Event Manager Object
+ * @extends {CrunchJS.Manager}
  */
-Engine.EventManager = function() {
+CrunchJS.EventManager = function(scene) {
+	goog.base(this, scene);
 	/**
 	 * A map of actions to arrays of listeners 
 	 * @type {Object}
@@ -21,7 +23,14 @@ Engine.EventManager = function() {
 	this._listeners = {};
 };
 
-Engine.EventManager.prototype.fireEvent = function(eventName, eventData) {
+goog.inherits(CrunchJS.EventManager, CrunchJS.Manager);
+
+/**
+ * Fires an event to the scene
+ * @param  {String} eventName The name of the event
+ * @param  {Object} eventData The event data
+ */
+CrunchJS.EventManager.prototype.fireEvent = function(eventName, eventData) {
 	if(goog.isDefAndNotNull(eventName) && goog.isDefAndNotNull(this._listeners[eventName])){
 		goog.array.forEach(this._listeners[eventName], function(el, index, array) {
 			if(goog.isFunction(el))
@@ -35,7 +44,7 @@ Engine.EventManager.prototype.fireEvent = function(eventName, eventData) {
  * @param  {string} eventName The name of the event to listen for
  * @param  {Function} fun     The function to call when the event happens
  */
-Engine.EventManager.prototype.addListener = function(eventName, fun) {
+CrunchJS.EventManager.prototype.addListener = function(eventName, fun) {
 	if(!(eventName in this._listeners))
 		this._listeners[eventName] = [];
 
@@ -47,7 +56,7 @@ Engine.EventManager.prototype.addListener = function(eventName, fun) {
  * @param  {string} eventName The name of the event
  * @param  {Function} fun       The listener to remove
  */
-Engine.EventManager.prototype.removeListener = function(eventName, fun) {
+CrunchJS.EventManager.prototype.removeListener = function(eventName, fun) {
 	if(eventName in this._listeners){
 		goog.array.remove(this._listeners[eventName], fun);
 	}
@@ -58,7 +67,7 @@ Engine.EventManager.prototype.removeListener = function(eventName, fun) {
  * @param  {string} eventName The name of the event
  * @return {Array<Function>}           An array of listeners
  */
-Engine.EventManager.prototype.getListeners = function(eventName) {
+CrunchJS.EventManager.prototype.getListeners = function(eventName) {
 	return this._listeners[eventName];
 };
 
@@ -66,6 +75,6 @@ Engine.EventManager.prototype.getListeners = function(eventName) {
  * Removes all of the listeners for an event
  * @param  {string} eventName The name of the event
  */
-Engine.EventManager.prototype.removeAllListeners = function(eventName) {
+CrunchJS.EventManager.prototype.removeAllListeners = function(eventName) {
 	this._listeners[eventName] = [];
 };

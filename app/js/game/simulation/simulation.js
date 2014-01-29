@@ -4,9 +4,9 @@
 
 goog.provide('Simulation');
 
-goog.require('Engine');
+goog.require('CrunchJS');
 goog.require('SimulationConfig');
-goog.require('Engine.WebWorkerChannel');
+goog.require('CrunchJS.WebWorkerChannel');
 
 /**
  * Creates a Simulation object in a web worker.
@@ -16,13 +16,13 @@ goog.require('Engine.WebWorkerChannel');
  */
 Simulation = function() {
 
-	// Create the engine
-	this.engine = new Engine.Core();
+	// Create the world
+	this.world = new CrunchJS.World();
 
-	goog.global.engine = this.engine;
+	goog.global.world = this.world;
 
 	// Load the simulation
-	SimulationConfig(this.engine);
+	SimulationConfig(this.world);
 
 };
 

@@ -4,9 +4,12 @@
 goog.provide('Moba');
 goog.provide('Moba.Core');
 
-goog.require('Engine')
-goog.require('Engine.WebWorkerChannel');
-goog.require('Moba.SimpleRenderer');
+goog.require('CrunchJS');
+goog.require('Moba.ExampleScene');
+goog.require('Moba.ExampleSystem');
+goog.require('Moba.ExampleSystem1');
+goog.require('Moba.ExampleComp');
+goog.require('Moba.ExampleComp1');
 
 /**
  * The Game Object
@@ -16,40 +19,38 @@ goog.require('Moba.SimpleRenderer');
  */
 Moba.Core = function(){
 	var simulation, 
-		engine;
+		world;
 
 
 
-	engine = new Engine.Core({
-		renderer:{}
+	world = new CrunchJS.World();
+
+	var scene = new Moba.ExampleScene();
+
+	scene.addListener('engine_started', function(data) {
+		console.log("Holy crap it works");
 	});
 
-	if(!COMPILED)
-		simulation = new Worker('/js/game/simulation/simulation-bootstrap.js');
-	else
-		simulation = new Worker('/jsc/sim.js');
+	world.addScene(scene);
 
+	var sys1 = new Moba.ExampleSystem1();
 
-	engine.setSimulation(simulation);
+	var sys = new Moba.ExampleSystem();
 
-	this.sim = simulation;
+	scene.addSystem(sys1);
+	scene.addSystem(sys);
 
-	engine.addListener('message', function(event) {
-		console.log(event);
-	});
+	var entity = scene.createEntity();
 
-	engine.addSystem(new Moba.SimpleRenderer());
-	
-	engine.run();
+	var excomp = new Moba.ExampleComp();
 
-	var entity = engine.createEntity();
+	var excomp1 = new Moba.ExampleComp1();
 
-	engine.addComponent(entity, {
-		
-		'__identifier' : 'renderable',
+	scene.addComponent(entity, excomp);
+	scene.addComponent(entity, excomp1);
 
-		'count' : 0
-	});
+	world.run();
+
 };
 
 var moba = new Moba.Core();

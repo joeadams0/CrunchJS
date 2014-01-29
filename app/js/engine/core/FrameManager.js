@@ -2,17 +2,17 @@
  * @author Joe Adams
  */
 
-goog.provide('Engine.FrameManager');
+goog.provide('CrunchJS.FrameManager');
 
-goog.require('Engine.Frame');
+goog.require('CrunchJS.Frame');
 
 /**
  * Creates a new Frame Manager
  * @constructor
- * @class Manages the Frames for the Engine (for internal use)
- * @this {Engine.FrameManager}
+ * @class Manages the Frames for the CrunchJS (for internal use)
+ * @this {CrunchJS.FrameManager}
  */
-Engine.FrameManager = function() {
+CrunchJS.FrameManager = function() {
 
 	/**
 	 * The Next Id of the frame
@@ -22,7 +22,7 @@ Engine.FrameManager = function() {
 
 	/**
 	 * The current frame
-	 * @type {Engine.Frame}
+	 * @type {CrunchJS.Frame}
 	 */
 	this.frame = null;
 
@@ -31,17 +31,17 @@ Engine.FrameManager = function() {
 /**
  * Updates the endTime of the current frame
  */
-Engine.FrameManager.prototype.frameOver = function() {
+CrunchJS.FrameManager.prototype.frameOver = function() {
 	var time = goog.now();
 	this.frame.endTime = time;
 };
 
 /**
  * Creates a new frame
- * @return {Engine.Frame} The new Frame
- * @this {Engine.FrameManager}
+ * @return {CrunchJS.Frame} The new Frame
+ * @this {CrunchJS.FrameManager}
  */
-Engine.FrameManager.prototype.nextFrame = function() {
+CrunchJS.FrameManager.prototype.nextFrame = function() {
 	var time = goog.now();
 
 	var delta = null;
@@ -49,7 +49,7 @@ Engine.FrameManager.prototype.nextFrame = function() {
 		delta = time - this.frame.startTime;
 	}
 
-	this.frame = new Engine.Frame(this.nextId, time, null, delta);
+	this.frame = new CrunchJS.Frame(this.nextId, time, null, delta);
 
 	this.nextId++;
 	return this.frame;

@@ -4,14 +4,14 @@
 
 goog.provide('SimulationConfig');
 
-goog.require('ExampleSystem');
+goog.require('Moba.ExampleSystem');
 
 /**
  * Loads up all Systems for the Simulation
  * @param {Engine.Core} engine The current engine
  */
 SimulationConfig = function(engine) {
-	var exampleSystem = new ExampleSystem();
+	//var exampleSystem = ExampleSystem();
 
-	engine.addSystem(exampleSystem);
+	//engine.addSystem(exampleSystem);
 };

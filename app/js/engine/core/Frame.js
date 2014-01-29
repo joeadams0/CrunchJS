@@ -2,7 +2,7 @@
  * @author Joe Adams
  */
 
-goog.provide('Engine.Frame');
+goog.provide('CrunchJS.Frame');
 
 
 /**
@@ -10,7 +10,7 @@ goog.provide('Engine.Frame');
  * @constructor
  * @struct
  */
-Engine.Frame = function(id, startTime, endTime, delta) {
+CrunchJS.Frame = function(id, startTime, endTime, delta) {
 	/**
 	 * Unique Frame Id
 	 * @type {Number|String}

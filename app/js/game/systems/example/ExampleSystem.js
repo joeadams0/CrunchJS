@@ -2,30 +2,25 @@
  * @author Joe Adams
  */
 
-goog.provide('ExampleSystem');
+goog.provide('Moba.ExampleSystem');
+
+goog.require('CrunchJS.System');
 
 /**
- * Constructs the Example System
+ * Creates an example system
+ * @extends {CrunchJS.System}
  * @constructor
- * @class A Simple Example System
+ * @class An Example System
  */
-ExampleSystem = function() {
-
+Moba.ExampleSystem = function() {
+	goog.base(this);
 };
 
-ExampleSystem.prototype.update = function(frame) {
-	var engine = Engine.engine;
-	var ents = engine.findEntities('renderable');
-	if(frame.id%5 ==0){
-		//throw JSON.stringify("Ents: "+ents);
+goog.inherits(Moba.ExampleSystem, CrunchJS.System);
 
-		engine.mainChannel.postEvent('message', "Simple System Update: "+frame.id+", Entity Count: "+ents.length);
+Moba.ExampleSystem.prototype.name = 'ExampleSystem';
 
-		if(ents.length>0){
-			var comp = engine.getComponent(ents[0]._id, 'renderable');
-			comp.count++;
-		}
-	}
+Moba.ExampleSystem.prototype.activate = function() {
+	goog.base(this, 'activate');
+	this.setEntityComposition(this.getScene().createEntityComposition().one('ExampleComp', 'ExampleComp1').exclude('ExampleComp'));
 };
-
-ExampleSystem.prototype.__identifier = 'ExampleSystem';

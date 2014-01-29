@@ -114,10 +114,17 @@ module.exports = function (grunt) {
   grunt.initConfig({
 
     jsdoc : {
-        dist : {
-            src: ['app/js/game/*', 'app/js/engine/*'], 
+        engine : {
+            src: ['app/js/engine/*'], 
             options: {
-                destination: 'doc',
+                destination: 'doc/engine',
+                configure:"./jsdocConf.json"
+            }
+        },
+        game : {
+            src: ['app/js/game/*', 'app/js/shared/*'], 
+            options: {
+                destination: 'doc/game',
                 configure:"./jsdocConf.json"
             }
         }

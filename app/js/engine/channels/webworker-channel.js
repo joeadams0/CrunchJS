@@ -3,9 +3,9 @@
  */
 
 
-goog.provide('Engine.WebWorkerChannel');
+goog.provide('CrunchJS.WebWorkerChannel');
 
-goog.require('Engine.IChannel');
+goog.require('CrunchJS.IChannel');
 goog.require('goog.array');
 
 /**
@@ -16,7 +16,7 @@ goog.require('goog.array');
  * @class Communicates between Web Workers and Main windows
  * @implements {IChannel}
  */
-Engine.WebWorkerChannel = function(worker) {
+CrunchJS.WebWorkerChannel = function(worker) {
 	/**
 	 * The Worker to listen for messages from. All the worker needs are postmessage and onmessage functions.
 	 * @type {Worker}
@@ -34,18 +34,18 @@ Engine.WebWorkerChannel = function(worker) {
 	this.worker.onmessage = fun;
 };
 
-goog.inherits(Engine.WebWorkerChannel, Engine.IChannel);
+goog.inherits(CrunchJS.WebWorkerChannel, CrunchJS.IChannel);
 
 /**
  * Recieves messages and fires the event into the engine
  * @param  {Object} event The message event
  */
-Engine.WebWorkerChannel.prototype.onMessage = function(event) {
+CrunchJS.WebWorkerChannel.prototype.onMessage = function(event) {
 	if(goog.isDefAndNotNull(event.data) && goog.isDefAndNotNull(event.data["eventName"]) ){
 		var eventName = event.data["eventName"];
 		// Fire the evetn in the engine
 		console.log("Recieved :",event);
-		Engine.engine.fireEvent(eventName, event.data['data']);
+		CrunchJS.world.fireEvent(eventName, event.data['data']);
 	}
 		
 };
@@ -55,7 +55,7 @@ Engine.WebWorkerChannel.prototype.onMessage = function(event) {
  * @param  {string} eventName The Event name
  * @param  {Object} data   The data to pass
  */
-Engine.WebWorkerChannel.prototype.postEvent = function(eventName, data) {
+CrunchJS.WebWorkerChannel.prototype.postEvent = function(eventName, data) {
 	var newData = {
 		"eventName" : eventName,
 		"data" : data
