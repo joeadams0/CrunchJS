@@ -6,7 +6,7 @@ goog.provide('Simulation');
 
 goog.require('CrunchJS');
 goog.require('SimulationConfig');
-goog.require('CrunchJS.WebWorkerChannel');
+goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
 /**
  * Creates a Simulation object in a web worker.

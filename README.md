@@ -27,6 +27,8 @@ This project's goal is to build an HTML5 Massive Online Battle Arena. For this p
 2. Utilize Web Workers to do the game simulation, allowing for greater frame rate and a better user experience.
 3. Use Peer-to-Peer networking for syncronization. 
 
+See documentation [here][doc].
+
 
 NOTE: Below we refer to sim and main when running the development tools. sim means that the operation will be run on the Simulation code (inside a webworker), and main means that the operation will be run on the code that runs in the normal window environment.
 
@@ -151,3 +153,4 @@ Licensed under the [MIT](LICENSE-MIT).
 [bower]:http://twitter.github.com/bower/ "THE BROWSER PACKAGE MANAGER html, css, and javascript"
 [closure-gen]:https://github.com/closureplease/generator-closure
 [ecs-article]:http://t-machine.org/index.php/2007/09/03/entity-systems-are-the-future-of-mmog-development-part-1/
+[doc]:http://jadmz.github.io/CrunchJS

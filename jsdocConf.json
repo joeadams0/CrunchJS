@@ -1,5 +1,9 @@
 {
+	"source":{
+		"include":["./README.md"]
+	},
 	"opts":{
-		"recurse":true
+		"recurse":true,
+		"template":"./docstrap-master/template"
 	}
 }

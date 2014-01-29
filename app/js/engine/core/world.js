@@ -1,5 +1,7 @@
 /**
  * @author Joe Adams
+ * @namespace CrunchJS
+ * @description  This is the main namespace for CrunchJS. All of these classes are a part of the core engine functionality.
  */
 goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
@@ -10,9 +12,9 @@ goog.require('goog.Timer');
 goog.require('goog.events');
 goog.require('goog.object');
 
-goog.require('CrunchJS.SceneManager');
-goog.require('CrunchJS.FrameManager');
-goog.require('CrunchJS.WebWorkerChannel');
+goog.require('CrunchJS.Internal.SceneManager');
+goog.require('CrunchJS.Internal.FrameManager');
+goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
 /**
  * Global debug flag
@@ -37,16 +39,19 @@ CrunchJS.Events = {
 };
 
 /**
- * Creates a new instance of the World CrunchJS. Should be a singleton, global access at CrunchJS.world.
+ * @description This is the main object for the CrunchJS Engine. It can be thought of as a collection of scenes, with each scene will have its 
+ * own data and entities. Scenes can be added, removed, and transitioned between. This creates a new instance of the World CrunchJS
+ * and should be a singleton. Global access at CrunchJS.world.
  * @param {(Object|string)=} config The configurations for the engine.
  * @param {Number=} config.fps The frames per second to run at. Usually leave this undefined so that the engine can pick the optimal rate.
- * @class The Game CrunchJS Object
+ * @class 
  * @constructor
- * @this {CrunchJS.World}
  *
  * @example
  * // Create a world that uses a webworker for the simulation
  * var world = new CrunchJS.World();
+ *
+ * // Then create scenes and add them to the world
  */
 CrunchJS.World = function(config) {
 
@@ -83,18 +88,18 @@ CrunchJS.World = function(config) {
 
 	/**
 	 * Manages the Scenes for the Game
-	 * @type {CrunchJS.SceneManager}
+	 * @type {CrunchJS.Internal.SceneManager}
 	 * @private
 	 */
-	this._sceneManager = new CrunchJS.SceneManager();
+	this._sceneManager = new CrunchJS.Internal.SceneManager();
 
 
 	/**
 	 * Manages the Frames for the game
-	 * @type {CrunchJS.FrameManager}
+	 * @type {CrunchJS.Internal.FrameManager}
 	 * @private
 	 */
-	this._frameManager = new CrunchJS.FrameManager();
+	this._frameManager = new CrunchJS.Internal.FrameManager();
 
 
 	// Public vars 
@@ -155,7 +160,7 @@ CrunchJS.World = function(config) {
 	// Create the main channel if a sim and if in a webworker
 	if(this.isSim() && this.isWebWorker){
 	    
-		var channel = new CrunchJS.WebWorkerChannel();
+		var channel = new CrunchJS.Network.Channel.WebWorkerChannel();
 
 		this.setMainChannel(channel);
 

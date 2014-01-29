@@ -323,7 +323,7 @@ module.exports = function (grunt) {
     clean: {
       dist: ['temp'],
       server: 'temp',
-      doc: 'doc'
+      doc: 'doc/**/*.html'
     },
     uglify: {
       vendorMain: {

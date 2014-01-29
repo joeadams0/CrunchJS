@@ -5,11 +5,11 @@
 
 goog.provide('CrunchJS.Scene');
 
-goog.require('CrunchJS.SystemManager');
-goog.require('CrunchJS.EntityManager');
-goog.require('CrunchJS.ComponentManager');
-goog.require('CrunchJS.EventManager');
-goog.require('CrunchJS.WebWorkerChannel');
+goog.require('CrunchJS.Internal.SystemManager');
+goog.require('CrunchJS.Internal.EntityManager');
+goog.require('CrunchJS.Internal.ComponentManager');
+goog.require('CrunchJS.Internal.EventManager');
+goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
 /**
  * Constructs a new Scene. This class is meant to be extended so that you can override 
@@ -60,31 +60,31 @@ CrunchJS.Scene = function() {
 
 	/**
 	 * The EventManager for the scene
-	 * @type {CrunchJS.EventManager}
+	 * @type {CrunchJS.Internal.EventManager}
 	 * @protected
 	 */
-	this._eventManager = new CrunchJS.EventManager(this);
+	this._eventManager = new CrunchJS.Internal.EventManager(this);
 
 	/**
 	 * The SystemManager for the scene
-	 * @type {CrunchJS.SystemManager}
+	 * @type {CrunchJS.Internal.SystemManager}
 	 * @protected
 	 */
-	this._systemManager = new CrunchJS.SystemManager(this);
+	this._systemManager = new CrunchJS.Internal.SystemManager(this);
 
 	/**
 	 * The EntityManager for the scene
-	 * @type {CrunchJS.EntityManager}
+	 * @type {CrunchJS.Internal.EntityManager}
 	 * @protected
 	 */
-	this._entityManager = new CrunchJS.EntityManager(this);
+	this._entityManager = new CrunchJS.Internal.EntityManager(this);
 
 	/**
 	 * The ComponentManager for the scene
-	 * @type {CrunchJS.ComponentManager}
+	 * @type {CrunchJS.Internal.ComponentManager}
 	 * @protected
 	 */
-	this._componentManager = new CrunchJS.ComponentManager(this);
+	this._componentManager = new CrunchJS.Internal.ComponentManager(this);
 
 	/**
 	 * The channel to communicate to the simulation
@@ -149,7 +149,7 @@ CrunchJS.Scene.prototype.process = function(frame) {
 
 /**
  * Adds a system to the scene. The order that systems are added to the engine is the order the will be updated in.
- * @param {CrunchJS.System} system The System to add to the CrunchJS
+ * @param {CrunchJS.Internal.System} system The System to add to the CrunchJS
  * @final
  * 
  */
@@ -189,7 +189,7 @@ CrunchJS.Scene.prototype.destroyEntity = function(entityId) {
 /**
  * Checks if an entity matches an entity composition
  * @param  {number} entityId The entity id
- * @param  {CrunchJS.EntityComposition} entComp  The entity composition
+ * @param  {CrunchJS.Internal.EntityComposition} entComp  The entity composition
  * @return {Boolean}          True if it matches the composition
  */
 CrunchJS.Scene.prototype.matchesComposition = function(entityId, entComp) {
@@ -215,7 +215,7 @@ CrunchJS.Scene.prototype.disableEntity = function(entityId) {
 /**
  * Adds a component to the entity corresponding to the given id.
  * @param {Number} entityId  The Entity Id
- * @param {CrunchJS.Component} component The Component to add
+ * @param {CrunchJS.Internal.Component} component The Component to add
  * @final
  */
 CrunchJS.Scene.prototype.addComponent = function(entityId, component) {
@@ -326,7 +326,7 @@ CrunchJS.Scene.prototype.getSimChannel = function() {
 CrunchJS.Scene.prototype.setSimulation = function(sim) {
 	this._sim = sim;
 
-	var channel = new CrunchJS.WebWorkerChannel(sim);
+	var channel = new CrunchJS.Network.Channel.WebWorkerChannel(sim);
 
 	this.setSimChannel(channel);
 
@@ -342,7 +342,7 @@ CrunchJS.Scene.prototype.getSim = function() {
 
 /**
  * Creates a new entity composition used to search the entity space for interesting entities
- * @return {CrunchJS.EntityComposition} The Composition
+ * @return {CrunchJS.Internal.EntityComposition} The Composition
  */
 CrunchJS.Scene.prototype.createEntityComposition = function() {
 	return this._componentManager.createEntityComposition();
