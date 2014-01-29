@@ -265,7 +265,8 @@ module.exports = function (grunt) {
         compilerOpts: {
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           define: [
-            '\'goog.DEBUG=false\''
+            '\'goog.DEBUG=false\'',
+            '\'CrunchJS.DEBUG=true\''
           ],
           warning_level: 'verbose',
           jscomp_off: ['checkTypes', 'fileoverviewTags'],

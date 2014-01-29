@@ -12,14 +12,43 @@ goog.require('CrunchJS.EventManager');
 goog.require('CrunchJS.WebWorkerChannel');
 
 /**
- * Constructs a new Scene. ALWAYS set the name field to the name of the class.
+ * Constructs a new Scene. This class is meant to be extended so that you can override 
+ * the activate and deactivate methods to perform any loading or unloading as you see fit.
+ * ALWAYS set the name field to the name of the class. 
  * @constructor
  * @class The Scene Class
  *
  * @example
  *
- * var scene = CrunchJS.Scene();
- * scene.name = "ExampleScene";
+ * goog.require('CrunchJS.Scene');
+ * 
+ * var ExampleScene = function() {
+ * 	// Initialize here
+ * }
+ *
+ * goog.inherits(ExampleScene, CrunchJS.Scene);
+ * 
+ * ExampleScene.prototype.name = "ExampleScene";
+ *
+ * ExampleScene.prototype.activate = function(data){
+ * 	// Call super method
+ * 	goog.base(this, 'activate', data)
+ * 	
+ * 	// Load assets here
+ * }
+ *
+ * Example Scene.prototype.deactivate = function(){
+ * 	// Call super method	
+ * 	goog.base(this, 'deactivate');
+ * 	
+ * 	// Unload assets here
+ * }
+ *
+ * var scene = new ExampleScene();
+ *
+ * var world = new CrunchJS.World();
+ *
+ * world.addScene(scene);
  */
 CrunchJS.Scene = function() {
 	/**

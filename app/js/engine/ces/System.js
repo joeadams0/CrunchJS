@@ -8,9 +8,45 @@ goog.require('goog.structs');
 goog.require('goog.structs.Set');
 
 /**
- * Creates a basic system. This class is designed to be extended.
+ * Creates a basic system. This class is designed to be extended. 
+ * Systems hold all of the logic for the game. They operate on a set of entities that they are interested in.
+ * For instance, the Physics system will operate on all of the entities with a 
+ * physics component and a position component. 
+ *
+ * The activate method is designed to be overwritten, and in it to specify the entity composition. 
+ * Once the entity composition is defined, the system will automatically track all of
+ * the entities that are active and that you are interested in. These will be put in the
+ * activeEntities set which you can access through the getActiveEntities method. 
+ *
  * @class The System Class
  * @constructor
+ * 
+ * @example
+ *
+ * goog.require('CrunchJS.System');
+ *
+ * var ExampleSystem = function(){
+ * 	// Initialize here
+ * }
+ *
+ * goog.inherits(ExampleSystem, CrunchJS.System);
+ *
+ * ExampleSystem.prototype.name = "ExampleSystem";
+ *
+ * ExampleSystem.prototype.activate = function(){
+ * 	this.setEntityComposition(this.getScene().createEntityComposition()
+ * 	.all('ExampleComp', 'ExampleComp1')
+ * 	.one('ExampleComp2', 'ExampleComp3')
+ * 	.exclude('ExampleComp4', 'ExampleComp5'));
+ * }
+ *
+ * // Called once per frame per entity
+ * ExampleSystem.prototype.processEntity = function(entityId){
+ * 	// Process the entity here
+ * }
+ *
+ * 
+ * 	
  */
 CrunchJS.System = function() {
 	/**
@@ -45,8 +81,10 @@ CrunchJS.System = function() {
  */
 CrunchJS.System.prototype.activate = function() {
 };
+
 /**
- * A function to process all entities in the system. Called every frame.
+ * A function to process all entities in the system. Called every frame. 
+ * This can be overwritten, but processEntity will not be called unless this method is called.
  * @param  {CrunchJS.Frame} frame The current frame
  */
 CrunchJS.System.prototype.process = function(frame) {

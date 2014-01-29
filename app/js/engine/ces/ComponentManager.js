@@ -87,6 +87,18 @@ CrunchJS.ComponentManager.prototype.matchesComposition = function(entityId, entC
 };
 
 /**
+ * Creates a new component type
+ * @param  {string} compName The name of the new component
+ * @return {number}          The comp index
+ */
+CrunchJS.ComponentManager.prototype.createComponentType = function(compName) {
+	var compTypeId = this._componentMaps.push(new goog.structs.Map());
+	this._compIndecies.set(compName, compTypeId); 
+
+	return compTypeId;
+};
+
+/**
  * Adds a component to an entity
  * @param {number} entityId  The entity id
  * @param {CrunchJS.Component} component The component to add
@@ -107,18 +119,6 @@ CrunchJS.ComponentManager.prototype.addComponent = function(entityId, component)
 
 	component.entityId = entityId;
 	this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
-};
-
-/**
- * Creates a new component type
- * @param  {string} compName The name of the new component
- * @return {number}          The comp index
- */
-CrunchJS.ComponentManager.prototype.createComponentType = function(compName) {
-	var compTypeId = this._componentMaps.push(new goog.structs.Map());
-	this._compIndecies.set(compName, compTypeId); 
-
-	return compTypeId;
 };
 
 /**
@@ -164,8 +164,7 @@ CrunchJS.ComponentManager.prototype.getComponentMap = function(compId) {
  * @return {Boolean}          True if it has the component
  */
 CrunchJS.ComponentManager.prototype.hasComponent = function(entityId, compName) {
-	if(this.hasComponentType(compName))
-		return this.hasComponentBit(entityId, compName);
+	return this.hasComponentBit(entityId, compName);
 };
 
 /**
@@ -179,6 +178,22 @@ CrunchJS.ComponentManager.prototype.getComponent = function(entityId, compName) 
 		return this.getComponentsByType(compName).get(entityId);
 
 	return null;
+};
+
+/**
+ * Gets all of the components for an entity
+ * @param  {number} entityId The entity id
+ * @return {goog.structs.Set}          The set of components
+ */
+CrunchJS.ComponentManager.prototype.getComponents = function(entityId) {
+	var comps = new goog.structs.Set();
+
+	for(var i = 0, len = this._componentMaps.length; i<len; i++){
+		if(this._componentMaps[i].contains(entityId))
+			comps.add(this._componentMaps[i].get(entityId));
+	}
+
+	return comps;
 };
 
 /**

@@ -4,6 +4,7 @@
 goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
 goog.provide('CrunchJS.Events');
+goog.provide('CrunchJS.DEBUG');
 
 goog.require('goog.Timer');
 goog.require('goog.events');
@@ -12,6 +13,12 @@ goog.require('goog.object');
 goog.require('CrunchJS.SceneManager');
 goog.require('CrunchJS.FrameManager');
 goog.require('CrunchJS.WebWorkerChannel');
+
+/**
+ * Global debug flag
+ * @define {boolean} 
+ */
+CrunchJS.DEBUG = true;
 
 /**
  * The engine wide events
@@ -42,6 +49,8 @@ CrunchJS.Events = {
  * var world = new CrunchJS.World();
  */
 CrunchJS.World = function(config) {
+
+	console.log("Debugging:", CrunchJS.DEBUG);
 
 	goog.provide('CrunchJS.world');
 	

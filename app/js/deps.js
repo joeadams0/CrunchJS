@@ -14,7 +14,7 @@ goog.addDependency('../../../js/engine/core/Frame.js', ['CrunchJS.Frame'], []);
 goog.addDependency('../../../js/engine/core/FrameManager.js', ['CrunchJS.FrameManager'], ['CrunchJS.Frame']);
 goog.addDependency('../../../js/engine/core/Scene.js', ['CrunchJS.Scene'], ['CrunchJS.ComponentManager', 'CrunchJS.EntityManager', 'CrunchJS.EventManager', 'CrunchJS.SystemManager', 'CrunchJS.WebWorkerChannel']);
 goog.addDependency('../../../js/engine/core/SceneManager.js', ['CrunchJS.SceneManager'], ['goog.structs', 'goog.structs.Map']);
-goog.addDependency('../../../js/engine/core/world.js', ['CrunchJS', 'CrunchJS.Events', 'CrunchJS.World', 'CrunchJS.world'], ['CrunchJS.FrameManager', 'CrunchJS.SceneManager', 'CrunchJS.WebWorkerChannel', 'goog.Timer', 'goog.events', 'goog.object']);
+goog.addDependency('../../../js/engine/core/world.js', ['CrunchJS', 'CrunchJS.DEBUG', 'CrunchJS.Events', 'CrunchJS.World', 'CrunchJS.world'], ['CrunchJS.FrameManager', 'CrunchJS.SceneManager', 'CrunchJS.WebWorkerChannel', 'goog.Timer', 'goog.events', 'goog.object']);
 goog.addDependency('../../../js/engine/utils/bitset.js', ['CrunchJS.Utils.BitSetOperator'], []);
 goog.addDependency('../../../js/game/components/examples/ExampleComp.js', ['Moba.ExampleComp'], ['CrunchJS.Component']);
 goog.addDependency('../../../js/game/components/examples/ExampleComp1.js', ['Moba.ExampleComp1'], ['CrunchJS.Component']);
