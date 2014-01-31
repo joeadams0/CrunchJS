@@ -5,6 +5,7 @@
 goog.provide('Moba.ExampleScene');
 
 goog.require('CrunchJS.Scene');
+goog.require('CrunchJS.Network.RemoteEngine.WWRemoteEngine');
 
 /**
  * Creates an example scene
@@ -30,6 +31,18 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
  */
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
+
+	if(!CrunchJS.world.isSim()){
+		var sim;
+		if(COMPILED){
+			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/sim.js');
+		}
+		else{
+			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/js/game/simulation/simulation-bootstrap.js');
+		}
+
+		this.setSimulation(sim);
+	}
 };
 
 /**

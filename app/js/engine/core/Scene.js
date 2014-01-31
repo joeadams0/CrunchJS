@@ -11,12 +11,15 @@ goog.require('CrunchJS.Internal.ComponentManager');
 goog.require('CrunchJS.Internal.EventManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
+goog.require('goog.object');
+
 /**
  * Constructs a new Scene. This class is meant to be extended so that you can override 
  * the activate and deactivate methods to perform any loading or unloading as you see fit.
  * ALWAYS set the name field to the name of the class. 
  * @constructor
  * @class The Scene Class
+ * @extends {CrunchJS.Internal.EventManager}
  *
  * @example
  *
@@ -51,19 +54,14 @@ goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
  * world.addScene(scene);
  */
 CrunchJS.Scene = function() {
+	goog.base(this);
+
 	/**
 	 * True when the scene is active
 	 * @type {Boolean}
 	 * @protected
 	 */
 	this._isActive = false;
-
-	/**
-	 * The EventManager for the scene
-	 * @type {CrunchJS.Internal.EventManager}
-	 * @protected
-	 */
-	this._eventManager = new CrunchJS.Internal.EventManager(this);
 
 	/**
 	 * The SystemManager for the scene
@@ -87,30 +85,44 @@ CrunchJS.Scene = function() {
 	this._componentManager = new CrunchJS.Internal.ComponentManager(this);
 
 	/**
-	 * The channel to communicate to the simulation
-	 * @type {CrunchJS.IChannel}
-	 * @private
-	 */
-	this._simChannel = null;
-
-	/**
-	 * The web worker simulation
-	 * @type {Worker}
+	 * The remote engine for the web worker 
+	 * @type {CrunchJS.Network.RemoteSystem.WWRemoteEngine}
 	 * @private
 	 */
 	this._sim = null;
 
 
+	// Events incoming
+	this.addEventListener(CrunchJS.EngineCommands.Run, goog.bind(CrunchJS.world.run, CrunchJS.world));
+	this.addEventListener(CrunchJS.EngineCommands.Pause, goog.bind(CrunchJS.world.pause, CrunchJS.world));
+
+	// Events that should be forwarded to the sim
+	this.addEventListener(CrunchJS.Events.Started, goog.bind(function() {
+		this.postEventToRemoteEngine(CrunchJS.EngineCommands.Run);
+	}, this));
+
+	this.addEventListener(CrunchJS.Events.Paused, goog.bind(function() {
+		this.postEventToRemoteEngine(CrunchJS.EngineCommands.Pause);
+	}, this));
+
+
+
+	this.addEventListener(CrunchJS.Events.SendCommand, goog.bind(this.onSendCommand, this));
+
 };
+
+goog.inherits(CrunchJS.Scene, CrunchJS.Internal.EventManager);
 
 /**
  * Called when the scene is activated. Made to be overwritten, but should call super in overwritten method.
  * @param {Object=} data Optional data that may be passed in
  */
 CrunchJS.Scene.prototype.activate = function(data) {
-	console.log('Activating ', this.name);
+	this.log('Activating ' + this.name, CrunchJS.LogLevels.DEBUG);
 	this._isActive = true;
 
+	this._entityManager.activate();
+	this._componentManager.activate();
 	this._systemManager.activate();
 };
 
@@ -120,6 +132,10 @@ CrunchJS.Scene.prototype.activate = function(data) {
 CrunchJS.Scene.prototype.deactivate = function() {
 	console.log('Deactivating ', this.name);	
 	this._isActive = false;
+
+	this._entityManager.deactivate();
+	this._componentManager.deactivate();
+	this._systemManager.deactivate();
 };
 
 /**
@@ -135,7 +151,7 @@ CrunchJS.Scene.prototype.isActive = function() {
  * @return {Boolean} True if the scene has a simulation
  */
 CrunchJS.Scene.prototype.hasSim = function() {
-	return this.sim != null;
+	return this._sim != null;
 }; 
 
 /**
@@ -261,75 +277,28 @@ CrunchJS.Scene.prototype.getComponentsByType = function(compName) {
 };
 
 /**
- * Add a listener for an event
- * @param {String} eventName The name of the event
- * @param {Function} fun       The function to call when the event is heard
- */
-CrunchJS.Scene.prototype.addListener = function(eventName, fun) {
-	this._eventManager.addListener(eventName, fun);
-};
-
-/**
- * Removes a listener from an event
- * @param  {String} eventName The name of the event
- * @param  {Function} fun       The function to remove
- */
-CrunchJS.Scene.prototype.removeListener = function(eventName, fun) {
-	this._eventManager.removeListener(eventName, fun);
-};
-
-/**
- * Returns an array of listeners for the event
- * @param  {String} eventName The name of the event
- * @return {Array<Function>}           The array of listeners
- */
-CrunchJS.Scene.prototype.getListeners = function(eventName) {
-	return this._eventManager.getListeners(eventName);
-};
-
-/**
- * Removes all the listeners from an event
- * @param  {String} eventName The name of the event */
-CrunchJS.Scene.prototype.removeAllListeners = function(eventName){
-	this._eventManager.removeAllListeners(eventName);
-}
-
-/**
- * Fires an event
- * @param  {String} eventName The name of the event to fire
- * @param  {Object} eventData The event object
- */
-CrunchJS.Scene.prototype.fireEvent = function(eventName, eventData) {
-	this._eventManager.fireEvent(eventName, eventData);
-};
-
-/**
- * Sets the channel to talk to the simulation
- * @param {CrunchJS.IChannel} channel The chanel 
- */
-CrunchJS.Scene.prototype.setSimChannel = function(channel) {
-	this._simChannel = channel;
-};
-
-/**
- * Gets the current simulation channel if there is one
- * @return {CrunchJS.IChannel} The Simulation channel
- */
-CrunchJS.Scene.prototype.getSimChannel = function() {
-	return this._simChannel;
-};
-
-/**
- * Sets the simulation and creates the WebWorkerChannel to communicate to the simulation.
- * @param {Worker} sim The WebWorker that the simulation is running in
+ * Sets the simulation remote engine holding the simulation
+ * @param {CrunchJS.Network.RemoteEngine.WWRemoteEngine} sim The remote engine holding the simulation
  */
 CrunchJS.Scene.prototype.setSimulation = function(sim) {
 	this._sim = sim;
 
-	var channel = new CrunchJS.Network.Channel.WebWorkerChannel(sim);
+	this.fireEvent(CrunchJS.Events.SimAdded);
 
-	this.setSimChannel(channel);
+	if(CrunchJS.world.isRunning()){
+		// Send running event
+		this._sim.run();
+	}
 
+};
+
+/**
+ * Remove the simulation
+ */
+CrunchJS.Scene.prototype.removeSimulation = function() {
+	this._sim = null;
+
+	this.fireEvent(CrunchJS.Events.SimRemoved);
 };
 
 /**
@@ -341,10 +310,59 @@ CrunchJS.Scene.prototype.getSim = function() {
 };
 
 /**
+ * Sends Command to remote engine
+ * @param  {Object} data The data to send to the remote engine
+ */
+CrunchJS.Scene.prototype.onSendCommand = function(data) {
+	if(this.hasSim())
+		this.getSim().postEvent(data.eventName, data.data);
+	else if(CrunchJS.world.isSim())
+		CrunchJS.world.getMainEngine().postEvent(data.eventName, data.data);
+};
+
+/**
  * Creates a new entity composition used to search the entity space for interesting entities
  * @return {CrunchJS.Internal.EntityComposition} The Composition
  */
 CrunchJS.Scene.prototype.createEntityComposition = function() {
 	return this._componentManager.createEntityComposition();
+};
+
+/**
+ * Posts an event to the remote engine
+ * @param  {string} eventName The event name
+ * @param  {Object} data      The data to pass
+ */
+CrunchJS.Scene.prototype.postEventToRemoteEngine = function(eventName, data){
+	var event = {
+		eventName : eventName,
+		data : data
+	};
+
+	this.fireEvent(CrunchJS.Events.SendCommand, event);
+};
+
+/**
+ * Gets the number of entities
+ * @return {number} The number of entities
+ */
+CrunchJS.Scene.prototype.getEntityCount = function() {
+	return this._entityManager.entities;
+};
+
+/**
+ * Gets the number of active entities
+ * @return {number} The number of active entities
+ */
+CrunchJS.Scene.prototype.getActiveCount = function() {
+	return this._entityManager.actives;
+};
+/**
+ * Logs a message
+ * @param  {Object} message The object to log
+ * @param  {CrunchJS.LogLevel} level   The log level
+ */
+CrunchJS.Scene.prototype.log = function(message, level) {
+	CrunchJS.world.log(message, level);
 };
 

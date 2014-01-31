@@ -266,7 +266,8 @@ module.exports = function (grunt) {
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           define: [
             '\'goog.DEBUG=false\'',
-            '\'CrunchJS.DEBUG=true\''
+            '\'CrunchJS.DEBUG=true\'',
+            '\'CrunchJS.DATA_SYNC_DEBUG=false\''
           ],
           warning_level: 'verbose',
           jscomp_off: ['checkTypes', 'fileoverviewTags'],
@@ -323,7 +324,7 @@ module.exports = function (grunt) {
     clean: {
       dist: ['temp'],
       server: 'temp',
-      doc: 'doc/**/*.html'
+      doc: ['doc/**/*', '!doc/engine/.git']
     },
     uglify: {
       vendorMain: {

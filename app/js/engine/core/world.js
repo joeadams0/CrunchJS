@@ -7,6 +7,9 @@ goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
 goog.provide('CrunchJS.Events');
 goog.provide('CrunchJS.DEBUG');
+goog.provide('CrunchJS.LogLevels');
+goog.provide('CrunchJS.EngineCommands');
+goog.provide('CrunchJS.DATA_SYNC_DEBUG');
 
 goog.require('goog.Timer');
 goog.require('goog.events');
@@ -15,28 +18,211 @@ goog.require('goog.object');
 goog.require('CrunchJS.Internal.SceneManager');
 goog.require('CrunchJS.Internal.FrameManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
+goog.require('CrunchJS.Network.RemoteEngine.MainRemoteEngine');
 
 /**
  * Global debug flag
+ * When compiled, this is set in the build settings 
  * @define {boolean} 
  */
 CrunchJS.DEBUG = true;
 
+// Exporting it so you can change it at runtime
+goog.exportSymbol('CrunchJS.DATA_SYNC_DEBUG');
+
+/**
+ * Data sync debug flag
+ * When compiled, this is set in the build settings 
+ * @define {boolean} 
+ */
+CrunchJS.DATA_SYNC_DEBUG = false;
+
 /**
  * The engine wide events
- * @type {Object}
  * @enum
  */
 CrunchJS.Events = {
+	/**
+	 * Fired when the engine is started
+	 * @type {String}
+	 */
 	Started : 'engine_started',
+
+	/**
+	 * Fired when the engine is paused
+	 * @type {String}
+	 */
 	Paused : 'engine_paused',
+
+	/**
+	 * Fired when the scene creates an entity
+	 * @type {String}
+	 */
 	EntityCreated : 'entity_created',
+
+	/**
+	 * Fired when the scene destroys an entity
+	 * @type {String}
+	 */
 	EntityDestroyed : 'entity_destroyed',
+
+	/**
+	 * Fired when an entity is enabled
+	 * @type {String}
+	 */
 	EntityEnabled : 'entity_enabled',
+
+	/**
+	 * Fired when an entity is disabled
+	 * @type {String}
+	 */
 	EntityDisabled : 'entity_disabled',
+
+	/**
+	 * Fired when an entity composition is changed
+	 * @type {String}
+	 */
 	EntityChanged : 'entity_changed',
-	ComponentUpdated : 'component_updated'
+
+	/**
+	 * Fired when a component is updated
+	 * @type {String}
+	 */
+	ComponentUpdated: 'component_changed',
+
+	/**
+	 * Fired when a simulation is added to a scene
+	 * @type {String}
+	 */
+	SimAdded : 'sim_added',
+
+	/**
+	 * Fired when a simualtion is removed from a scene
+	 * @type {String}
+	 */
+	SimRemoved : 'sim_removed',
+
+	/**
+	 * Sends a command to a remote engine
+	 * @type {String}
+	 */
+	SendCommand : 'send_command'
+
 };
+
+/**
+ * These commands are used for syncing data and actions with the simulation
+ * @enum {String}
+ */
+CrunchJS.EngineCommands = {
+
+	/**
+	 * Starts the simulation
+	 * @type {String}
+	 */
+	Run : 'run',
+
+	/**
+	 * Pauses the simulation
+	 * @type {String}
+	 */
+	Pause : 'pause',
+
+	/**
+	 * Write to the console
+	 * @type {String}
+	 */
+	Write : 'write',
+
+	/**
+	 * Create an entity
+	 * @type {String}
+	 */
+	CreateEntity : 'create_entity',
+
+	/**
+	 * Destroy an entity
+	 * @type {String}
+	 */
+	DestroyEntity : 'destroy_entity',
+
+	/**
+	 * Update an entity
+	 * @type {String}
+	 */
+	UpdateComponent : 'update_component',
+
+	/**
+	 * Add a component
+	 * @type {String}
+	 */
+	AddComponent : 'add_component',
+
+	/**
+	 * Remove a component
+	 * @type {String}
+	 */
+	RemoveComponent : 'remove_component',
+
+	/**
+	 * Enable an entity
+	 * @type {String}
+	 */
+	EnableEntity : 'enable_entity',
+
+	/**
+	 * Disable an entity
+	 * @type {String}
+	 */
+	DisableEntity : 'disable_entity',
+
+	/**
+	 * Requests the sync data
+	 * @type {String}
+	 */
+	SyncRequest : 'sync_request',
+
+	/**
+	 * Provides the sync data
+	 * @type {String}
+	 */
+	Sync : 'sync'
+
+};
+
+
+
+
+/**
+ * The log levels
+ * @enum {String}
+ */
+CrunchJS.LogLevels = {
+	/**
+	 * Logs with this level will only be shown in debug mode
+	 * @type {String}
+	 */
+	DEBUG : 'DEBUG: ',
+
+	/**
+	 * Displays a warning. This will always be shown.
+	 * @type {String}
+	 */
+	WARNING : 'WARNING: ',
+
+	/**
+	 * Displays an error. This will always be shown.
+	 * @type {String}
+	 */
+	ERROR : 'ERROR: ',
+
+	/**
+	 * Displays a fatal error. This will always be shown.
+	 * @type {String}
+	 */
+	FATAL : 'FATAL: '
+};
+
 
 /**
  * @description This is the main object for the CrunchJS Engine. It can be thought of as a collection of scenes, with each scene will have its 
@@ -55,8 +241,6 @@ CrunchJS.Events = {
  */
 CrunchJS.World = function(config) {
 
-	console.log("Debugging:", CrunchJS.DEBUG);
-
 	goog.provide('CrunchJS.world');
 	
 	/**
@@ -73,11 +257,20 @@ CrunchJS.World = function(config) {
 	this._clock = null;	
 
 	/**
+	 * Is the script running in a webworker
+	 * @type {Boolean}
+	 * @private
+	 */
+	this._isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+
+	/**
 	 * True if the engine is a simulation
 	 * @type {Boolean}
 	 * @private
 	 */
-	this._isSim = true;
+	this._isSim = this._isWebWorker;
+
 
 	/**
 	 * Is the engine running
@@ -111,19 +304,13 @@ CrunchJS.World = function(config) {
 	 */
 	this.config = null;
 
-	/**
-	 * Is the script running in a webworker
-	 * @type {Boolean}
-	 * @public
-	 */
-	this.isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
 
 	/**
 	 * The chanel to the main engine. Null if not in a simulation
-	 * @type {CrunchJS.IChannel}
+	 * @type {CrunchJS.Network.RemoteSystem.MainRemoteSystem}
 	 * @public
 	 */
-	this.mainChannel = null;
+	this.mainEngine = null;
 
 	/**
 	 * The Default Configurations
@@ -158,15 +345,10 @@ CrunchJS.World = function(config) {
 
 	
 	// Create the main channel if a sim and if in a webworker
-	if(this.isSim() && this.isWebWorker){
+	if(this.isSim() && this._isWebWorker){
 	    
-		var channel = new CrunchJS.Network.Channel.WebWorkerChannel();
-
-		this.setMainChannel(channel);
-
-		this.addListener(this.Commands.run, goog.bind(this.run, this));
-		this.addListener(this.Commands.pause, goog.bind(this.pause, this));
-		this.addListener(this.Commands.step, goog.bind(this.step, this));
+		this.mainEngine = new CrunchJS.Network.RemoteEngine.MainRemoteEngine();
+		
 	}
 
 	return this;
@@ -182,6 +364,9 @@ CrunchJS.World.prototype.run = function() {
 	this._clock.start();
 
 	this.fireEvent(CrunchJS.Events.Started);
+
+	this.log('Engine Running');
+
 };
 
 /**
@@ -194,6 +379,8 @@ CrunchJS.World.prototype.pause = function() {
 	this._clock.stop();
 
 	this.fireEvent(CrunchJS.Events.Paused);
+
+	this.log('Engine Paused');
 };
 
 /**
@@ -211,11 +398,11 @@ CrunchJS.World.prototype.step = function() {
 
 
 /**
- * Adds a channel to talk to the Main Window
- * @param {CrunchJS.IChannel} channel The Channel to add
+ * Gets the main engine
+ * @return {CrunchJS.Network.RemoteEngine.MainRemoteEngine} The main channel
  */
-CrunchJS.World.prototype.setMainChannel = function(channel) {
-	this.mainChannel = channel;
+CrunchJS.World.prototype.getMainEngine = function() {
+	return this.mainEngine;
 };
 
 /**
@@ -239,7 +426,9 @@ CrunchJS.World.prototype.isRunning = function() {
  * @param {CrunchJS.Scene} scene The Scene to add
  */
 CrunchJS.World.prototype.addScene = function(scene) {
-	return this._sceneManager.addScene(scene);
+	var success = this._sceneManager.addScene(scene);
+
+	return success;
 };
 
 /**
@@ -248,7 +437,10 @@ CrunchJS.World.prototype.addScene = function(scene) {
  * @return {boolean}       Whether the scene object was found and removed
  */
 CrunchJS.World.prototype.removeScene = function(scene) {
-	return this._sceneManager.removeScene(scene);
+	var resetListeners = this._sceneManager.isCurrentScene(scene);
+	var success = this._sceneManager.removeScene(scene);
+
+	return success;
 };
 
 /**
@@ -267,7 +459,9 @@ CrunchJS.World.prototype.getScene = function(sceneName) {
  * @return {Boolean}          Whether the new scene was found and the transition occured successfully.
  */
 CrunchJS.World.prototype.transitionScene = function(sceneName, data) {
-	return this._sceneManager.transitionScene(sceneName, data);
+	var success = this._sceneManager.transitionScene(sceneName, data);
+	this.setListeners();
+	return success;
 };
 
 /**
@@ -277,7 +471,6 @@ CrunchJS.World.prototype.transitionScene = function(sceneName, data) {
 CrunchJS.World.prototype.getCurrentScene = function() {
 	return this._sceneManager.getCurrentScene();
 };
-
 /**
  * Posts an event to the currently active scene
  * @param  {String} eventName The Event Name
@@ -285,5 +478,43 @@ CrunchJS.World.prototype.getCurrentScene = function() {
  */
 CrunchJS.World.prototype.fireEvent = function(eventName, data) {
 	this._sceneManager.fireEvent(eventName, data);
+};
+
+/**
+ * Logs a message
+ * @param  {Object} message The object to log
+ * @param  {CrunchJS.LogLevel} level   The log level
+ */
+CrunchJS.World.prototype.log = function(message, level) {
+	if(!level)
+		level = CrunchJS.LogLevels.DEBUG;
+
+	if(CrunchJS.DEBUG && level == CrunchJS.LogLevels.DEBUG){
+		this.write({
+			prefix : level,
+			message : message
+		});
+	}
+	else
+		this.write({
+			prefix : level,
+			message : message
+		});		
+};
+
+/**
+ * Writes a message. Use log method instead
+ * @param {Object} prefix The prefix of the message
+ * @param {Object} message The message
+ */
+CrunchJS.World.prototype.write = function(data) {
+	if(this.isSim()){
+		data['prefix'] = 'WW - ' + data.prefix;
+		data['message'] = data.message;
+		this.getMainEngine().write(data);
+	}
+	else{
+		console.log(data.prefix, data.message);
+	}
 };
 

@@ -21,15 +21,9 @@ Moba.Core = function(){
 	var simulation, 
 		world;
 
-
-
 	world = new CrunchJS.World();
 
 	var scene = new Moba.ExampleScene();
-
-	scene.addListener('engine_started', function(data) {
-		console.log("Holy crap it works");
-	});
 
 	world.addScene(scene);
 

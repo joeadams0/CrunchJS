@@ -7,6 +7,7 @@ goog.provide('Simulation');
 goog.require('CrunchJS');
 goog.require('SimulationConfig');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
+goog.require('Moba.ExampleScene');
 
 /**
  * Creates a Simulation object in a web worker.
@@ -17,12 +18,16 @@ goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 Simulation = function() {
 
 	// Create the world
-	this.world = new CrunchJS.World();
+	var world = new CrunchJS.World();
 
-	goog.global.world = this.world;
+	CrunchJS.world.log("I'M ALIVE", CrunchJS.LogLevels.DEBUG);
+	
+	var scene = new Moba.ExampleScene();
 
+	world.addScene(scene);
+	
 	// Load the simulation
-	SimulationConfig(this.world);
+	SimulationConfig(scene);
 
 };
 

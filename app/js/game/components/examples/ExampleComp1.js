@@ -21,3 +21,7 @@ goog.inherits(Moba.ExampleComp1, CrunchJS.Component);
 
 
 Moba.ExampleComp1.prototype.name = "ExampleComp1";
+
+Moba.ExampleComp1.prototype.getNum = function() {
+	return this['ahahah'];
+};
