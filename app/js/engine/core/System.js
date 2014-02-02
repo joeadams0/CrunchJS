@@ -124,16 +124,13 @@ CrunchJS.System.prototype.setScene = function(scene) {
  * Sets the listeners for the system
  */
 CrunchJS.System.prototype.setListeners = function() {
-	var entChangedListener = goog.bind(this.entityChanged, this);
-	var entDestroyedListener = goog.bind(this.entityDestroyed, this);
-	var entEnabledListener = goog.bind(this.entityEnabled, this);
-	var entDisabledListener = goog.bind(this.entityDisabled, this);
 
+	this.getScene().addEventListener(CrunchJS.Events.EntityChanged, goog.bind(this.entityChanged, this));
+	this.getScene().addEventListener(CrunchJS.Events.EntityDestroyed, goog.bind(this.entityDestroyed, this));
+	this.getScene().addEventListener(CrunchJS.Events.EntityEnabled, goog.bind(this.entityEnabled, this));
+	this.getScene().addEventListener(CrunchJS.Events.EntityDisabled, goog.bind(this.entityDisabled, this));
+	this.getScene().addEventListener(CrunchJS.Events.RefreshData, goog.bind(this.refreshData, this));
 
-	this.getScene().addEventListener(CrunchJS.Events.EntityChanged, entChangedListener);
-	this.getScene().addEventListener(CrunchJS.Events.EntityDestroyed, entDestroyedListener);
-	this.getScene().addEventListener(CrunchJS.Events.EntityEnabled, entEnabledListener);
-	this.getScene().addEventListener(CrunchJS.Events.EntityDisabled, entDisabledListener);
 };
 
 /**
@@ -209,4 +206,11 @@ CrunchJS.System.prototype.getEntityComposition = function() {
  */
 CrunchJS.System.prototype.setEntityComposition = function(comp) {
 	this._entityComposition = comp;
+};
+
+/**
+ * Refreshes the active entities set
+ */
+CrunchJS.System.prototype.refreshData = function() {
+	this._activeEntities = this.getScene().findComponents(this._entityComposition);
 };

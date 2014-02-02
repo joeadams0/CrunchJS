@@ -7,6 +7,10 @@ var mountFolder = function (connect, dir) {
   return connect.static(require('path').resolve(dir));
 };
 
+var modules = [];
+modules.push('blah:53');
+var useModules = modules.join(' --module ');
+
 module.exports = function (grunt) {
 
   //
@@ -263,7 +267,7 @@ module.exports = function (grunt) {
         compile: true,
         compilerFile: compiler.getPathSS(),
         compilerOpts: {
-          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          compilation_level: 'SIMPLE_OPTIMIZATIONS',
           define: [
             '\'goog.DEBUG=false\'',
             '\'CrunchJS.DEBUG=true\'',
@@ -273,7 +277,7 @@ module.exports = function (grunt) {
           jscomp_off: ['checkTypes', 'fileoverviewTags'],
           summary_detail_level: 3,
           only_closure_dependencies: null,
-          source_map_format: 'V3',
+          source_map_format: 'V3'
 
         }
       },

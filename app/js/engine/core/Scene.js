@@ -95,6 +95,8 @@ CrunchJS.Scene = function() {
 	// Events incoming
 	this.addEventListener(CrunchJS.EngineCommands.Run, goog.bind(CrunchJS.world.run, CrunchJS.world));
 	this.addEventListener(CrunchJS.EngineCommands.Pause, goog.bind(CrunchJS.world.pause, CrunchJS.world));
+	this.addEventListener(CrunchJS.EngineCommands.Sync, goog.bind(this.onSync, this));
+	this.addEventListener(CrunchJS.EngineCommands.SyncRequest, goog.bind(this.onSyncRequest, this));
 
 	// Events that should be forwarded to the sim
 	this.addEventListener(CrunchJS.Events.Started, goog.bind(function() {
@@ -104,10 +106,6 @@ CrunchJS.Scene = function() {
 	this.addEventListener(CrunchJS.Events.Paused, goog.bind(function() {
 		this.postEventToRemoteEngine(CrunchJS.EngineCommands.Pause);
 	}, this));
-
-
-
-	this.addEventListener(CrunchJS.Events.SendCommand, goog.bind(this.onSendCommand, this));
 
 };
 
@@ -268,6 +266,15 @@ CrunchJS.Scene.prototype.getComponents = function(entityId) {
 };
 
 /**
+ * Finds all of the active entities for a certain composition
+ * @param  {CrunchJS.EntityComposition} entityComp The entity composition
+ * @return {goog.structs.Set()}            A set of the entity ids
+ */
+CrunchJS.Scene.prototype.findEntities = function(entityComp) {
+	return this._componentManager.findEntities(entityComp);
+};
+
+/**
  * Gets all of the components of a single type
  * @param  {String} compName The Component name
  * @return {goog.structs.Map}          A map of entity ids -> components
@@ -310,14 +317,28 @@ CrunchJS.Scene.prototype.getSim = function() {
 };
 
 /**
- * Sends Command to remote engine
- * @param  {Object} data The data to send to the remote engine
+ * Overwrites the current data with the new data
+ * @param  {Object} data The new data
  */
-CrunchJS.Scene.prototype.onSendCommand = function(data) {
-	if(this.hasSim())
-		this.getSim().postEvent(data.eventName, data.data);
-	else if(CrunchJS.world.isSim())
-		CrunchJS.world.getMainEngine().postEvent(data.eventName, data.data);
+CrunchJS.Scene.prototype.onSync = function(data) {
+	this._entityManager.sync(data['entity_manager']);
+	this._componentManager.sync(data['component_manager']);
+
+	this.fireEvent(CrunchJS.Events.RefreshData);
+
+	CrunchJS.world.log('Syncing');
+};
+
+/**
+ * Sends the current entities and components
+ */
+CrunchJS.Scene.prototype.onSyncRequest = function() {
+	var data = {};
+
+	data['entity_manager'] = this._entityManager.getSnapshot();
+	data['component_manager'] = this._componentManager.getSnapshot();
+
+	this.postEventToRemoteEngine(CrunchJS.EngineCommands.Sync, data);
 };
 
 /**

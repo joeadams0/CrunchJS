@@ -275,3 +275,38 @@ CrunchJS.Internal.EntityManager.prototype.getEnabledEntities = function() {
 CrunchJS.Internal.EntityManager.prototype.getDisabledEntities = function() {
 	return this._disabledEntities;
 };
+
+
+/**
+ * Gets a snapshot of the current state of all of the entities
+ * @return {Object} The state
+ * #TODO
+ */
+CrunchJS.Internal.EntityManager.prototype.getSnapshot = function() {
+	var data = {};
+
+	data['_nextEntityId'] = this._nextEntityId;
+	data['_enabledEntities'] = this._enabledEntities.getValues();
+	data['_disabledEntities'] = this._disabledEntities.getValues();
+
+	data['_entityPool'] = this._entityPool;
+	data['entities'] = this.entities;
+	data['actives'] = this.actives;
+	
+};
+
+/**
+ * Overwrites the current state with the incoming state
+ * @param  {Object} data The new state
+ * #TODO
+ */
+CrunchJS.Internal.EntityManager.prototype.sync = function(data) {
+	this._nextEntityId = data['_nextEntityId'] ;
+	this._enabledEntities = new goog.structs.Set(data['_enabledEntities']);
+	this._disabledEntities = new goog.structs.Set(data['_disabledEntities']);
+
+	this._entityPool = data['_entityPool'];
+	this.entities = data['entities'] ;
+	this.actives = data['actives'] ;
+};
+

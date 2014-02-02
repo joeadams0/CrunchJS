@@ -276,6 +276,16 @@ CrunchJS.Internal.ComponentManager.prototype.getComponents = function(entityId) 
 };
 
 /**
+ * Finds all of the active entities for a certain composition
+ * @param  {CrunchJS.EntityComposition} entityComp The entity composition
+ * @return {goog.structs.Set()}            A set of the entity ids
+ * #TODO
+ */
+CrunchJS.Internal.ComponentManager.prototype.findEntities = function(entityComposition) {
+	
+};
+
+/**
  * Gets a list of all of the components of a given type
  * @param  {string} compName The name of the component
  * @return {goog.structs.Map}          A map of entity ids -> components
@@ -462,6 +472,24 @@ CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 	});	
 
 	return data;
+};
+
+/**
+ * Gets a snapshot of the current state of all of the components
+ * @return {Object} The state
+ * #TODO
+ */
+CrunchJS.Internal.ComponentManager.prototype.getSnapshot = function() {
+	
+};
+
+/**
+ * Overwrites the current state with the incoming state
+ * @param  {Object} data The new state
+ * #TODO
+ */
+CrunchJS.Internal.ComponentManager.prototype.sync = function(data) {
+	
 };
 
 /**

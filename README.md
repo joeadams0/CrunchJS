@@ -1,6 +1,6 @@
-# Moba
+# CrunchJS
 
-An HTML5 MOBA.
+An HTML5 Game Engine built for speed and power.
 
 ## Table Of Contents
 

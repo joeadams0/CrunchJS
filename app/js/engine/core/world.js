@@ -106,7 +106,13 @@ CrunchJS.Events = {
 	 * Sends a command to a remote engine
 	 * @type {String}
 	 */
-	SendCommand : 'send_command'
+	SendCommand : 'send_command',
+
+	/**
+	 * Fired when the data has been refreshed
+	 * @type {String}
+	 */
+	RefreshData : 'refresh_data'
 
 };
 
