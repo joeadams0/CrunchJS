@@ -60,16 +60,7 @@ CrunchJS.Internal.ComponentManager = function(scene) {
 	this._destroyedEntities = new goog.structs.Set();
 	
 
-};
-
-goog.inherits(CrunchJS.Internal.ComponentManager, CrunchJS.Internal.Manager);
-
-
-/**
- * Called when activated
- */
-CrunchJS.Internal.ComponentManager.prototype.activate = function() {
-	goog.base(this, 'activate');
+	
 
 	// Listen for external commands
 	this.getScene().addEventListener(CrunchJS.Events.EntityCreated, goog.bind(this.entityCreated,this));
@@ -80,6 +71,18 @@ CrunchJS.Internal.ComponentManager.prototype.activate = function() {
 	this.getScene().addEventListener(CrunchJS.EngineCommands.UpdateComponent, goog.bind(this.onUpdateComponent, this));
 	this.getScene().addEventListener(CrunchJS.EngineCommands.AddComponent, goog.bind(this.onAddComponent, this));
 	this.getScene().addEventListener(CrunchJS.EngineCommands.RemoveComponent, goog.bind(this.onRemoveComponent, this));
+	this.getScene().addEventListener(CrunchJS.EngineCommands.RemoveAllComponents, goog.bind(this.onRemoveAllComponents, this));
+
+};
+
+goog.inherits(CrunchJS.Internal.ComponentManager, CrunchJS.Internal.Manager);
+
+
+/**
+ * Called when activated
+ */
+CrunchJS.Internal.ComponentManager.prototype.activate = function() {
+	goog.base(this, 'activate');
 };
 
 /**
@@ -88,7 +91,8 @@ CrunchJS.Internal.ComponentManager.prototype.activate = function() {
  * @private
  */
 CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) {
-	CrunchJS.world.log('Entity Updated:' + JSON.stringify(data));
+	if(CrunchJS.DATA_SYNC_DEBUG)
+		CrunchJS.world.log('Entity Updated:' + JSON.stringify(data));
 	this._setComponent(data['id'], this.deserialize(data['comp']));
 };
 
@@ -98,18 +102,30 @@ CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) 
  * @param  {Object} data The data from the remote engine
  */
 CrunchJS.Internal.ComponentManager.prototype.onAddComponent = function(data) {
-	CrunchJS.world.log('Add component: '+ JSON.stringify(data));
+	if(CrunchJS.DATA_SYNC_DEBUG)
+		CrunchJS.world.log('Add component: '+ JSON.stringify(data));
 	this._setComponent(data['id'], this.deserialize(data['comp']));
-	CrunchJS.world.log(this.deserialize(data['comp']));
 };
 
 /**
- * Remove a component from a remote engine
+ * Remove a component command from a remote engine
  * @param  {Object} data The data from the remote engine
  */
 CrunchJS.Internal.ComponentManager.prototype.onRemoveComponent = function(data) {
-	CrunchJS.world.log('Remove component: '+ JSON.stringify(data));
+	if(CrunchJS.DATA_SYNC_DEBUG)
+		CrunchJS.world.log('Remove component: '+ JSON.stringify(data));
 	this._removeComponent(data['id'], data['compName']);
+};
+
+/**
+ * Removes all components 	
+ * @param  {number} entityId The entity id
+ */
+CrunchJS.Internal.ComponentManager.prototype.onRemoveAllComponents = function(entityId) {
+	if(CrunchJS.DATA_SYNC_DEBUG)
+		CrunchJS.world.log('Remove All Components: '+entityId);
+
+	this._removeAllComponents(entityId);
 };
 
 /**
@@ -279,10 +295,16 @@ CrunchJS.Internal.ComponentManager.prototype.getComponents = function(entityId) 
  * Finds all of the active entities for a certain composition
  * @param  {CrunchJS.EntityComposition} entityComp The entity composition
  * @return {goog.structs.Set()}            A set of the entity ids
- * #TODO
  */
 CrunchJS.Internal.ComponentManager.prototype.findEntities = function(entityComposition) {
-	
+	var set = new goog.structs.Set();
+
+	goog.array.forEach(this._entityCompostitions, function(comp, id) {
+		if(this.matchesComposition(id, entityComposition))
+			set.add(id);
+	}, this);
+
+	return set;
 };
 
 /**
@@ -376,18 +398,27 @@ CrunchJS.Internal.ComponentManager.prototype.getComponentIndex = function(compon
  * Removes all of the components from the entity
  * @param  {number} entityId The entity id
  */
-CrunchJS.Internal.ComponentManager.prototype.removeComponentsOfEntity = function(entityId) {
+CrunchJS.Internal.ComponentManager.prototype.removeAllComponents = function(entityId) {
+	
+	this._removeAllComponents(entityId);
+
+	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.RemoveAllComponents, entityId);
+
+};
+
+CrunchJS.Internal.ComponentManager.prototype._removeAllComponents = function(entityId) {
 	var composition = this.getEntityComposition(entityId),
 		len = this.bitSetOperator.length(composition);
 
 	for(var i = 0; i<len; i++){
 		
 		// If the bit is set, remove the component
-		if(this.bitSetOperator.get(i)){
+		if(this.bitSetOperator.get(composition, i)){
 			this.getComponentMap(i).remove(entityId);
-			this.bitSetOperator.clear(i);
+			this.bitSetOperator.clear(composition, i);
 		}
 	}
+
 
 	this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
 };
@@ -428,21 +459,27 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
 	var serData = {},
 		transVal;
 
-	serData['__functions'] = {};
+	serData.__functions = {};
 	goog.array.forEach(Object.getOwnPropertyNames(obj), function(name) {
 		transVal = obj[name];
 
 		if(goog.isFunction(transVal)){
 			transVal = transVal.toString();
-			serData['__functions'][name] = transVal;
+			serData.__functions[name] = transVal;
 		}
-		else
-			serData[name] = transVal;
-	});	
+		else{
+			// If it inherits from something, serialize that too
+			if(goog.isObject(transVal) && transVal.__proto__.__proto__){
+				serData[name] = this.serialize(transVal);
+			}
+			else
+				serData[name] = transVal;
+		}
+	}, this);	
 
 	// Serialize the proto if not the last proto
 	if(obj.__proto__.__proto__)
-		serData['__prototype'] = this.serialize(obj.__proto__); 
+		serData.__prototype = this.serialize(obj.__proto__); 
 
 	return serData;
 };
@@ -454,22 +491,24 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
  */
 CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 	var data;
-	if(obj['__prototype']){
-		data = Object.create(this.deserialize(obj['__prototype']));
-		delete obj['__prototype'];
+
+	if(!goog.isDefAndNotNull(obj) || !goog.isObject(obj))
+		return obj;
+
+	if(obj.__prototype){
+		data = Object.create(this.deserialize(obj.__prototype));
+		delete obj.__prototype;
 	}
 	else
 		data = {};
 
+	goog.object.forEach(obj.__functions, function(funString, funKey) {
+		data[funKey] = eval('var fun = ' + funString + '; fun;');
+	});
+
 	goog.object.forEach(obj, function(val, key) {
-		if(key == '__functions'){
-			goog.object.forEach(val, function(funString, funKey) {
-				data[funKey] = eval('var fun = ' + funString + '; fun;');
-			});
-		}
-		else
-			data[key] = val;
-	});	
+		data[key] = this.deserialize(val);
+	}, this);	
 
 	return data;
 };
@@ -477,19 +516,36 @@ CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 /**
  * Gets a snapshot of the current state of all of the components
  * @return {Object} The state
- * #TODO
  */
 CrunchJS.Internal.ComponentManager.prototype.getSnapshot = function() {
-	
+	var data = {};
+
+	data._compIndecies = this._compIndecies.toObject();
+
+	data._componentMaps = goog.array.map(this._componentMaps, function(el, index) {
+		return el.toObject();
+	});
+
+	data._entityCompostitions= this._entityCompostitions;
+
+	data._destroyedEntities = this._destroyedEntities.getValues();
+
+	return data;
 };
 
 /**
  * Overwrites the current state with the incoming state
  * @param  {Object} data The new state
- * #TODO
  */
 CrunchJS.Internal.ComponentManager.prototype.sync = function(data) {
-	
+	this._compIndecies = new goog.structs.Map(data._compIndecies);
+	this._componentMaps = goog.array.map(data._componentMaps, function(el, index) {
+		return new goog.structs.Map(el);
+	});
+
+	this._entityCompostitions = data._entityCompostitions;
+
+	this._destroyedEntities = new goog.structs.Set(data._destroyedEntities);
 };
 
 /**

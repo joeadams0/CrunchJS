@@ -82,6 +82,7 @@ CrunchJS.System.prototype.activate = function() {
  * Called when the scene this system is a part of is deactivated
  */
 CrunchJS.System.prototype.deactivate = function() {
+
 };
 
 /**
@@ -151,6 +152,13 @@ CrunchJS.System.prototype.check = function(entityId) {
 		this.getActiveEntities().add(entityId);
 		this.getScene().log("Entity " +entityId + " added to " + this.name, CrunchJS.LogLevels.DEBUG);
 	}
+	else{
+		var success = this.getActiveEntities().remove(entityId);
+
+		if(success)
+			this.getScene().log("Entity " +entityId + " removed from " + this.name, CrunchJS.LogLevels.DEBUG);
+
+	}
 };
 
 /**
@@ -206,11 +214,13 @@ CrunchJS.System.prototype.getEntityComposition = function() {
  */
 CrunchJS.System.prototype.setEntityComposition = function(comp) {
 	this._entityComposition = comp;
+
+	this.refreshData();
 };
 
 /**
  * Refreshes the active entities set
  */
 CrunchJS.System.prototype.refreshData = function() {
-	this._activeEntities = this.getScene().findComponents(this._entityComposition);
+	this._activeEntities = this.getScene().findEntities(this._entityComposition);
 };

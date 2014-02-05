@@ -8,6 +8,8 @@ goog.require('CrunchJS');
 goog.require('SimulationConfig');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 goog.require('Moba.ExampleScene');
+goog.require('Moba.ExampleSystem');
+goog.require('Moba.ExampleSystem1');
 
 /**
  * Creates a Simulation object in a web worker.
@@ -25,6 +27,13 @@ Simulation = function() {
 	var scene = new Moba.ExampleScene();
 
 	world.addScene(scene);
+
+	var sys1 = new Moba.ExampleSystem1();
+
+	var sys = new Moba.ExampleSystem();
+
+	scene.addSystem(sys1);
+	scene.addSystem(sys);
 	
 	// Load the simulation
 	SimulationConfig(scene);

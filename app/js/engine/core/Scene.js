@@ -107,6 +107,8 @@ CrunchJS.Scene = function() {
 		this.postEventToRemoteEngine(CrunchJS.EngineCommands.Pause);
 	}, this));
 
+	this.addEventListener(CrunchJS.Events.SendCommand, goog.bind(this.onSendCommand, this));
+
 };
 
 goog.inherits(CrunchJS.Scene, CrunchJS.Internal.EventManager);
@@ -247,6 +249,14 @@ CrunchJS.Scene.prototype.removeComponent = function(entityId, compName) {
 };
 
 /**
+ * Removes all of the components from an entity
+ * @param  {number} entityId The entity id
+ */
+CrunchJS.Scene.prototype.removeAllComponents = function(entityId) {
+	this._componentManager.removeAllComponents(entityId);
+};
+
+/**
  * Finds the Component with compName in the Entity with entityId
  * @param  {Number} entityId The Entity Id
  * @param  {String} compName The Component Name
@@ -292,6 +302,8 @@ CrunchJS.Scene.prototype.setSimulation = function(sim) {
 
 	this.fireEvent(CrunchJS.Events.SimAdded);
 
+	this.onSyncRequest();
+
 	if(CrunchJS.world.isRunning()){
 		// Send running event
 		this._sim.run();
@@ -321,24 +333,44 @@ CrunchJS.Scene.prototype.getSim = function() {
  * @param  {Object} data The new data
  */
 CrunchJS.Scene.prototype.onSync = function(data) {
-	this._entityManager.sync(data['entity_manager']);
-	this._componentManager.sync(data['component_manager']);
+	CrunchJS.world.log('Syncing');
+
+	this._entityManager.sync(data.entityManager);
+	this._componentManager.sync(data.componentManager);
 
 	this.fireEvent(CrunchJS.Events.RefreshData);
-
-	CrunchJS.world.log('Syncing');
 };
 
 /**
  * Sends the current entities and components
  */
 CrunchJS.Scene.prototype.onSyncRequest = function() {
+	this.postEventToRemoteEngine(CrunchJS.EngineCommands.Sync, this.getSnapshot());
+};
+
+/**
+ * Gets a snapshot of the current scene
+ * @return {Object} The snapshot
+ */
+CrunchJS.Scene.prototype.getSnapshot = function() {
 	var data = {};
 
-	data['entity_manager'] = this._entityManager.getSnapshot();
-	data['component_manager'] = this._componentManager.getSnapshot();
+	data.entityManager = this._entityManager.getSnapshot();
+	data.componentManager = this._componentManager.getSnapshot();
 
-	this.postEventToRemoteEngine(CrunchJS.EngineCommands.Sync, data);
+	return data;
+};
+/**
+ * Listens for the send command event
+ * @param  {Object} data The event data
+ */
+CrunchJS.Scene.prototype.onSendCommand = function(data) {
+	if(this.hasSim()){
+		this.getSim().postEvent(data.eventName, data.data);
+	}
+	else if(CrunchJS.world.isSim()){
+		CrunchJS.world.getMainEngine().postEvent(data.eventName, data.data);
+	}
 };
 
 /**

@@ -49,6 +49,9 @@ CrunchJS.Network.RemoteEngine.AbstractRemoteEngine = function(iChannel) {
 	// manager and events being posted go into the channel
 	this._channel.onEvent = goog.bind(this.fireEvent, this);
 	this.postEvent = goog.bind(this._channel.postEvent, this._channel);
+
+
+
 };
 
 goog.inherits(CrunchJS.Network.RemoteEngine.AbstractRemoteEngine, CrunchJS.Internal.EventManager);

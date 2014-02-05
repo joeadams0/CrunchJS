@@ -22,10 +22,10 @@ goog.addDependency('../../../js/engine/network/remoteengines/WWRemoteEngine.js',
 goog.addDependency('../../../js/engine/utils/bitset.js', ['CrunchJS.Utils.BitSetOperator'], []);
 goog.addDependency('../../../js/game/components/examples/ExampleComp.js', ['Moba.ExampleComp'], ['CrunchJS.Component']);
 goog.addDependency('../../../js/game/components/examples/ExampleComp1.js', ['Moba.ExampleComp1'], ['CrunchJS.Component']);
-goog.addDependency('../../../js/game/core/core.js', ['Moba', 'Moba.Core'], ['CrunchJS', 'Moba.ExampleComp', 'Moba.ExampleComp1', 'Moba.ExampleScene', 'Moba.ExampleSystem', 'Moba.ExampleSystem1']);
-goog.addDependency('../../../js/game/scenes/examples/ExampleScene.js', ['Moba.ExampleScene'], ['CrunchJS.Network.RemoteEngine.WWRemoteEngine', 'CrunchJS.Scene']);
-goog.addDependency('../../../js/game/simulation/simulation-bootstrap.js', ['SimulationBootstrap'], ['Simulation']);
-goog.addDependency('../../../js/game/simulation/simulation.js', ['Simulation'], ['CrunchJS', 'CrunchJS.Network.Channel.WebWorkerChannel', 'Moba.ExampleScene', 'SimulationConfig']);
+goog.addDependency('../../../js/game/core/core.js', ['Moba', 'Moba.Core'], ['CrunchJS', 'Moba.ExampleScene']);
+goog.addDependency('../../../js/game/scenes/examples/ExampleScene.js', ['Moba.ExampleScene'], ['CrunchJS.Network.RemoteEngine.WWRemoteEngine', 'CrunchJS.Scene', 'Moba.ExampleComp', 'Moba.ExampleComp1', 'Moba.ExampleSystem', 'Moba.ExampleSystem1']);
+goog.addDependency('../../../js/game/simulation/simulation-bootstrap.js', ['SimulationBootstrap'], ['Moba']);
+goog.addDependency('../../../js/game/simulation/simulation.js', ['Simulation'], ['CrunchJS', 'CrunchJS.Network.Channel.WebWorkerChannel', 'Moba.ExampleScene', 'Moba.ExampleSystem', 'Moba.ExampleSystem1', 'SimulationConfig']);
 goog.addDependency('../../../js/game/systems/example/ExampleSystem.js', ['Moba.ExampleSystem'], ['CrunchJS.System']);
 goog.addDependency('../../../js/game/systems/example/ExampleSystem1.js', ['Moba.ExampleSystem1'], ['CrunchJS.System']);
 goog.addDependency('../../../js/main.js', ['main'], ['Moba']);

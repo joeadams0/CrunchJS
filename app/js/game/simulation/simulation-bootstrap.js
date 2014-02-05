@@ -34,4 +34,4 @@ if(typeof COMPILED == "undefined"){
 
 goog.provide('SimulationBootstrap');
 
-goog.require('Simulation');
+goog.require('Moba');

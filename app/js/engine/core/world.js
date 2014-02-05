@@ -171,6 +171,12 @@ CrunchJS.EngineCommands = {
 	RemoveComponent : 'remove_component',
 
 	/**
+	 * Remove all components from an entity
+	 * @type {String}
+	 */
+	RemoveAllComponents : 'remove_all_components',
+
+	/**
 	 * Enable an entity
 	 * @type {String}
 	 */

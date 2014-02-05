@@ -127,13 +127,17 @@ CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.defaultListener = fu
 /**
  * Sends the sync data
  */
-CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSyncRequest = function() {};
+CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSyncRequest = function() {
+	CrunchJS.world.fireEvent(CrunchJS.EngineCommands.SyncRequest);
+};
 
 /**
  * Syncs the data with our system
  * @param  {Object} data The sync data
  */
-CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSync = function(data) {};
+CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSync = function(data) {
+	CrunchJS.world.fireEvent(CrunchJS.EngineCommands.Sync, data);
+};
 
 /**
  * Writes the data

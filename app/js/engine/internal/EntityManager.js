@@ -53,6 +53,12 @@ CrunchJS.Internal.EntityManager = function(scene) {
 	// Actives count
 	this.actives = 0;
 
+	
+	this.getScene().addEventListener(CrunchJS.EngineCommands.CreateEntity, goog.bind(this.onCreateEntity, this));
+	this.getScene().addEventListener(CrunchJS.EngineCommands.DestroyEntity, goog.bind(this.onDestroyEntity, this));
+	this.getScene().addEventListener(CrunchJS.EngineCommands.EnableEntity, goog.bind(this.onEnableEntity, this));
+	this.getScene().addEventListener(CrunchJS.EngineCommands.DisableEntity, goog.bind(this.onDisableEntity, this));
+
 };
 
 goog.inherits(CrunchJS.Internal.EntityManager, CrunchJS.Internal.Manager);
@@ -63,11 +69,6 @@ goog.inherits(CrunchJS.Internal.EntityManager, CrunchJS.Internal.Manager);
  */
 CrunchJS.Internal.EntityManager.prototype.activate = function() {
 	goog.base(this, 'activate');
-
-	this.getScene().addEventListener(CrunchJS.EngineCommands.CreateEntity, goog.bind(this.onCreateEntity, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.DestroyEntity, goog.bind(this.onDestroyEntity, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.EnableEntity, goog.bind(this.onEnableEntity, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.DisableEntity, goog.bind(this.onDisableEntity, this));
 	
 };	
 
@@ -77,7 +78,7 @@ CrunchJS.Internal.EntityManager.prototype.activate = function() {
  * @private
  */
 CrunchJS.Internal.EntityManager.prototype.onCreateEntity = function(id) {
-	CrunchJS.world.log('Create Entity:'+id);
+	//CrunchJS.world.log('Create Entity:'+id);
 	this._createEntity(id);
 };
 
@@ -87,7 +88,7 @@ CrunchJS.Internal.EntityManager.prototype.onCreateEntity = function(id) {
  * @private
  */
 CrunchJS.Internal.EntityManager.prototype.onDestroyEntity = function(id) {
-	CrunchJS.world.log('Destroy Entity:'+id);
+	//CrunchJS.world.log('Destroy Entity:'+id);
 	this._destroyEntity(id);
 };
 
@@ -97,7 +98,7 @@ CrunchJS.Internal.EntityManager.prototype.onDestroyEntity = function(id) {
  * @private
  */
 CrunchJS.Internal.EntityManager.prototype.onEnableEntity = function(id) {
-	CrunchJS.world.log('Entity Enabled:'+id);
+	//CrunchJS.world.log('Entity Enabled:'+id);
 	this._enableEntity(id);
 };
 
@@ -107,7 +108,7 @@ CrunchJS.Internal.EntityManager.prototype.onEnableEntity = function(id) {
  * @private
  */
 CrunchJS.Internal.EntityManager.prototype.onDisableEntity = function(id) {
-	CrunchJS.world.log('Entity Disabled:'+id);
+	//CrunchJS.world.log('Entity Disabled:'+id);
 	this._disableEntity(id);
 };
 
@@ -280,33 +281,33 @@ CrunchJS.Internal.EntityManager.prototype.getDisabledEntities = function() {
 /**
  * Gets a snapshot of the current state of all of the entities
  * @return {Object} The state
- * #TODO
  */
 CrunchJS.Internal.EntityManager.prototype.getSnapshot = function() {
 	var data = {};
 
-	data['_nextEntityId'] = this._nextEntityId;
-	data['_enabledEntities'] = this._enabledEntities.getValues();
-	data['_disabledEntities'] = this._disabledEntities.getValues();
+	data._nextEntityId = this._nextEntityId;
+	data._enabledEntities = this._enabledEntities.getValues();
+	data._disabledEntities = this._disabledEntities.getValues();
 
-	data['_entityPool'] = this._entityPool;
-	data['entities'] = this.entities;
-	data['actives'] = this.actives;
+	data._entityPool = this._entityPool;
+	data.entities = this.entities;
+	data.actives = this.actives;
+
+	return data;
 	
 };
 
 /**
  * Overwrites the current state with the incoming state
  * @param  {Object} data The new state
- * #TODO
  */
 CrunchJS.Internal.EntityManager.prototype.sync = function(data) {
-	this._nextEntityId = data['_nextEntityId'] ;
-	this._enabledEntities = new goog.structs.Set(data['_enabledEntities']);
-	this._disabledEntities = new goog.structs.Set(data['_disabledEntities']);
+	this._nextEntityId = data._nextEntityId ;
+	this._enabledEntities = new goog.structs.Set(data._enabledEntities);
+	this._disabledEntities = new goog.structs.Set(data._disabledEntities);
 
-	this._entityPool = data['_entityPool'];
-	this.entities = data['entities'] ;
-	this.actives = data['actives'] ;
+	this._entityPool = data._entityPool;
+	this.entities = data.entities;
+	this.actives = data.actives ;
 };
 

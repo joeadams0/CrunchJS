@@ -175,7 +175,7 @@ CrunchJS.EntityComposition.prototype.matchesOneSet = function(bitset) {
 	
 	for(var i = 1; i<=this.bsOp.length(set); i++){
 		if(this.bsOp.get(set, i))
-			if(!(this.bsOp.get(bitset, i)))
+			if(this.bsOp.get(bitset, i))
 				return true;
 	}
 

@@ -44,7 +44,7 @@ CrunchJS.Internal.SystemManager.prototype.activate = function() {
 		
 		function(system) {
 			this.activateSystem(system);
-	});	
+	}, this);	
 };
 
 /**
@@ -96,6 +96,10 @@ CrunchJS.Internal.SystemManager.prototype.addSystem = function(system) {
 
 	if(this.getScene() != null && this.getScene().isActive()){
 		this.activateSystem(system);
+	}
+	
+	if(!goog.isDefAndNotNull(system.getScene())){
+		system.setScene(this.getScene());
 	}
 };
 

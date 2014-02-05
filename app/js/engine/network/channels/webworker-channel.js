@@ -44,10 +44,10 @@ goog.inherits(CrunchJS.Network.Channel.WebWorkerChannel, CrunchJS.Network.Channe
  * @param  {Object} event The message event
  */
 CrunchJS.Network.Channel.WebWorkerChannel.prototype.onMessage = function(event) {
-	if(goog.isDefAndNotNull(event.data) && goog.isDefAndNotNull(event.data["eventName"]) ){
-		var eventName = event.data["eventName"];
+	if(goog.isDefAndNotNull(event.data) && goog.isDefAndNotNull(event.data.eventName) ){
+		var eventName = event.data.eventName;
 		
-		this.onEvent(eventName, event.data['data']);
+		this.onEvent(eventName, event.data.data);
 
 		// Debug
 		if(CrunchJS.DATA_SYNC_DEBUG){
@@ -64,8 +64,8 @@ CrunchJS.Network.Channel.WebWorkerChannel.prototype.onMessage = function(event) 
  */
 CrunchJS.Network.Channel.WebWorkerChannel.prototype.postEvent = function(eventName, data) {
 	var newData = {
-		"eventName" : eventName,
-		"data" : data
+		eventName : eventName,
+		data : data
 	};
 
 
