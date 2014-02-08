@@ -29,7 +29,7 @@ if(typeof COMPILED == "undefined"){
 	importScripts(
 		CLOSURE_BASE_PATH+'bootstrap/webworkers.js',
 	  	CLOSURE_BASE_PATH+'base.js',
-	  	'/js/deps-sim.js');	
+	  	'/js/deps.js');	
 }
 
 goog.provide('SimulationBootstrap');

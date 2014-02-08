@@ -229,6 +229,24 @@ CrunchJS.Scene.prototype.disableEntity = function(entityId) {
 };
 
 /**
+ * Sets a name for the entityId
+ * @param {string} name     The name to set
+ * @param {number} entityId The entityId
+ */
+CrunchJS.Scene.prototype.setEntityName = function(name, entityId) {
+	this._entityManager.setEntityName(name, entityId, true);	
+};
+
+/**
+ * Gets the entity from its name, if it has one
+ * @param  {string} name The name of the entity
+ * @return {number}      The entityId
+ */
+CrunchJS.Scene.prototype.getEntityByName = function(name) {
+	return this._entityManager.getEntityByName(name);
+};
+
+/**
  * Adds a component to the entity corresponding to the given id.
  * @param {Number} entityId  The Entity Id
  * @param {CrunchJS.Internal.Component} component The Component to add

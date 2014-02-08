@@ -198,7 +198,9 @@ CrunchJS.EngineCommands = {
 	 * Provides the sync data
 	 * @type {String}
 	 */
-	Sync : 'sync'
+	Sync : 'sync',
+
+	SetEntityName : 'set_entity_name'
 
 };
 

@@ -1,4 +1,4 @@
-goog.provide('main');
+goog.provide('game');
 
 goog.require('Moba');
 
