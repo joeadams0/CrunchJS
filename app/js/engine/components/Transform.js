@@ -2,7 +2,7 @@
  * @author Joe Adams
  */
 
-goog.provide('CrunchJS.Transform');
+goog.provide('CrunchJS.Components.Transform');
 
 goog.require('CrunchJS.Component');
 
@@ -15,7 +15,7 @@ goog.require('CrunchJS.Component');
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Transform = function(x,y,isMovable) {
+CrunchJS.Components.Transform = function(x,y,isMovable) {
 
 	/**
 	 * The x position
@@ -42,6 +42,10 @@ CrunchJS.Transform = function(x,y,isMovable) {
 	this.hasMoved = false;
 };
 
-goog.inherits(CrunchJS.Transform, CrunchJS.Component);
+goog.inherits(CrunchJS.Components.Transform, CrunchJS.Component);
 
-CrunchJS.Transform.name = 'Transform';
+/**
+ * The component type
+ * @type {String}
+ */
+CrunchJS.Components.Transform.name = 'Transform';

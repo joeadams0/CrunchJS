@@ -2,46 +2,23 @@
  * @author Joe Adams
  */
 
-goog.provide('CrunchJS.Impulse');
+goog.provide('CrunchJS.Components.Impulse');
 
 goog.require('CrunchJS.Component');
 
 /**
- * Contains data about the postitioning and rotation of the object. Use this if you want your entity to have a position in the world.
- * @param {number}  [x=0]     The x position
- * @param {number}  [y=0]     The y position
- * @param {Boolean} [isMovable=true] Should this object be allowed to be moved
+ * Contains data about the velocity and the force on the object. 
+ * @param {Object}  velocity  The Velocity of the component
+ * @param {Object}  force     The force on the object
  * @constructor
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Impulse = function(velocity) {
+CrunchJS.Components.Impulse = function(velocity, force) {
 
-	/**
-	 * The x position
-	 * @type {number}
-	 */
-	this.x = x ? x : 0;
-
-	/**
-	 * The y postition
-	 * @type {number}
-	 */
-	this.y = y ? y : 0;
-
-	/**
-	 * Is this object moveable
-	 * @type {Boolean}
-	 */
-	this.isMovable = isMovable ? isMovable : true;
-
-	/**
-	 * Has the object moved this frame
-	 * @type {Boolean}
-	 */
-	this.hasMoved = false;
+	
 };
 
-goog.inherits(CrunchJS.Impulse, CrunchJS.Component);
+goog.inherits(CrunchJS.Components.Impulse, CrunchJS.Component);
 
-CrunchJS.Impulse.name = 'Impulse';
+CrunchJS.Components.Impulse.name = 'Impulse';
