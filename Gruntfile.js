@@ -7,9 +7,6 @@ var mountFolder = function (connect, dir) {
   return connect.static(require('path').resolve(dir));
 };
 
-var modules = [];
-modules.push('blah:53');
-var useModules = modules.join(' --module ');
 
 module.exports = function (grunt) {
 
@@ -96,16 +93,8 @@ module.exports = function (grunt) {
   // the file globbing pattern for vendor file uglification.
   CONF.game.vendorFiles = [
       // all files JS in vendor folder
-      CONF.game.appPath + '/vendor/game/*.js',
+      CONF.game.appPath + '/vendor/*.js',
     ];
-
-
-  // the file globbing pattern for vendor file uglification.
-  CONF.sim.vendorFiles = [
-      // all files JS in vendor folder
-      CONF.sim.appPath + '/vendor/sim/*.js',
-    ];
-
   //
   //
   // Start Gruntconfig

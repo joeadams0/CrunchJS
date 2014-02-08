@@ -27,5 +27,5 @@ Moba.ExampleSystem.prototype.activate = function() {
 
 
 Moba.ExampleSystem.prototype.processEntity = function(frame, entityId) {
-	CrunchJS.world.log(this.getScene().getComponent(entityId,"Body").size.area());
+	//CrunchJS.world.log(this.getScene().getComponent(entityId,"Body").size.area());
 };
