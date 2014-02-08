@@ -5,3 +5,4 @@ temp
 closure-library
 npm-debug.log
 doc
+app/js/deps.js
