@@ -20,6 +20,7 @@ CrunchJS.RenderingSystem = function(canvasData){
     (canvasData.width ? canvasData.width : 400),
     (canvasData.height ? canvasData.height : 400)
   );
+  document.body.appendChild(this.renderer.view);
   this.sprites = []; // an array of Entities that are in the stage
 };
 
@@ -36,8 +37,12 @@ CrunchJS.RenderingSystem.prototype.activate = function() {
 
 CrunchJS.RenderingSystem.prototype.process = function(f){
   goog.base(this, 'process');
-
-  this.renderer.render(this.stage);
+  
+  var rend = this.renderer;
+  var stag = this.stage;
+  requestAnimFrame( function(){
+    rend.render(stag);
+  });
 };
 
 CrunchJS.RenderingSystem.prototype.processEntity = function(f, eId){
@@ -51,5 +56,7 @@ CrunchJS.RenderingSystem.prototype.processEntity = function(f, eId){
 
     this.stage.addChild(sprite);
     this.sprites.push(eId);
+    
+    console.log(this.stage.children);
   }
 };

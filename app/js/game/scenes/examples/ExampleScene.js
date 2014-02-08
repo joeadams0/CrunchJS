@@ -10,7 +10,9 @@ goog.require('Moba.ExampleSystem');
 goog.require('Moba.ExampleSystem1');
 goog.require('Moba.ExampleComp');
 goog.require('Moba.ExampleComp1');
-goog.require('CrunchJS.Components.Body');
+goog.require('CrunchJS.RenderingSystem');
+goog.require('CrunchJS.Components.Transform');
+goog.require('CrunchJS.Components.RenderImage');
 
 /**
  * Creates an example scene
@@ -50,9 +52,10 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var entity = this.createEntity();
 
-		this.addComponent(entity, new CrunchJS.Components.Body());
+		this.addComponent(entity, new CrunchJS.Components.Transform());
+		this.addComponent(entity, new CrunchJS.Components.RenderImage('star-on.png'));
 
-		var sys = new Moba.ExampleSystem();
+		var sys = new CrunchJS.RenderingSystem({});
 
 		this.addSystem(sys);
 	}
