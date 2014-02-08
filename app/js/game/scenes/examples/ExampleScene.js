@@ -13,6 +13,7 @@ goog.require('Moba.ExampleComp1');
 goog.require('CrunchJS.RenderingSystem');
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
+goog.require('CrunchJS.Components.OccupancyGrid');
 
 /**
  * Creates an example scene
@@ -39,7 +40,11 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
-	if(!CrunchJS.world.isSim()){
+	// If it is the sim
+	if(CrunchJS.world.isSim()){
+	}
+	// If it is the main window
+	else{
 		var sim;
 		if(COMPILED){
 			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/game.js');
