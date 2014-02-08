@@ -459,27 +459,33 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
 	var serData = {},
 		transVal;
 
-	serData.__functions = {};
-	goog.array.forEach(Object.getOwnPropertyNames(obj), function(name) {
-		transVal = obj[name];
 
-		if(goog.isFunction(transVal)){
-			transVal = transVal.toString();
-			serData.__functions[name] = transVal;
-		}
-		else{
-			// If it inherits from something, serialize that too
-			if(goog.isObject(transVal) && transVal.__proto__.__proto__){
-				serData[name] = this.serialize(transVal);
+	if(goog.isArray(obj)){
+		serData = goog.array.map(obj, this.serialize, this);
+	}
+	else{
+		serData.__functions = {};
+		goog.array.forEach(Object.getOwnPropertyNames(obj), function(name) {
+			transVal = obj[name];
+
+			if(goog.isFunction(transVal)){
+				transVal = transVal.toString();
+				serData.__functions[name] = transVal;
 			}
-			else
-				serData[name] = transVal;
-		}
-	}, this);	
+			else{
+				// If it inherits from something, serialize that too
+				if(goog.isObject(transVal) && transVal.__proto__.__proto__){
+					serData[name] = this.serialize(transVal);
+				}
+				else
+					serData[name] = transVal;
+			}
+		}, this);	
 
-	// Serialize the proto if not the last proto
-	if(obj.__proto__.__proto__)
-		serData.__prototype = this.serialize(obj.__proto__); 
+		// Serialize the proto if not the last proto
+		if(obj.__proto__.__proto__)
+			serData.__prototype = this.serialize(obj.__proto__); 
+	}
 
 	return serData;
 };
@@ -491,7 +497,6 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
  */
 CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 	var data;
-
 	if(!goog.isDefAndNotNull(obj) || !goog.isObject(obj))
 		return obj;
 
@@ -502,14 +507,18 @@ CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 	else
 		data = {};
 
-	goog.object.forEach(obj.__functions, function(funString, funKey) {
-		data[funKey] = eval('var fun = ' + funString + '; fun;');
-	});
+	if(goog.isArray(obj)){
+		data = goog.array.map(obj, this.deserialize, this);
+	}
+	else{
+		goog.object.forEach(obj.__functions, function(funString, funKey) {
+			data[funKey] = eval('var fun = ' + funString + '; fun;');
+		});
 
-	goog.object.forEach(obj, function(val, key) {
-		data[key] = this.deserialize(val);
-	}, this);	
-
+		goog.object.forEach(obj, function(val, key) {
+			data[key] = this.deserialize(val);
+		}, this);	
+	}
 
 	delete data.__functions;
 

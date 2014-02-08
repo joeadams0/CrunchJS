@@ -3,6 +3,8 @@
  * @namespace CrunchJS
  * @description  This is the main namespace for CrunchJS. All of these classes are a part of the core engine functionality.
  */
+// Load all of the vendor stuff if its not compiled
+
 goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
 goog.provide('CrunchJS.Events');
@@ -19,6 +21,7 @@ goog.require('CrunchJS.Internal.SceneManager');
 goog.require('CrunchJS.Internal.FrameManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 goog.require('CrunchJS.Network.RemoteEngine.MainRemoteEngine');
+goog.require('CrunchJS.Utils.vendor');
 
 /**
  * Global debug flag
@@ -364,6 +367,9 @@ CrunchJS.World = function(config) {
 		this.mainEngine = new CrunchJS.Network.RemoteEngine.MainRemoteEngine();
 		
 	}
+
+	if(!COMPILED)
+  		CrunchJS.Utils.vendor.go(CrunchJS.Utils.vendor.files);
 
 	return this;
 };
