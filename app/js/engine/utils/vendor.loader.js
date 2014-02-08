@@ -1,16 +1,11 @@
-/**
- * @fileoverview third-party deps loader. Works only for devel env.
- */
+// From https://github.com/thanpolas/generator-closure
+
 goog.provide('CrunchJS.vendor');
 
 
 if (!COMPILED) {
 
-  /**
-   * EDIT THIS ARRAY.
-   *
-   * @type {Array} define the 3rd party deps.
-   */
+
   CrunchJS.vendor.files = [
     'pixi.js'
   ];
