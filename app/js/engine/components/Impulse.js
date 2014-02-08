@@ -16,9 +16,25 @@ goog.require('CrunchJS.Component');
  */
 CrunchJS.Components.Impulse = function(velocity, force) {
 
-	
+	/**
+	 * The velocity of the entity	
+	 * @type {Object}
+	 */
+	this.velocity = velocity ? velocity : {
+		x : 0,
+		y : 0
+	};
+
+	/**
+	 * The force on the entity
+	 * @type {Object}
+	 */
+	this.force = force ? force : {
+		x : 0,
+		y : 0
+	}
 };
 
 goog.inherits(CrunchJS.Components.Impulse, CrunchJS.Component);
 
-CrunchJS.Components.Impulse.name = 'Impulse';
+CrunchJS.Components.Impulse.prototype.name = 'Impulse';

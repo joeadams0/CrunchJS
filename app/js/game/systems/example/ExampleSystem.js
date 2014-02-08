@@ -22,5 +22,10 @@ Moba.ExampleSystem.prototype.name = 'ExampleSystem';
 
 Moba.ExampleSystem.prototype.activate = function() {
 	goog.base(this, 'activate');
-	this.setEntityComposition(this.getScene().createEntityComposition().one('ExampleComp', 'ExampleComp1').exclude('ExampleComp'));
+	this.setEntityComposition(this.getScene().createEntityComposition().one('Body'));
+};
+
+
+Moba.ExampleSystem.prototype.processEntity = function(frame, entityId) {
+	CrunchJS.world.log(this.getScene().getComponent(entityId,"Body").size.area());
 };

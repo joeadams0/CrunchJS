@@ -3,3 +3,5 @@
  * @namespace CrunchJS.Components
  * @description All of the components for the engine.
  */
+
+goog.provide('CrunchJS.Components');

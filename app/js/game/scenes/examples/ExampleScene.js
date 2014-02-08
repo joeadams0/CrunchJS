@@ -10,6 +10,7 @@ goog.require('Moba.ExampleSystem');
 goog.require('Moba.ExampleSystem1');
 goog.require('Moba.ExampleComp');
 goog.require('Moba.ExampleComp1');
+goog.require('CrunchJS.Components.Body');
 
 /**
  * Creates an example scene
@@ -49,20 +50,13 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var entity = this.createEntity();
 
-		var excomp = new Moba.ExampleComp();
+		this.addComponent(entity, new CrunchJS.Components.Body());
 
-		var excomp1 = new Moba.ExampleComp1();
+		var sys = new Moba.ExampleSystem();
 
-		this.addComponent(entity, excomp);
-		this.addComponent(entity, excomp1);
+		this.addSystem(sys);
 	}
 
-	var sys1 = new Moba.ExampleSystem1();
-
-	var sys = new Moba.ExampleSystem();
-
-	this.addSystem(sys1);
-	this.addSystem(sys);
 };
 
 /**

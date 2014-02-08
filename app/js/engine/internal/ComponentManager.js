@@ -510,6 +510,9 @@ CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 		data[key] = this.deserialize(val);
 	}, this);	
 
+
+	delete data.__functions;
+
 	return data;
 };
 

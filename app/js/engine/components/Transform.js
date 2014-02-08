@@ -48,4 +48,4 @@ goog.inherits(CrunchJS.Components.Transform, CrunchJS.Component);
  * The component type
  * @type {String}
  */
-CrunchJS.Components.Transform.name = 'Transform';
+CrunchJS.Components.Transform.prototype.name = 'Transform';
