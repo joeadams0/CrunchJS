@@ -12,7 +12,7 @@ if (!COMPILED) {
    * @type {Array} define the 3rd party deps.
    */
   CrunchJS.vendor.files = [
-    'pixi.js'
+//    'pixi.js'
   ];
 
 

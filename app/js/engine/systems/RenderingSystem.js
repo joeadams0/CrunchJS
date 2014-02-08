@@ -38,25 +38,44 @@ CrunchJS.RenderingSystem.prototype.activate = function() {
 CrunchJS.RenderingSystem.prototype.process = function(f){
   goog.base(this, 'process');
   
-  var rend = this.renderer;
-  var stag = this.stage;
-  requestAnimFrame( function(){
-    rend.render(stag);
+  // the code that actually tries to re-draw to the Canvas
+  var me = this;                    // explicit reference
+  requestAnimFrame( function(){     // this is from JavaScript and prevents exceeding framerate
+    me.renderer.render(me.stage);   // PIXI call to render the stage
   });
 };
 
 CrunchJS.RenderingSystem.prototype.processEntity = function(f, eId){
-  if(this.sprites.indexOf(eId) == -1){ // if the entity isn't in the stage
-    var scene = this.getScene();
-    var sprite = new PIXI.Sprite(PIXI.Texture.fromImage(scene.getComponent(eId, 'RenderImage').image));
-    var transf = scene.getComponent(eId, 'Transform');
+  // variable declarations
+  var sprite,                                       // the PIXI sprite object for this entity
+      scene = this.getScene(),                      // the CrunchJS Scene object in which this entity resides
+      transf = scene.getComponent(eId, 'Transform'),// the transform component for this entity
+      imgRenC,                                      // the RenderImage component for this entity
+      shapeRenC                                     // the RenderShape component for this entity
+      ;
 
-    sprite.position.x = transf.x;
-    sprite.position.y = transf.y;
-
-    this.stage.addChild(sprite);
-    this.sprites.push(eId);
-    
-    console.log(this.stage.children);
+  // Does the PIXI sprite list have a representation of this entity?
+  if (this.sprites[eId] != undefined){
+    sprite = this.sprites[eId];  // access the sprite
+  } else {  // the entity has no PIXI representation, so we give it one
+    // create the PIXI Sprite for this entity
+    imgRenC = scene.getComponent(eId, 'RenderImage');
+    shapeRenC = scene.getComponent(eId, 'RenderShape');
+    if (imgRenC == null) {
+      sprite = new PIXI.Sprite(  );
+    } else {
+      sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+    }
+    this.stage.addChild(sprite);  // add it to the stage
+    this.sprites[eId] = sprite;   // and the stage's sprite-list
   }
+
+  // after handling PIXI representations of entity
+  // (sprite => entity)
+  ///////////////////////////////////
+  // Do the actual visual updating //
+  ///////////////////////////////////
+  // translate the Transform position to the onscreen position
+  sprite.position.x = transf.x;
+  sprite.position.y = transf.y;
 };
