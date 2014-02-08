@@ -10,7 +10,7 @@ goog.require('Moba.ExampleSystem');
 goog.require('Moba.ExampleSystem1');
 goog.require('Moba.ExampleComp');
 goog.require('Moba.ExampleComp1');
-goog.require('CrunchJS.Components.Body');
+goog.require('CrunchJS.Components.OccupancyGrid');
 
 /**
  * Creates an example scene
@@ -37,7 +37,11 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
-	if(!CrunchJS.world.isSim()){
+	// If it is the sim
+	if(CrunchJS.world.isSim()){
+	}
+	// If it is the main window
+	else{
 		var sim;
 		if(COMPILED){
 			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/game.js');
@@ -50,11 +54,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var entity = this.createEntity();
 
-		this.addComponent(entity, new CrunchJS.Components.Body());
-
-		var sys = new Moba.ExampleSystem();
-
-		this.addSystem(sys);
+		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid(10,10,5,5));
 	}
 
 };

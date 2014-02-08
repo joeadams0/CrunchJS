@@ -32,7 +32,7 @@ module.exports = function (grunt) {
     bootstrapFile: 'game.js',
 
     // The folder that contains all the externs files.
-    externsPath: 'build/externs/game/',
+    externsPath: 'build/externs/',
 
     // define the main namespace of your app.
     entryPoint: 'game',
@@ -221,7 +221,10 @@ module.exports = function (grunt) {
           closure_entry_point: CONF.entryPoint,
           summary_detail_level: 3,
           only_closure_dependencies: null,
-          source_map_format: 'V3'
+          source_map_format: 'V3',
+          externs: [CONF.externsPath + '*.js'],
+          output_wrapper: CONF.outputWrapper,
+          create_source_map: CONF.sourceMap,
 
         }
       },
@@ -232,13 +235,6 @@ module.exports = function (grunt) {
           CONF.componentPath
         ],
         dest: 'temp/compiledGame.js',
-
-        compilerOpts : {
-          closure_entry_point: CONF.entryPoint,
-          externs: [CONF.externsPath + '*.js'],
-          output_wrapper: CONF.outputWrapper,
-          create_source_map: CONF.sourceMap,
-        }
       },
       debug: {
         options: {

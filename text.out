@@ -1,0 +1,29 @@
+[4mRunning "clean:dist" (clean) task[24m
+Cleaning temp...[32mOK[39m
+
+[4mRunning "uglify:vendorGame" (uglify) task[24m
+File "temp/vendorGame.js" created.
+
+[4mRunning "closureBuilder:game" (closureBuilder) task[24m
+[34mExecuting: [39mpython app/closure-library/closure/bin/build/closurebuilder.py  -i app/js/game.js --root=app/js/ --root=app/closure-library --root=app/components -o compiled --output_file=temp/compiledGame.js --compiler_jar=node_modules/superstartup-closure-compiler/build/sscompiler.jar --compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS" --compiler_flags="--define='goog.DEBUG=false'" --compiler_flags="--define='CrunchJS.DEBUG=true'" --compiler_flags="--define='CrunchJS.DATA_SYNC_DEBUG=false'" --compiler_flags="--warning_level=verbose" --compiler_flags="--jscomp_off=checkTypes" --compiler_flags="--jscomp_off=fileoverviewTags" --compiler_flags="--closure_entry_point=game" --compiler_flags="--summary_detail_level=3" --compiler_flags="--only_closure_dependencies" --compiler_flags="--source_map_format=V3"
+[31m>> [39mError: Command failed: app/closure-library/closure/bin/build/closurebuilder.py: Scanning paths...[31m
+>> [39mapp/closure-library/closure/bin/build/closurebuilder.py: 1097 sources scanned.[31m
+>> [39mapp/closure-library/closure/bin/build/closurebuilder.py: Building dependency tree..[31m
+>> [39mapp/closure-library/closure/bin/build/closurebuilder.py: Compiling with the following command: java -d32 -client -jar node_modules/superstartup-closure-compiler/build/sscompiler.jar --js app/closure-library/closure/goog/base.js --js app/closure-library/closure/goog/object/object.js --js app/closure-library/closure/goog/dom/nodetype.js --js app/closure-library/closure/goog/debug/error.js --js app/closure-library/closure/goog/string/string.js --js app/closure-library/closure/goog/asserts/asserts.js --js app/closure-library/closure/goog/array/array.js --js app/closure-library/closure/goog/structs/structs.js --js app/closure-library/closure/goog/structs/collection.js --js app/closure-library/closure/goog/functions/functions.js --js app/closure-library/closure/goog/math/math.js --js app/closure-library/closure/goog/iter/iter.js --js app/closure-library/closure/goog/structs/map.js --js app/closure-library/closure/goog/structs/set.js --js app/js/engine/core/System.js --js app/js/game/systems/example/ExampleSystem1.js --js app/js/engine/network/channels/ichannel.js --js app/js/engine/network/channels/webworker-channel.js --js app/js/engine/internal/EventManager.js --js app/js/engine/network/remoteengines/AbstractRemoteEngine.js --js app/js/engine/network/remoteengines/TrustedRemoteEngine.js --js app/js/engine/network/remoteengines/WWRemoteEngine.js --js app/js/engine/core/Component.js --js app/js/game/components/examples/ExampleComp1.js --js app/js/game/systems/example/ExampleSystem.js --js app/js/engine/utils/bitset.js --js app/js/engine/helpers/OccupancyGridHelper.js --js app/js/engine/components/OccupancyGrid.js --js app/js/engine/internal/Manager.js --js app/js/engine/internal/EntityManager.js --js app/js/engine/internal/SystemManager.js --js app/js/engine/core/EntityComposition.js --js app/js/engine/internal/ComponentManager.js --js app/js/engine/core/Scene.js --js app/js/game/components/examples/ExampleComp.js --js app/js/game/scenes/examples/ExampleScene.js --js app/js/engine/utils/vendor.loader.js --js app/closure-library/closure/goog/disposable/idisposable.js --js app/closure-library/closure/goog/disposable/disposable.js --js app/closure-library/closure/goog/events/eventid.js --js app/closure-library/closure/goog/events/listenable.js --js app/closure-library/closure/goog/events/listener.js --js app/closure-library/closure/goog/events/listenermap.js --js app/closure-library/closure/goog/useragent/useragent.js --js app/closure-library/closure/goog/events/browserfeature.js --js app/closure-library/closure/goog/debug/entrypointregistry.js --js app/closure-library/closure/goog/events/eventtype.js --js app/closure-library/closure/goog/events/event.js --js app/closure-library/closure/goog/reflect/reflect.js --js app/closure-library/closure/goog/events/browserevent.js --js app/closure-library/closure/goog/events/events.js --js app/closure-library/closure/goog/events/eventtarget.js --js app/closure-library/closure/goog/timer/timer.js --js app/js/engine/internal/SceneManager.js --js app/js/engine/core/Frame.js --js app/js/engine/internal/FrameManager.js --js app/js/engine/network/remoteengines/MainRemoteEngine.js --js app/js/engine/core/World.js --js app/js/game/core/core.js --js app/js/game.js --compilation_level=ADVANCED_OPTIMIZATIONS --define='goog.DEBUG=false' --define='CrunchJS.DEBUG=true' --define='CrunchJS.DATA_SYNC_DEBUG=false' --warning_level=verbose --jscomp_off=checkTypes --jscomp_off=fileoverviewTags --closure_entry_point=game --summary_detail_level=3 --only_closure_dependencies --source_map_format=V3[31m
+>> [39mapp/js/game/core/core.js:24: ERROR - variable PIXI is undeclared[31m
+>> [39m	    var renderer = PIXI.autoDetectRenderer(400, 300);[31m
+>> [39m	                   ^[31m
+>> [39m[31m
+>> [39m1 error(s), 0 warning(s)[31m
+>> [39mTraceback (most recent call last):[31m
+>> [39m  File "app/closure-library/closure/bin/build/closurebuilder.py", line 265, in <module>[31m
+>> [39m    main()[31m
+>> [39m  File "app/closure-library/closure/bin/build/closurebuilder.py", line 254, in main[31m
+>> [39m    compiler_flags=options.compiler_flags)[31m
+>> [39m  File "/Users/josephadams/Documents/Code/CrunchJS/app/closure-library/closure/bin/build/jscompiler.py", line 135, in Compile[31m
+>> [39m    raise JsCompilerError('JavaScript compilation failed.')[31m
+>> [39mjscompiler.JsCompilerError: JavaScript compilation failed.
+[31m>> [39mFAILED to run command for target: [31mgame[39m
+[33mWarning: Task "closureBuilder:game" failed. Use --force to continue.[39m
+
+[31mAborted due to warnings.[39m

@@ -1,13 +1,12 @@
 // From https://github.com/thanpolas/generator-closure
 
-goog.provide('CrunchJS.vendor');
+goog.provide('CrunchJS.Utils.vendor');
 
 
 if (!COMPILED) {
 
 
-  CrunchJS.vendor.files = [
-    'pixi.js'
+  CrunchJS.Utils.vendor.files = [
   ];
 
 
@@ -24,9 +23,9 @@ if (!COMPILED) {
    *
    * @param  {Array} deps key value, value being the url.
    */
-  CrunchJS.vendor.loadDeps = function(deps) {
+  CrunchJS.Utils.vendor.loadDeps = function(deps) {
     for(var i = 0, len = deps.length; i < len; i++) {
-      CrunchJS.vendor.writeScript(deps[i]);
+      CrunchJS.Utils.vendor.writeScript(deps[i]);
     }
   };
 
@@ -36,7 +35,7 @@ if (!COMPILED) {
    * @param  {string} src A canonical path.
    * @param  {boolean=} optInline set to true to append inline javascript.
    */
-  CrunchJS.vendor.writeScript = function (src, optInline) {
+  CrunchJS.Utils.vendor.writeScript = function (src, optInline) {
     if(CrunchJS.world.isSim()){
       importScripts(src);
     }
@@ -56,9 +55,9 @@ if (!COMPILED) {
    * Load vendor deps
    * @param {Array} files
    */
-  CrunchJS.vendor.go = function(files) {
+  CrunchJS.Utils.vendor.go = function(files) {
 
-    var vendorFilepath = goog.basePath + goog.getPathFromDeps_('CrunchJS.vendor');
+    var vendorFilepath = goog.basePath + goog.getPathFromDeps_('CrunchJS.Utils.vendor');
 
     var vendorFilename = vendorFilepath.match(/[\.\w]+$/)[0];
 
@@ -73,6 +72,6 @@ if (!COMPILED) {
     }
 
     // load third party deps
-    CrunchJS.vendor.loadDeps(newFiles);
+    CrunchJS.Utils.vendor.loadDeps(newFiles);
   };
 }
