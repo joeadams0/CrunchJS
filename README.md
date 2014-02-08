@@ -75,23 +75,7 @@ The server will start and open up the page in your web browser. The page that is
 grunt deps
 ```
 
-Calculates the dependancies for the project. This will run "grunt deps:main" and "grunt deps:sim" for you.
-
-#### Update the Simulation Dependacies
-
-```
-grunt deps:sim
-```
-
-Calculates all of the dependancies for the Simulation and puts them in app/js/deps-sim.js.
-
-#### Update the Main Dependancies
-
-```
-grunt deps:main
-```
-
-Calculates all of the dependancies for the main window and puts them in app/js/deps.js.
+Calculates all of the dependancies for the whole game and puts them in app/js/deps.js.
 
 ### Build the Project
 
@@ -99,32 +83,12 @@ Calculates all of the dependancies for the main window and puts them in app/js/d
 grunt build
 ```
 
-Runs "grunt build:sim" and "grunt build:main" (this also generates the documentation). To run the compiled code:
-
-1. Run the build command
-2. Run the server 
-3. Go to the /compile.html page to run the compiled code.
-
-#### Build Simulation
-
-```
-grunt build:sim
-```
-
-Compiles all of the source files for the simultation into an optimized, minimized, single script located at app/jsc/sim.js
-
-#### Build Main
-
-```
-grunt build:main
-```
-
-Compiles all of the source files for the main window into an optimized, minimized, single script located at app/jsc/game.js
+Compiles all of the source files for the game into an optimized, minimized, single script located at app/jsc/game.js.
 
 ### Generate Documentation
 
 ```
-grunt jsdoc
+grunt doc
 ```
 
 Generates the documentation for the project. The documentation is taken from annotations in the source code. The generated documentation is in the /doc folder.

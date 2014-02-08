@@ -7,7 +7,7 @@ goog.addDependency('../../../js/engine/core/Scene.js', ['CrunchJS.Scene'], ['Cru
 goog.addDependency('../../../js/engine/core/System.js', ['CrunchJS.System'], ['goog.structs', 'goog.structs.Set']);
 goog.addDependency('../../../js/engine/core/World.js', ['CrunchJS', 'CrunchJS.DATA_SYNC_DEBUG', 'CrunchJS.DEBUG', 'CrunchJS.EngineCommands', 'CrunchJS.Events', 'CrunchJS.LogLevels', 'CrunchJS.World', 'CrunchJS.world'], ['CrunchJS.Internal.FrameManager', 'CrunchJS.Internal.SceneManager', 'CrunchJS.Network.Channel.WebWorkerChannel', 'CrunchJS.Network.RemoteEngine.MainRemoteEngine', 'goog.Timer', 'goog.events', 'goog.object']);
 goog.addDependency('../../../js/engine/internal/ComponentManager.js', ['CrunchJS.Internal.ComponentManager'], ['CrunchJS.EntityComposition', 'CrunchJS.Internal.Manager', 'CrunchJS.Utils.BitSetOperator', 'goog.array', 'goog.object', 'goog.structs', 'goog.structs.Map', 'goog.structs.Set']);
-goog.addDependency('../../../js/engine/internal/EntityManager.js', ['CrunchJS.Internal.EntityManager'], ['CrunchJS.Internal.Manager', 'goog.array', 'goog.object', 'goog.structs.Set']);
+goog.addDependency('../../../js/engine/internal/EntityManager.js', ['CrunchJS.Internal.EntityManager'], ['CrunchJS.Internal.Manager', 'goog.array', 'goog.object', 'goog.structs.Map', 'goog.structs.Set']);
 goog.addDependency('../../../js/engine/internal/EventManager.js', ['CrunchJS.Internal.EventManager'], ['goog.array', 'goog.structs', 'goog.structs.Map', 'goog.structs.Set']);
 goog.addDependency('../../../js/engine/internal/FrameManager.js', ['CrunchJS.Internal.FrameManager'], ['CrunchJS.Frame']);
 goog.addDependency('../../../js/engine/internal/Manager.js', ['CrunchJS.Internal.Manager'], []);
@@ -20,6 +20,7 @@ goog.addDependency('../../../js/engine/network/remoteengines/MainRemoteEngine.js
 goog.addDependency('../../../js/engine/network/remoteengines/TrustedRemoteEngine.js', ['CrunchJS.Network.RemoteEngine.TrustedRemoteEngine'], ['CrunchJS.Network.RemoteEngine.AbstractRemoteEngine']);
 goog.addDependency('../../../js/engine/network/remoteengines/WWRemoteEngine.js', ['CrunchJS.Network.RemoteEngine.WWRemoteEngine'], ['CrunchJS.Network.Channel.WebWorkerChannel', 'CrunchJS.Network.RemoteEngine.TrustedRemoteEngine']);
 goog.addDependency('../../../js/engine/utils/bitset.js', ['CrunchJS.Utils.BitSetOperator'], []);
+goog.addDependency('../../../js/game.js', ['game'], ['Moba']);
 goog.addDependency('../../../js/game/components/examples/ExampleComp.js', ['Moba.ExampleComp'], ['CrunchJS.Component']);
 goog.addDependency('../../../js/game/components/examples/ExampleComp1.js', ['Moba.ExampleComp1'], ['CrunchJS.Component']);
 goog.addDependency('../../../js/game/core/core.js', ['Moba', 'Moba.Core'], ['CrunchJS', 'Moba.ExampleScene']);
@@ -28,6 +29,5 @@ goog.addDependency('../../../js/game/simulation/simulation-bootstrap.js', ['Simu
 goog.addDependency('../../../js/game/simulation/simulation.js', ['Simulation'], ['CrunchJS', 'CrunchJS.Network.Channel.WebWorkerChannel', 'Moba.ExampleScene', 'Moba.ExampleSystem', 'Moba.ExampleSystem1', 'SimulationConfig']);
 goog.addDependency('../../../js/game/systems/example/ExampleSystem.js', ['Moba.ExampleSystem'], ['CrunchJS.System']);
 goog.addDependency('../../../js/game/systems/example/ExampleSystem1.js', ['Moba.ExampleSystem1'], ['CrunchJS.System']);
-goog.addDependency('../../../js/main.js', ['main'], ['Moba']);
 goog.addDependency('../../../js/shared/simulation-config.js', ['SimulationConfig'], ['Moba.ExampleSystem']);
-goog.addDependency('app/js/main.js', ['main'], ['Moba']);
+goog.addDependency('app/js/game.js', ['game'], ['Moba']);

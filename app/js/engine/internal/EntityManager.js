@@ -7,6 +7,7 @@ goog.provide("CrunchJS.Internal.EntityManager");
 goog.require('goog.array');
 goog.require('goog.structs.Set');
 goog.require('goog.object');
+goog.require('goog.structs.Map');
 
 goog.require('CrunchJS.Internal.Manager');
 
@@ -53,11 +54,18 @@ CrunchJS.Internal.EntityManager = function(scene) {
 	// Actives count
 	this.actives = 0;
 
+	/**
+	 * Maps names to entity Ids
+	 * @type {goog.structs.Map}
+	 */
+	this._nameMap = new goog.structs.Map();
+
 	
 	this.getScene().addEventListener(CrunchJS.EngineCommands.CreateEntity, goog.bind(this.onCreateEntity, this));
 	this.getScene().addEventListener(CrunchJS.EngineCommands.DestroyEntity, goog.bind(this.onDestroyEntity, this));
 	this.getScene().addEventListener(CrunchJS.EngineCommands.EnableEntity, goog.bind(this.onEnableEntity, this));
 	this.getScene().addEventListener(CrunchJS.EngineCommands.DisableEntity, goog.bind(this.onDisableEntity, this));
+	this.getScene().addEventListener(CrunchJS.EngineCommands.SetEntityName, goog.bind(this.onSetEntityName, this));
 
 };
 
@@ -110,6 +118,14 @@ CrunchJS.Internal.EntityManager.prototype.onEnableEntity = function(id) {
 CrunchJS.Internal.EntityManager.prototype.onDisableEntity = function(id) {
 	//CrunchJS.world.log('Entity Disabled:'+id);
 	this._disableEntity(id);
+};
+
+/**
+ * Listens for the command to set an entity name
+ * @param  {Object} data The event data
+ */
+CrunchJS.Internal.EntityManager.prototype.onSetEntityName = function(data) {
+	this.setEntityName(data.name, data.id, false);
 };
 
 /**
@@ -277,6 +293,30 @@ CrunchJS.Internal.EntityManager.prototype.getDisabledEntities = function() {
 	return this._disabledEntities;
 };
 
+/**
+ * Sets a name for the entityId
+ * @param {string} name     The name to set
+ * @param {number} entityId The entityId
+ */
+CrunchJS.Internal.EntityManager.prototype.setEntityName = function(name, entityId, fireEvent) {
+	this._nameMap.set(name, entityId);
+
+	if(fireEvent){
+		this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.SetEntityName, {
+			id : entityId,
+			name : name
+		});
+	}
+};
+
+/**
+ * Gets the entity from its name, if it has one
+ * @param  {string} name The name of the entity
+ * @return {number}      The entityId
+ */
+CrunchJS.Internal.EntityManager.prototype.getEntityByName = function(name) {
+	return this._nameMap.get(name);
+};
 
 /**
  * Gets a snapshot of the current state of all of the entities
@@ -288,10 +328,12 @@ CrunchJS.Internal.EntityManager.prototype.getSnapshot = function() {
 	data._nextEntityId = this._nextEntityId;
 	data._enabledEntities = this._enabledEntities.getValues();
 	data._disabledEntities = this._disabledEntities.getValues();
+	data._nameMap = this._nameMap.toObject();
 
 	data._entityPool = this._entityPool;
 	data.entities = this.entities;
 	data.actives = this.actives;
+
 
 	return data;
 	
@@ -305,6 +347,7 @@ CrunchJS.Internal.EntityManager.prototype.sync = function(data) {
 	this._nextEntityId = data._nextEntityId ;
 	this._enabledEntities = new goog.structs.Set(data._enabledEntities);
 	this._disabledEntities = new goog.structs.Set(data._disabledEntities);
+	this._nameMap = new goog.structs.Map(data._nampMap);
 
 	this._entityPool = data._entityPool;
 	this.entities = data.entities;
