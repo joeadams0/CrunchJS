@@ -10,6 +10,9 @@ goog.require('Moba.ExampleSystem');
 goog.require('Moba.ExampleSystem1');
 goog.require('Moba.ExampleComp');
 goog.require('Moba.ExampleComp1');
+goog.require('CrunchJS.Systems.RenderingSystem');
+goog.require('CrunchJS.Components.Transform');
+goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.OccupancyGrid');
 
 /**
@@ -54,7 +57,12 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var entity = this.createEntity();
 
-		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid(10,10,5,5));
+		this.addComponent(entity, new CrunchJS.Components.Transform());
+		this.addComponent(entity, new CrunchJS.Components.RenderImage('star-on.png'));
+
+		var sys = new CrunchJS.Systems.RenderingSystem({});
+
+		this.addSystem(sys);
 	}
 
 };
