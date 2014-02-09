@@ -46,7 +46,7 @@ CrunchJS.Components.OccupancyGrid = function(width, height, tileWidth, tileHeigh
 	 * The map of locations to occupancy tiles
 	 * @type {Object}
 	 */
-	this.map = CrunchJS.Helpers.OccupancyGridHelper.getInstance().createMap(width, height);
+	this.map = CrunchJS.Helpers.OccupancyGridHelper.createMap(width, height);
 };
 
 goog.inherits(CrunchJS.Components.OccupancyGrid, CrunchJS.Component);

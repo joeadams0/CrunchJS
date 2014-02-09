@@ -463,6 +463,9 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
 	if(goog.isArray(obj)){
 		serData = goog.array.map(obj, this.serialize, this);
 	}
+	else if(goog.isString(obj) || goog.isNumber(obj)){
+		serData = obj;
+	}
 	else{
 		serData.__functions = {};
 		goog.array.forEach(Object.getOwnPropertyNames(obj), function(name) {
