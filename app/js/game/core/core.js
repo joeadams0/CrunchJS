@@ -19,14 +19,6 @@ Moba.Core = function(){
 
 	world = new CrunchJS.World();
 
-	if(typeof document != undefined){
-		// create a renderer instance.
-	    var renderer = PIXI.autoDetectRenderer(400, 300);
-	 
-	    // add the renderer view element to the DOM
-	    document.body.appendChild(renderer.view);
-	}
-
 	var scene = new Moba.ExampleScene();
 
 	world.addScene(scene);

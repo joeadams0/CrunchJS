@@ -40,7 +40,7 @@ CrunchJS.RenderingSystem.prototype.process = function(f){
   
   // the code that actually tries to re-draw to the Canvas
   var me = this;                    // explicit reference
-  requestAnimFrame( function(){     // this is from JavaScript and prevents exceeding framerate
+  window.requestAnimFrame( function(){     // this is from JavaScript and prevents exceeding framerate
     me.renderer.render(me.stage);   // PIXI call to render the stage
   });
 };
