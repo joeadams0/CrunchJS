@@ -5,7 +5,11 @@ goog.provide('CrunchJS.Utils.vendor');
 
 if (!COMPILED) {
 
-
+  /**
+   * EDIT THIS ARRAY.
+   *
+   * @type {Array} define the 3rd party deps.
+   */
   CrunchJS.Utils.vendor.files = [
   ];
 

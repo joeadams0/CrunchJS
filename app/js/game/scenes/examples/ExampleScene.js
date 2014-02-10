@@ -10,6 +10,9 @@ goog.require('Moba.ExampleSystem');
 goog.require('Moba.ExampleSystem1');
 goog.require('Moba.ExampleComp');
 goog.require('Moba.ExampleComp1');
+goog.require('CrunchJS.Systems.RenderingSystem');
+goog.require('CrunchJS.Components.Transform');
+goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.Body');
@@ -67,6 +70,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.addComponent(ent2, new CrunchJS.Components.Transform(-15,-15));
 		this.addComponent(ent2, new CrunchJS.Components.Body(7,7));
 		this.addComponent(ent2, new CrunchJS.Components.Occupancy(false, true));
+
 	}
 
 };
