@@ -49,7 +49,7 @@ Moba.PhysicsSystem.prototype.activate = function() {
 //var deletionBuffer = x;
 
 var canvasw;
-function setcanvaswidth(canvaswidth){
+Moba.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
 	return canvasw = canvaswidth;
 }
 
@@ -62,7 +62,7 @@ function setcanvaswidth(canvaswidth){
 /**
  * Initializes world and objects.  Sets regular interval
  */
-function init(){
+Moba.PhysicsSystem.prototype = function init(){
 	//create ground here if needed
 
 
@@ -81,7 +81,7 @@ var z = window.setInterval(update, (1000/50));
  * @param {int} object1 id (entity) of first object involved in collision
  * @param {int} object2 id (entity) of second object involved in collision
  */
-function collisionAlert(object1, object2){
+Moba.PhysicsSystem.prototype = function collisionAlert(object1, object2){
 
 };
 
@@ -90,7 +90,7 @@ function collisionAlert(object1, object2){
  * called at the regular interval as defined in init()
  * edits the transform component once an object moves after a step()
  */
-function update(){
+Moba.PhysicsSystem.prototype = function update(){
 
 
 };
@@ -102,7 +102,7 @@ function update(){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-function addRectangle(canvaswidth, canvasheight){
+Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight){
 	//create rectangle
 	var bodyDef = new b2BodyDef;
 	var fixDef = new b2FixtureDef;
@@ -126,10 +126,14 @@ function addRectangle(canvaswidth, canvasheight){
 
 /**
  * Adds force to objectID within in physics simulation
+ *
+ * ApplyImpulse method signiture from Box2D file
+ * box2d.Body.prototype.ApplyImpulse = function(impulse, point)
+ * 
  * @param {int} objectID Entity
  * @param {vector} v is a vector composed of x and y components representing velocity in each direction
  */
-function addImpulse(objectID, v){
+Moba.PhysicsSystem.prototype = function addImpulse(objectID, v){
 
 };
 
@@ -137,6 +141,6 @@ function addImpulse(objectID, v){
  * Stops the execution of the setInterval
  * @param  {int} intervalVariable global variable set by initial setInterval() call
  */
-function cancelUpdate(intervalVariable){
+Moba.PhysicsSystem.prototype = function cancelUpdate(intervalVariable){
 	window.clearInterval(intervalVariable);
 };
