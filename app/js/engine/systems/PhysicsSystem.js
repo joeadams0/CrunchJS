@@ -28,7 +28,7 @@ Moba.PhysicsSystem.prototype.activate = function() {
 
 /**
  * Sets gravity to be having no effect on the world
- * @define {b2Vec2}
+ * @define {int}
  */
 //var b2Vec2 = Box2D.Common.Math.b2Vec2;
 var gravity = new b2Vec2(0, 0);
