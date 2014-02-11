@@ -31,22 +31,33 @@ Moba.PhysicsSystem.prototype.activate = function() {
  * @define {int}
  */
 //var b2Vec2 = Box2D.Common.Math.b2Vec2;
-var gravity = new b2Vec2(0, 0);
+//var gravity = new b2Vec2(0, 0);
 /**
  * Allows objects in the world to enter the sleep state.  Sleep state allows for reduction in cpu usage when an object is not being moved.
  * @define {boolean}
  */
-var doSleep = true;
+//var doSleep = true;
 /**
  * Declares and initializes the world object used in the Box2D simulation
  * @define {b2World}
  */
-var world = new b2World(gravity, doSleep);
+//var world = new b2World(gravity, doSleep);
 /**
  * Deletes an object once it is x pixels off the screen
  * @define {int}
  */
 //var deletionBuffer = x;
+
+var canvasw;
+function setcanvaswidth(canvaswidth){
+	return canvasw = canvaswidth;
+}
+
+var canvash;
+function setcanvaswidth(canvaswidth){
+	return canvash = canvaswidth;
+}
+
 
 /**
  * Initializes world and objects.  Sets regular interval
@@ -56,7 +67,7 @@ function init(){
 
 
 	//create any objects that are needed in the scene at first
-	addRectangle(5, 5);
+	addRectangle(canvasw, canvash);
 };
 
 /**
@@ -86,12 +97,31 @@ function update(){
 
 /**
  * Adds rectangle to Box2D simulation
- * Sets width, height, mass
- * @param {int} w is width
- * @param {int} h is height
+ * Sets width, height, mass, and placement of object
+ * Creates object in Box2D world
+ * @param {int} canvaswidth
+ * @param {int} canvasheight
  */
-function addRectangle(w, h){
+function addRectangle(canvaswidth, canvasheight){
+	//create rectangle
+	var bodyDef = new b2BodyDef;
+	var fixDef = new b2FixtureDef;
+	xDef.density = 0.4;
+	fixDef.friction = 0.2;
+	fixDef.restitution = 0.2;
 
+	bodyDef.type = b2Body.b2_dynamicBody;
+	fixDef.shape = new b2PolygonShape;
+	var scale = 30;
+	fixDef.shape.SetAsArray([
+		new b2Vec2(scale*0.866 , scale*0.5),
+		new b2Vec2(scale*-0.866, scale*0.5),
+				new b2Vec2(0, scale*1),
+				new b2Vec2(0, scale*-1)
+			  	]);
+	bodyDef.position.x = (canvaswidth-scale*2)*Math.random()+scale*2;
+	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
+	world.CreateBody(bodyDef).CreateFixture(fixDef);
 };
 
 /**
