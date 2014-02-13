@@ -30,18 +30,18 @@ Moba.PhysicsSystem.prototype.activate = function() {
  * Sets gravity to be having no effect on the world
  * @define {int}
  */
-//var b2Vec2 = Box2D.Common.Math.b2Vec2;
-//var gravity = new b2Vec2(0, 0);
+var b2Vec2 = Box2D.Common.Math.b2Vec2;
+var gravity = new b2Vec2(0, 0);
 /**
  * Allows objects in the world to enter the sleep state.  Sleep state allows for reduction in cpu usage when an object is not being moved.
  * @define {boolean}
  */
-//var doSleep = true;
+var doSleep = true;
 /**
  * Declares and initializes the world object used in the Box2D simulation
  * @define {b2World}
  */
-//var world = new b2World(gravity, doSleep);
+var world = new b2World(gravity, doSleep);
 /**
  * Deletes an object once it is x pixels off the screen
  * @define {int}
