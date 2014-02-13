@@ -21,7 +21,7 @@ goog.require('CrunchJS.Internal.SceneManager');
 goog.require('CrunchJS.Internal.FrameManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 goog.require('CrunchJS.Network.RemoteEngine.MainRemoteEngine');
-goog.require('CrunchJS.vendor');
+goog.require('CrunchJS.Utils.vendor');
 
 /**
  * Global debug flag
@@ -369,7 +369,7 @@ CrunchJS.World = function(config) {
 	}
 
 	if(!COMPILED)
-  		CrunchJS.vendor.go(CrunchJS.vendor.files);
+  		CrunchJS.Utils.vendor.go(CrunchJS.Utils.vendor.files);
 
 	return this;
 };

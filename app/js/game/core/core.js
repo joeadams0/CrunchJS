@@ -6,6 +6,7 @@ goog.provide('Moba.Core');
 
 goog.require('CrunchJS');
 goog.require('Moba.ExampleScene');
+goog.require('box2d.World');
 
 /**
  * The Game Object
