@@ -9,6 +9,7 @@ goog.require('CrunchJS.Internal.SystemManager');
 goog.require('CrunchJS.Internal.EntityManager');
 goog.require('CrunchJS.Internal.ComponentManager');
 goog.require('CrunchJS.Internal.EventManager');
+goog.require('CrunchJS.Internal.NetworkManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
 goog.require('goog.object');
@@ -85,6 +86,13 @@ CrunchJS.Scene = function() {
 	this._componentManager = new CrunchJS.Internal.ComponentManager(this);
 
 	/**
+	 * The NetworkManager for the scene
+	 * @type {CrunchJS.Internal.NetworkManager}
+	 * @protected
+	 */
+	this._networkManager = new CrunchJS.Internal.NetworkManager(this);
+	
+	/**
 	 * The remote engine for the web worker 
 	 * @type {CrunchJS.Network.RemoteSystem.WWRemoteEngine}
 	 * @private
@@ -124,6 +132,7 @@ CrunchJS.Scene.prototype.activate = function(data) {
 	this._entityManager.activate();
 	this._componentManager.activate();
 	this._systemManager.activate();
+	this._networkManager.activate();
 };
 
 /**
@@ -136,6 +145,7 @@ CrunchJS.Scene.prototype.deactivate = function() {
 	this._entityManager.deactivate();
 	this._componentManager.deactivate();
 	this._systemManager.deactivate();
+	this._networkManager.deactivate();
 };
 
 /**
