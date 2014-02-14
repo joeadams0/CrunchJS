@@ -14,6 +14,7 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.OccupancyGrid');
+//goog.require('CrunchJS.Systems.PhysicsSystem');
 
 /**
  * Creates an example scene

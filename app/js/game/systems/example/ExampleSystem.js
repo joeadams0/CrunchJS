@@ -3,7 +3,6 @@
  */
 
 goog.provide('Moba.ExampleSystem');
-
 goog.require('CrunchJS.System');
 
 /**
