@@ -7,32 +7,19 @@ goog.provide('CrunchJS.Components.Box2DBodyDef');
 goog.require('CrunchJS.Component');
 
 /**
- * Contains data about the velocity and the force on the object. 
- * @param {Object}  velocity  The Velocity of the component
- * @param {Object}  force     The force on the object
+ * [Box2DBodyDef description]
+ * @param {Object}  position        Position of the entity
+ * @param {number}  rotation        Rotation of the entity
+ * @param {Boolean}  allowSleep      Is sleep allowed by the entity?
+ * @param {Boolean} isSleeping      Is the entity sleeping?
+ * @param {Boolean}  preventrotation Is the entity allowed to rotate
  * @constructor
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Box2DBodyDef = function(velocity, force, position, rotation, allowSleep, isSleeping, preventrotation) {
+CrunchJS.Components.Box2DBodyDef = function(position, rotation, allowSleep, isSleeping, preventrotation) {
 
-	/**
-	 * The velocity of the entity	
-	 * @type {Object}
-	 */
-	this.velocity = velocity ? velocity : {
-		x : 0,
-		y : 0
-	};
-
-	/**
-	 * The force on the entity
-	 * @type {Object}
-	 */
-	this.force = force ? force : {
-		x : 0,
-		y : 0
-	}
+	
 	/**
 	 * Position of the entity
 	 * @type {Object}
@@ -49,7 +36,7 @@ CrunchJS.Components.Box2DBodyDef = function(velocity, force, position, rotation,
 
 	/**
 	 * Is sleep allowed for the entity?
-	 * @type {boolean}
+	 * @type {Boolean}
 	 */
 	this.allowSleep = allowSleep;
 
