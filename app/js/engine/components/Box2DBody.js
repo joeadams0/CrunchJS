@@ -10,6 +10,7 @@ goog.require('CrunchJS.Component');
  * Contains data about the velocity and the force on the object. 
  * @param {Object}  velocity  The Velocity of the component
  * @param {Object}  force     The force on the object
+ * @param {number}  mass     The mass of the object
  * @constructor
  * @class 
  * @extends {CrunchJS.Component}
