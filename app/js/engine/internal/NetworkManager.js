@@ -71,6 +71,11 @@ CrunchJS.Internal.NetworkManager.prototype.deactivate = function() {
 
 CrunchJS.Internal.NetworkManager.prototype.initialize = function()
 {
+	//only run Network Manager in main window
+	if(typeof(Peer) === 'undefined')
+	{
+		return;
+	}
 	var peer = new Peer({key: this.apiKey});
 	//on a connection
 	peer.on('open', function(id) {
