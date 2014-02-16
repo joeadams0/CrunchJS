@@ -49,47 +49,59 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
 
-CrunchJS.Internal.NetworkManager.prototype.getPeerId = function() {
-	return this.peerId;
-};
-
 /**
  * Called to activate the Network Manager
  */
 CrunchJS.Internal.NetworkManager.prototype.activate = function() {
 	goog.base(this, 'activate');
-	this.initialize();
+	this.initialize(false);
 };
 
 /**
  * Deactivates the Network Manager
  */
 CrunchJS.Internal.NetworkManager.prototype.deactivate = function() {
-
+	goog.base(this, 'deactivate');
 };
 
-
-CrunchJS.Internal.NetworkManager.prototype.initialize = function()
+/**
+ * Initializes background tasks for the Network Manager.
+ * @param {boolean} createHost A boolean to determine if the host should be created
+ */
+CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 {
 	//only run Network Manager in main window
 	if(typeof(Peer) === 'undefined')
 	{
 		return;
 	}
-	var peer = new Peer({key: this.apiKey});
+	var peer = null;
+	if(createHost)
+	{
+		peer = new Peer("host", {key: this.apiKey});
+	}
+	else
+	{
+		peer = new Peer({key: this.apiKey});
+	}
 	//on a connection
 	peer.on('open', function(id) {
 		//record the generated ID
 		this.peerId = id;
 		console.log("PeerJS ID: " + this.peerId);
-	});
-	peer.on('connection', this.onConnectionOnData);
+		if(this.isHost() == false && this.becomeHost())
+		{
+			this.initialize(true);
+		}
+	}.bind(this));
+	peer.on('connection', this.onConnectionOnData.bind(this));
+	
 	this.peer = peer;
 };
 
 /**
- *
- *
+ * Sets up data handling on a connection
+ * @param {Object} conn Connection object on which data collection is defined
  */
 CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 	//define data handling function
@@ -104,11 +116,50 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 				console.log("I am reciprocating a conn with: " + otherPeer);
 			}
 		}
+		else if(data['type'] == 'should_connect')
+		{
+			//The host will broadcast new players to everybody and say that they should connect
+			var otherPeer = data['data'];
+			if(this.connectedPeers.indexOf(otherPeer) == -1)
+			{
+				this.connect(peer, otherPeer);
+				console.log("Host told me to create a conn with: " + otherPeer);
+			}
+		}
 		else
 		{
 			console.log("GOT DATA: " + data);
 		}
 	});
+};
+
+/**
+ * Checks the peer ID to see if this is the host
+ * @return {boolean} Whether this is the host or not
+ */
+CrunchJS.Internal.NetworkManager.prototype.isHost = function()
+{
+	if(this.peerId == "host")
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+/**
+ * Checks if there is not a host
+ * @return {boolean} Whether this peer should become the host or not
+ */
+CrunchJS.Internal.NetworkManager.prototype.becomeHost = function()
+{
+	//try to connect to host
+		
+	//if there is no host, you become the host
+	console.log("There is no host.  You should become the host.");
+	return true;
 };
 
 /**
