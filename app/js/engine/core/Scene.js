@@ -139,7 +139,7 @@ CrunchJS.Scene.prototype.activate = function(data) {
  * Called when the scene is deactivated. Made to be overwritten, but should call super in overwritten method.
  */
 CrunchJS.Scene.prototype.deactivate = function() {
-	console.log('Deactivating ', this.name);	
+	CrunchJS.world.log('Deactivating ', this.name);	
 	this._isActive = false;
 
 	this._entityManager.deactivate();
@@ -254,6 +254,14 @@ CrunchJS.Scene.prototype.setEntityName = function(name, entityId) {
  */
 CrunchJS.Scene.prototype.getEntityByName = function(name) {
 	return this._entityManager.getEntityByName(name);
+};
+
+/**
+ * Registers the component with the system. Do this for all components at the beginning of the scene
+ * @param  {Function} constr The constructor for the component. Make sure the name property is specifed
+ */
+CrunchJS.Scene.prototype.registerComponent = function(constr) {
+	this._componentManager.registerComponent(constr);
 };
 
 /**

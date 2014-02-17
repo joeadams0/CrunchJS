@@ -48,7 +48,6 @@ CrunchJS.Network.RemoteEngine.AbstractRemoteEngine = function(iChannel) {
 	// By default, the events coming from the channel go into this object's event
 	// manager and events being posted go into the channel
 	this._channel.onEvent = goog.bind(this.fireEvent, this);
-	this.postEvent = goog.bind(this._channel.postEvent, this._channel);
 
 
 
@@ -78,4 +77,6 @@ CrunchJS.Network.RemoteEngine.AbstractRemoteEngine.prototype.isReady = function(
  * @param  {string} eventName The event name
  * @param  {Object} data      The data to send
  */
-CrunchJS.Network.RemoteEngine.AbstractRemoteEngine.prototype.postEvent = function(eventName, data) {};
+CrunchJS.Network.RemoteEngine.AbstractRemoteEngine.prototype.postEvent = function(eventName, data) {
+	this._channel.postEvent(eventName, data);
+};

@@ -6,6 +6,7 @@ goog.provide('CrunchJS.Components.OccupancyGrid');
 
 goog.require('CrunchJS.Component');
 goog.require('CrunchJS.Helpers.OccupancyGridHelper');
+goog.require('goog.structs.Map');
 
 /**
  * Creates an Occupancy Grid Component. Occupancy Grids are used to be able to tell what space is occupied by which entities.
@@ -46,7 +47,14 @@ CrunchJS.Components.OccupancyGrid = function(width, height, tileWidth, tileHeigh
 	 * The map of locations to occupancy tiles
 	 * @type {Object}
 	 */
-	this.map = CrunchJS.Helpers.OccupancyGridHelper.getInstance().createMap(width, height);
+	this.map = CrunchJS.Helpers.OccupancyGridHelper.createMap(width, height);
+
+	/**
+	 * Maps the entities to the rectangle of tiles they occupy in the map 
+	 * @type {goog.structs.Map}
+	 */
+	this.entityToTilesMap = new goog.structs.Map();
+
 };
 
 goog.inherits(CrunchJS.Components.OccupancyGrid, CrunchJS.Component);

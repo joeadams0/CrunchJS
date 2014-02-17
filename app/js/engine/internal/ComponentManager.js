@@ -93,7 +93,7 @@ CrunchJS.Internal.ComponentManager.prototype.activate = function() {
 CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) {
 	if(CrunchJS.DATA_SYNC_DEBUG)
 		CrunchJS.world.log('Entity Updated:' + JSON.stringify(data));
-	this._setComponent(data['id'], this.deserialize(data['comp']));
+	this._setComponent(data.id, this.deserialize(data.comp));
 };
 
 
@@ -104,7 +104,7 @@ CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) 
 CrunchJS.Internal.ComponentManager.prototype.onAddComponent = function(data) {
 	if(CrunchJS.DATA_SYNC_DEBUG)
 		CrunchJS.world.log('Add component: '+ JSON.stringify(data));
-	this._setComponent(data['id'], this.deserialize(data['comp']));
+	this._setComponent(data.id, this.deserialize(data.comp));
 };
 
 /**
@@ -114,7 +114,7 @@ CrunchJS.Internal.ComponentManager.prototype.onAddComponent = function(data) {
 CrunchJS.Internal.ComponentManager.prototype.onRemoveComponent = function(data) {
 	if(CrunchJS.DATA_SYNC_DEBUG)
 		CrunchJS.world.log('Remove component: '+ JSON.stringify(data));
-	this._removeComponent(data['id'], data['compName']);
+	this._removeComponent(data.id, data.compName);
 };
 
 /**
@@ -154,9 +154,19 @@ CrunchJS.Internal.ComponentManager.prototype.matchesComposition = function(entit
 CrunchJS.Internal.ComponentManager.prototype.createComponentType = function(compName) {
 	var compTypeId = this._componentMaps.push(new goog.structs.Map());
 	this._compIndecies.set(compName, compTypeId); 
+	CrunchJS.world.log("Set comp type: "+compName+" to "+compTypeId);
 
 	return compTypeId;
 };
+
+/**
+ * Registers the component with the manager. Do this for all components at the beginning of the scene
+ * @param  {Function} constr The constructor for the component. Make sure the name property is specifed
+ */
+CrunchJS.Internal.ComponentManager.prototype.registerComponent = function(constr) {
+	this.createComponentType(constr.name ? constr.name : constr.prototype.name);
+};
+
 
 /**
  * Adds a component to an entity
@@ -167,8 +177,8 @@ CrunchJS.Internal.ComponentManager.prototype.addComponent = function(entityId, c
 	this._setComponent(entityId, component);
 
 	var data = {
-		'id' : entityId,
-		'comp' : this.serialize(component)
+		id : entityId,
+		comp : this.serialize(component)
 	}
 	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.AddComponent, data);
 };
@@ -207,8 +217,8 @@ CrunchJS.Internal.ComponentManager.prototype.removeComponent = function(entityId
 	var success = this._removeComponent(entityId, componentName);
 	if(success){
 		var data = {
-			'id' : entityId,
-			'compName' : componentName
+			id : entityId,
+			compName : componentName
 		};
 		this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.RemoveComponent, data);
 	}
@@ -445,8 +455,8 @@ CrunchJS.Internal.ComponentManager.prototype.entityDestroyed = function(entityId
  */
 CrunchJS.Internal.ComponentManager.prototype.componentUpdated = function(data) {
 	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.UpdateComponent, {
-		'id' : data.entityId,
-		'comp' : this.serialize(this.getComponent(data.entityId, data.compName))
+		id : data.entityId,
+		comp : this.serialize(this.getComponent(data.entityId, data.compName))
 	});
 };
 
@@ -462,6 +472,9 @@ CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
 
 	if(goog.isArray(obj)){
 		serData = goog.array.map(obj, this.serialize, this);
+	}
+	else if(goog.isString(obj) || goog.isNumber(obj)){
+		serData = obj;
 	}
 	else{
 		serData.__functions = {};

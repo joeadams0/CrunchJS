@@ -74,11 +74,10 @@ CrunchJS.EntityComposition.prototype.getExclusionSet = function() {
 CrunchJS.EntityComposition.prototype.createBitSet = function(comps) {
 	var bitset = this.bsOp.createBitSet(),
 		iter = function(compName) {
-			// If it doesnt have the comp type, make it bc it will prob be coming soon
-			if(!this._componentManager.hasComponentType(compName))
-				this._componentManager.createComponentType(compName);
+			// Set it only if it has the type
+			if(this._componentManager.hasComponentType(compName))
+				this.bsOp.set(bitset, this._componentManager.getComponentIndex(compName));
 
-			this.bsOp.set(bitset, this._componentManager.getComponentIndex(compName));
 		};
 
 	goog.array.forEach(comps, goog.bind(iter, this));

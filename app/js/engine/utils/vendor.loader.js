@@ -8,7 +8,7 @@ if (!COMPILED) {
   /**
    * EDIT THIS ARRAY.
    *
-   * @type {Array} define the 3rd party deps.
+   * @type {Array} 
    */
   CrunchJS.Utils.vendor.files = [
   ];
