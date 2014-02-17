@@ -85,20 +85,33 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 		peer = new Peer({key: this.apiKey});
 	}
 	//on a connection
-	peer.on('open', function(id) {
-		//record the generated ID
-		this.peerId = id;
-		console.log("PeerJS ID: " + this.peerId);
-		if(this.isHost() == false && this.becomeHost())
-		{
-			this.initialize(true);
-		}
-	}.bind(this));
+	peer.on('open', this.peerOnOpen.bind(this));
 	peer.on('connection', this.onConnectionOnData.bind(this));
 	
 	this.peer = peer;
 };
 
+/**
+ * Function for when a peer opens a connection
+ * @param {string} id peer ID
+ */
+CrunchJS.Internal.NetworkManager.prototype.peerOnOpen = function(id) {
+	//record the generated ID
+	this.peerId = id;
+	console.log("PeerJS ID: " + this.peerId);
+	this.probeHost();
+}
+
+/**
+ * Function for when a peer has an error
+ * @param {Object} err An err object
+ */
+CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
+
+
+
+}
+ 
 /**
  * Sets up data handling on a connection
  * @param {Object} conn Connection object on which data collection is defined
@@ -108,11 +121,21 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 	conn.on('data', function(data){
 		if(data['type'] == 'connect')
 		{
-			//If somebody connected to me then I should connect back (if necessary).
 			var otherPeer = data['data'];
+			
+			//If I am the host, I should tell everybody to connect to this person
+			if(this.peerId == 'host')
+			{
+				for (var i=0;i<this.connections.length;i++)
+				{
+					this.connections[i].send({'type': 'should_connect', 'data': otherPeer});
+				}
+			}
+			
+			//If somebody connected to me then I should connect back (if necessary).
 			if(this.connectedPeers.indexOf(otherPeer) == -1)
 			{
-				this.connect(peer, otherPeer);
+				this.connect(otherPeer);
 				console.log("I am reciprocating a conn with: " + otherPeer);
 			}
 		}
@@ -122,7 +145,7 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			var otherPeer = data['data'];
 			if(this.connectedPeers.indexOf(otherPeer) == -1)
 			{
-				this.connect(peer, otherPeer);
+				this.connect(otherPeer);
 				console.log("Host told me to create a conn with: " + otherPeer);
 			}
 		}
@@ -130,7 +153,7 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		{
 			console.log("GOT DATA: " + data);
 		}
-	});
+	}.bind(this));
 };
 
 /**
@@ -153,13 +176,25 @@ CrunchJS.Internal.NetworkManager.prototype.isHost = function()
  * Checks if there is not a host
  * @return {boolean} Whether this peer should become the host or not
  */
-CrunchJS.Internal.NetworkManager.prototype.becomeHost = function()
+CrunchJS.Internal.NetworkManager.prototype.probeHost = function()
 {
 	//try to connect to host
-		
 	//if there is no host, you become the host
-	console.log("There is no host.  You should become the host.");
-	return true;
+	if(this.isHost(this.pId) == false)
+	{
+		this.connect('host');
+	}
+};
+
+CrunchJS.Internal.NetworkManager.prototype.contains = function(list, item) {
+    var i = list.length;
+	//decreasing while loop is faster than others in JS
+    while (i--) {
+       if (list[i] === item) {
+           return true;
+       }
+    }
+    return false;
 };
 
 /**
@@ -168,13 +203,30 @@ CrunchJS.Internal.NetworkManager.prototype.becomeHost = function()
  */
 CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 {
+	console.log("Trying to connect to: " + pId);
 	var conn = this.peer.connect(pId);
 	//open a connection
 	conn.on('open', function(){
+		console.log("Connected to: " + pId);
 		//Tell the peer that you want to connect with him.
 		conn.send({'type':'connect','data':this.peerId});
 		//Save the connection.
-		connected.push(pId);
-		connections.push(conn);
-	});
+		this.connectedPeers.push(pId);
+		this.connections.push(conn);
+	}.bind(this));
+	setTimeout(function()
+	{
+		console.log("I have connections to these peers...");
+		console.log(this.connectedPeers);
+		if(this.contains(this.connectedPeers, pId) == false)
+		{
+			console.log("Could not connect to: " + pId);
+			
+			if(pId == 'host')
+			{
+				//become host
+				this.initialize(true);
+			}
+		}
+	}.bind(this), 2500);
 };
