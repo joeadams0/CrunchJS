@@ -45,7 +45,7 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
-	// Register all of the components so they have the same index no matter if they are in the webworker or the main window
+	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
 	var comps = [
 		CrunchJS.Components.Transform,
 		CrunchJS.Components.Body,
@@ -53,11 +53,10 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		CrunchJS.Components.Occupancy,
 		CrunchJS.Components.RenderImage
 	];
-
-
 	goog.array.forEach(comps, function(comp) {
 		this.registerComponent(comp)
 	}, this);
+
 
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
