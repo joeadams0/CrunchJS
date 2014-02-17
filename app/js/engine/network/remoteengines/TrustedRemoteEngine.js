@@ -146,3 +146,4 @@ CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSync = function(da
 CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onWrite = function(data) {
 	CrunchJS.world.write(data);
 };
+

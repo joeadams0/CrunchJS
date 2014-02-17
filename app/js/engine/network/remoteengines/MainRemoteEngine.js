@@ -15,6 +15,8 @@ goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
  */
 CrunchJS.Network.RemoteEngine.MainRemoteEngine = function() {
 	goog.base(this, new CrunchJS.Network.Channel.WebWorkerChannel());
+
+	this._isReady = true;
 };
 
 goog.inherits(CrunchJS.Network.RemoteEngine.MainRemoteEngine, CrunchJS.Network.RemoteEngine.TrustedRemoteEngine);

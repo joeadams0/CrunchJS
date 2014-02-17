@@ -4,17 +4,19 @@
 
 goog.provide('Moba.ExampleScene');
 
+goog.require('goog.array');
+
 goog.require('CrunchJS.Scene');
 goog.require('CrunchJS.Network.RemoteEngine.WWRemoteEngine');
-goog.require('Moba.ExampleSystem');
-goog.require('Moba.ExampleSystem1');
-goog.require('Moba.ExampleComp');
-goog.require('Moba.ExampleComp1');
+
+// Systems
 goog.require('CrunchJS.Systems.RenderingSystem');
+goog.require('CrunchJS.Systems.OccupancyGridSystem');
+
+// Comps
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.OccupancyGrid');
-goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
 
@@ -43,8 +45,25 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
+	// Register all of the components so they have the same index no matter if they are in the webworker or the main window
+	var comps = [
+		CrunchJS.Components.Transform,
+		CrunchJS.Components.Body,
+		CrunchJS.Components.OccupancyGrid,
+		CrunchJS.Components.Occupancy,
+		CrunchJS.Components.RenderImage
+	];
+
+
+	goog.array.forEach(comps, function(comp) {
+		this.registerComponent(comp)
+	}, this);
+
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
+		var sys = new CrunchJS.Systems.OccupancyGridSystem();
+
+		this.addSystem(sys);
 	}
 	// If it is the main window
 	else{
@@ -62,13 +81,22 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		this.setEntityName('master', entity);
 
-		this.addComponent(entity, new CrunchJS.Components.Transform(0,0));
+		this.addComponent(entity, new CrunchJS.Components.Transform({
+			layer : 0x00000001
+		}));
+
 		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid(10,10,3,3));
 
 		var ent2 = this.createEntity();
 
-		this.addComponent(ent2, new CrunchJS.Components.Transform(-15,-15));
-		this.addComponent(ent2, new CrunchJS.Components.Body(7,7));
+		this.addComponent(ent2, new CrunchJS.Components.Transform({
+			x : -15,
+			y : -15,
+			layer : 0x00000001
+
+		}));
+
+		this.addComponent(ent2, new CrunchJS.Components.Body(3,3));
 		this.addComponent(ent2, new CrunchJS.Components.Occupancy(false, true));
 
 	}
