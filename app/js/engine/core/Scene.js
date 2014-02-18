@@ -160,6 +160,7 @@ CrunchJS.Scene.prototype.hasSim = function() {
  */
 CrunchJS.Scene.prototype.process = function(frame) {
 	this._systemManager.process(frame);
+	this.sendUpdate();
 	this._componentManager.clean();
 };
 
@@ -317,6 +318,22 @@ CrunchJS.Scene.prototype.findEntities = function(entityComp) {
  */
 CrunchJS.Scene.prototype.getComponentsByType = function(compName) {
 	return this._componentManager.getComponentsByType(compName);
+};
+
+/**
+ * Sends the updates to the remote engine
+ */
+CrunchJS.Scene.prototype.sendUpdate = function() {
+	if(this.hasSim())
+		this.postEventToRemoteEngine(CrunchJS.EngineCommands.UpdateComponents, this._componentManager.getUpdates());
+};
+
+/**
+ * Called to update the components
+ * @param  {object} obj The update object
+ */
+CrunchJS.Scene.prototype.onComponentsUpdate = function(obj) {
+	this._componentManager.update(obj);
 };
 
 /**

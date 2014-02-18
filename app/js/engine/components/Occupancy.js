@@ -22,8 +22,47 @@ CrunchJS.Components.Occupancy = function(size) {
 		 */
 		this.size = new goog.math.Size(size.width, size.height);
 	}
+	this.updates = {};
 };
 
 goog.inherits(CrunchJS.Components.Occupancy, CrunchJS.Component);
 
 CrunchJS.Components.Occupancy.prototype.name = "Occupancy";
+
+/**
+ * Gets the size for the Occupancy, if there is one
+ * @return {goog.math.Size} The size
+ */
+CrunchJS.Components.Occupancy.prototype.getSize = function() {
+	return this.size;
+};
+
+/**
+ * Sets the size for the Occupancy
+ * @param {goog.math.Size} size The size
+ */
+CrunchJS.Components.Occupancy.prototype.setSize = function(size) {
+	if(!goog.math.Size.equals(this.getSize(), size)){
+		this.size = size;
+		this.updates.size = true;
+		this.hasBeenUpdated();
+	}
+};
+
+CrunchJS.Components.Occupancy.prototype.getUpdates = function() {
+	if(this.updates.size && goog.isDefAndNotNull(this.getSize())){
+		return {
+			width : this.getSize().width,
+			height : this.getSize().height
+		};
+	}
+};
+
+CrunchJS.Components.Occupancy.prototype.toObj = function() {
+	if(goog.isDefAndNotNull(this.getSize())){
+		return {
+			width : this.getSize().width,
+			height : this.getSize().height
+		};
+	}
+};
