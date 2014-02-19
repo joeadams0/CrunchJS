@@ -111,7 +111,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			height : 3
 		}));
 		
-		this.addComponent(ent2, new CrunchJS.Components.Occupancy());
+		var occ = new CrunchJS.Components.Occupancy();
+		this.addComponent(ent2, occ);
 
 
 		// var sys = new CrunchJS.Systems.RenderingSystem({});

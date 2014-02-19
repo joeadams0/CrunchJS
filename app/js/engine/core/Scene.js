@@ -324,7 +324,7 @@ CrunchJS.Scene.prototype.getComponentsByType = function(compName) {
  * Sends the updates to the remote engine
  */
 CrunchJS.Scene.prototype.sendUpdate = function() {
-	if(this.hasSim())
+	if(this.hasSim() || CrunchJS.world.isSim())
 		this.postEventToRemoteEngine(CrunchJS.EngineCommands.UpdateComponents, this._componentManager.getUpdates());
 };
 

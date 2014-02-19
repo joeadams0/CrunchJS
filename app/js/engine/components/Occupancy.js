@@ -56,6 +56,7 @@ CrunchJS.Components.Occupancy.prototype.getUpdates = function() {
 			height : this.getSize().height
 		};
 	}
+	return {};
 };
 
 CrunchJS.Components.Occupancy.prototype.toObj = function() {
@@ -65,4 +66,5 @@ CrunchJS.Components.Occupancy.prototype.toObj = function() {
 			height : this.getSize().height
 		};
 	}
+	return {};
 };

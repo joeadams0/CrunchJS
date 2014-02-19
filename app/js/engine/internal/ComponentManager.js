@@ -14,6 +14,7 @@ goog.require('goog.structs.Map');
 goog.require('goog.structs.Set');
 goog.require('goog.object');
 goog.require('goog.array');
+goog.require('goog.string');
 
 
 /**
@@ -622,10 +623,11 @@ CrunchJS.Internal.ComponentManager.prototype.update = function(obj) {
 
 	goog.object.forEach(obj.addRemove, function(comps, id) {
 
+		id = goog.string.parseInt(id, 10);
 		goog.array.forEach(comps, function(comp) {
 
 			// If the components are null, remove them
-			if(comp.data == null)
+			if(comp.comp == null)
 				this._removeComponent(id, comp.name);
 			// Else deserialize and add
 			else
@@ -635,7 +637,7 @@ CrunchJS.Internal.ComponentManager.prototype.update = function(obj) {
 
 	}, this);
 
-	goog.object.forEach(obj.updates, function(comps, id) {
+	goog.object.forEach(obj.updatedComponents, function(comps, id) {
 
 		goog.array.forEach(comps, function(comp) {
 			// Update each one with the data
@@ -667,4 +669,7 @@ CrunchJS.Internal.ComponentManager.prototype.clean = function() {
 	goog.structs.forEach(this._destroyedEntities, goog.bind(iterator, this));
 
 	this._destroyedEntities.clear();
+
+	this.updates.addRemove.clear();
+	this.updates.updatedComponents.clear();
 };
