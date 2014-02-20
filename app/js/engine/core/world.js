@@ -159,25 +159,7 @@ CrunchJS.EngineCommands = {
 	 * Update an entity
 	 * @type {String}
 	 */
-	UpdateComponent : 'update_component',
-
-	/**
-	 * Add a component
-	 * @type {String}
-	 */
-	AddComponent : 'add_component',
-
-	/**
-	 * Remove a component
-	 * @type {String}
-	 */
-	RemoveComponent : 'remove_component',
-
-	/**
-	 * Remove all components from an entity
-	 * @type {String}
-	 */
-	RemoveAllComponents : 'remove_all_components',
+	UpdateComponents : 'update_components',
 
 	/**
 	 * Enable an entity

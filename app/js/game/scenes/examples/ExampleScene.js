@@ -60,9 +60,11 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
+		
 		var sys = new CrunchJS.Systems.OccupancyGridSystem();
 
 		this.addSystem(sys);
+
 	}
 	// If it is the main window
 	else{
@@ -84,7 +86,12 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			layer : 0x00000001
 		}));
 
-		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid(10,10,3,3));
+		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid({
+			width : 10,
+			height : 10,
+			tileWidth : 3,
+			tileHeight :3
+		}));
 
 		var ent2 = this.createEntity();
 
@@ -95,9 +102,21 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		}));
 
-		this.addComponent(ent2, new CrunchJS.Components.Body(3,3));
-		this.addComponent(ent2, new CrunchJS.Components.Occupancy(false, true));
+		// this.addComponent(ent2, new CrunchJS.Components.RenderImage('star-on.png'));
 
+
+		this.addComponent(ent2, new CrunchJS.Components.Body({
+			width : 3,
+			height : 3
+		}));
+		
+		var occ = new CrunchJS.Components.Occupancy();
+		this.addComponent(ent2, occ);
+
+
+		// var sys = new CrunchJS.Systems.RenderingSystem({});
+
+		// this.addSystem(sys);
 	}
 
 };
