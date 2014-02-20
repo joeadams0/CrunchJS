@@ -14,6 +14,7 @@ goog.require('goog.structs.Map');
 goog.require('goog.structs.Set');
 goog.require('goog.object');
 goog.require('goog.array');
+goog.require('goog.string');
 
 
 /**
@@ -32,6 +33,8 @@ CrunchJS.Internal.ComponentManager = function(scene) {
 	 * @private
 	 */
 	this._compIndecies = new goog.structs.Map();
+
+	this._compConstructors = new goog.structs.Map();
 
 	/**
 	 * An array of maps of entity ids to components 
@@ -58,21 +61,21 @@ CrunchJS.Internal.ComponentManager = function(scene) {
 	 * @type {goog.structs.Set}
 	 */
 	this._destroyedEntities = new goog.structs.Set();
+
+	// The updates to send at the end of the frame
+	this.updates = {
+		addRemove : new goog.structs.Map(),
+		updatedComponents : new goog.structs.Map()
+	}
 	
 
-	
 
 	// Listen for external commands
 	this.getScene().addEventListener(CrunchJS.Events.EntityCreated, goog.bind(this.entityCreated,this));
 	this.getScene().addEventListener(CrunchJS.Events.EntityDestroyed, goog.bind(this.entityDestroyed,this));
 	this.getScene().addEventListener(CrunchJS.Events.ComponentUpdated, goog.bind(this.componentUpdated,this));
 
-	// Listen for sync commands
-	this.getScene().addEventListener(CrunchJS.EngineCommands.UpdateComponent, goog.bind(this.onUpdateComponent, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.AddComponent, goog.bind(this.onAddComponent, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.RemoveComponent, goog.bind(this.onRemoveComponent, this));
-	this.getScene().addEventListener(CrunchJS.EngineCommands.RemoveAllComponents, goog.bind(this.onRemoveAllComponents, this));
-
+	this.getScene().addEventListener(CrunchJS.EngineCommands.UpdateComponents, goog.bind(this.update, this));
 };
 
 goog.inherits(CrunchJS.Internal.ComponentManager, CrunchJS.Internal.Manager);
@@ -93,7 +96,8 @@ CrunchJS.Internal.ComponentManager.prototype.activate = function() {
 CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) {
 	if(CrunchJS.DATA_SYNC_DEBUG)
 		CrunchJS.world.log('Entity Updated:' + JSON.stringify(data));
-	this._setComponent(data.id, this.deserialize(data.comp));
+
+	this.getComponent(data.id, data.comp.name).update(data.comp.comp);
 };
 
 
@@ -104,7 +108,7 @@ CrunchJS.Internal.ComponentManager.prototype.onUpdateComponent = function(data) 
 CrunchJS.Internal.ComponentManager.prototype.onAddComponent = function(data) {
 	if(CrunchJS.DATA_SYNC_DEBUG)
 		CrunchJS.world.log('Add component: '+ JSON.stringify(data));
-	this._setComponent(data.id, this.deserialize(data.comp));
+	this._setComponent(data.id, this.deserializeComponent(data.comp));
 };
 
 /**
@@ -154,7 +158,6 @@ CrunchJS.Internal.ComponentManager.prototype.matchesComposition = function(entit
 CrunchJS.Internal.ComponentManager.prototype.createComponentType = function(compName) {
 	var compTypeId = this._componentMaps.push(new goog.structs.Map());
 	this._compIndecies.set(compName, compTypeId); 
-	CrunchJS.world.log("Set comp type: "+compName+" to "+compTypeId);
 
 	return compTypeId;
 };
@@ -164,7 +167,26 @@ CrunchJS.Internal.ComponentManager.prototype.createComponentType = function(comp
  * @param  {Function} constr The constructor for the component. Make sure the name property is specifed
  */
 CrunchJS.Internal.ComponentManager.prototype.registerComponent = function(constr) {
-	this.createComponentType(constr.name ? constr.name : constr.prototype.name);
+	this.createComponentType(constr.prototype.name);
+	this.setConstructor(constr.prototype.name, constr);
+};
+
+/**
+ * Sets the constructor for the name
+ * @param {String} name The name of the type of component
+ * @param {Function} ctor The constructor for the component
+ */
+CrunchJS.Internal.ComponentManager.prototype.setConstructor = function(name, ctor) {
+	this._compConstructors.set(name, ctor);
+};
+
+/**
+ * Gets the constructor for the type of component
+ * @param  {String} name The name of the type of component
+ * @return {Function}      The constructor
+ */
+CrunchJS.Internal.ComponentManager.prototype.getConstructor = function(name) {
+	return this._compConstructors.get(name);
 };
 
 
@@ -176,11 +198,7 @@ CrunchJS.Internal.ComponentManager.prototype.registerComponent = function(constr
 CrunchJS.Internal.ComponentManager.prototype.addComponent = function(entityId, component) {
 	this._setComponent(entityId, component);
 
-	var data = {
-		id : entityId,
-		comp : this.serialize(component)
-	}
-	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.AddComponent, data);
+	this.addRemoveUpdate(entityId, component.name);
 };
 
 /**
@@ -204,6 +222,9 @@ CrunchJS.Internal.ComponentManager.prototype._setComponent = function(entityId, 
 	this.setComponentBit(entityId, compTypeId);
 
 	component.entityId = entityId;
+
+	component.setScene(this.getScene());
+
 	this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
 };
 
@@ -216,11 +237,7 @@ CrunchJS.Internal.ComponentManager.prototype._setComponent = function(entityId, 
 CrunchJS.Internal.ComponentManager.prototype.removeComponent = function(entityId, componentName) {
 	var success = this._removeComponent(entityId, componentName);
 	if(success){
-		var data = {
-			id : entityId,
-			compName : componentName
-		};
-		this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.RemoveComponent, data);
+		this.addRemoveUpdate(entityId, componentName);
 	}
 
 	return success;
@@ -241,9 +258,10 @@ CrunchJS.Internal.ComponentManager.prototype._removeComponent = function(entityI
 			comp = compMap.get(entityId);
 
 		
-		success = this.getComponentMap(compTypeId).remove(entityId);
+		success = compMap.remove(entityId);
 
 		if(success){
+			comp.setScene(null);
 			this.clearComponentBit(entityId, compTypeId);
 			comp.entityId = null;
 			this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
@@ -406,19 +424,13 @@ CrunchJS.Internal.ComponentManager.prototype.getComponentIndex = function(compon
 
 /**
  * Removes all of the components from the entity
- * @param  {number} entityId The entity id
+ * @param  {Number} entityId The entity id
  */
 CrunchJS.Internal.ComponentManager.prototype.removeAllComponents = function(entityId) {
-	
-	this._removeAllComponents(entityId);
-
-	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.RemoveAllComponents, entityId);
-
-};
-
-CrunchJS.Internal.ComponentManager.prototype._removeAllComponents = function(entityId) {
 	var composition = this.getEntityComposition(entityId),
 		len = this.bitSetOperator.length(composition);
+
+	var newMap = this._compIndecies.transpose();
 
 	for(var i = 0; i<len; i++){
 		
@@ -426,6 +438,8 @@ CrunchJS.Internal.ComponentManager.prototype._removeAllComponents = function(ent
 		if(this.bitSetOperator.get(composition, i)){
 			this.getComponentMap(i).remove(entityId);
 			this.bitSetOperator.clear(composition, i);
+
+			this.addRemoveUpdate(entityId, newMap.get(i));
 		}
 	}
 
@@ -454,88 +468,64 @@ CrunchJS.Internal.ComponentManager.prototype.entityDestroyed = function(entityId
  * @param  {Object} data The event data
  */
 CrunchJS.Internal.ComponentManager.prototype.componentUpdated = function(data) {
-	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.UpdateComponent, {
-		id : data.entityId,
-		comp : this.serialize(this.getComponent(data.entityId, data.compName))
-	});
+	this.addUpdatedComp(data.entityId, data.compName);
 };
 
 /**
- * Returns a serializable object
- * @param  {Object} obj The object to transform
+ * Adds a component to the add remove component list so that we can send them at the end of the frame.
+ * @param {Numebr} id   The id of the entity
+ * @param {String} name The name of the component to add or remove
+ */
+CrunchJS.Internal.ComponentManager.prototype.addRemoveUpdate = function(id, name) {
+	if(!this.updates.addRemove.containsKey(id)){
+		this.updates.addRemove.set(id, new goog.structs.Set());
+	}
+
+	this.updates.addRemove.get(id).add(name);
+};
+
+/**
+ * Adds an updated component to the updates object so we can send it at the end of the frame
+ * @param {Number} id   The entity Id
+ * @param {String} name The name of the component
+ */
+CrunchJS.Internal.ComponentManager.prototype.addUpdatedComp = function(id, name) {
+	if(!this.updates.updatedComponents.containsKey(id))
+		this.updates.updatedComponents.set(id, new goog.structs.Set());
+
+
+	if(!this.updates.addRemove.containsKey(id))
+		this.updates.updatedComponents.get(id).add(name);
+};
+
+/**
+ * Returns a serializable object for a component
+ * @param  {CrunchJS.Component} obj The component to transform
+ * @param {Boolean} onlyUpdates if true, the object will only contain the updated data
  * @return {Object}     The transformed object
  */
-CrunchJS.Internal.ComponentManager.prototype.serialize = function(obj) {
-	var serData = {},
-		transVal;
+CrunchJS.Internal.ComponentManager.prototype.serializeComponent = function(comp, onlyUpdates) {
+	var data = {};
 
+	data.name = comp.name;
 
-	if(goog.isArray(obj)){
-		serData = goog.array.map(obj, this.serialize, this);
-	}
-	else if(goog.isString(obj) || goog.isNumber(obj)){
-		serData = obj;
-	}
-	else{
-		serData.__functions = {};
-		goog.array.forEach(Object.getOwnPropertyNames(obj), function(name) {
-			transVal = obj[name];
+	if(onlyUpdates)
+		data.comp = comp.getUpdates();
+	else
+		data.comp = comp.toObj();
 
-			if(goog.isFunction(transVal)){
-				transVal = transVal.toString();
-				serData.__functions[name] = transVal;
-			}
-			else{
-				// If it inherits from something, serialize that too
-				if(goog.isObject(transVal) && transVal.__proto__.__proto__){
-					serData[name] = this.serialize(transVal);
-				}
-				else
-					serData[name] = transVal;
-			}
-		}, this);	
-
-		// Serialize the proto if not the last proto
-		if(obj.__proto__.__proto__)
-			serData.__prototype = this.serialize(obj.__proto__); 
-	}
-
-	return serData;
+	return data;
 };
 
 /**
- * Deserializes the object
+ * Deserializes a Components object
  * @param  {Object} obj The object to deserialize 
- * @return {Object}     The deserialized object
+ * @return {CrunchJS.Component}     The Component
  */
-CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
-	var data;
-	if(!goog.isDefAndNotNull(obj) || !goog.isObject(obj))
-		return obj;
+CrunchJS.Internal.ComponentManager.prototype.deserializeComponent = function(obj) {
+	var constr = this.getConstructor(obj.name);
 
-	if(obj.__prototype){
-		data = Object.create(this.deserialize(obj.__prototype));
-		delete obj.__prototype;
-	}
-	else
-		data = {};
-
-	if(goog.isArray(obj)){
-		data = goog.array.map(obj, this.deserialize, this);
-	}
-	else{
-		goog.object.forEach(obj.__functions, function(funString, funKey) {
-			data[funKey] = eval('var fun = ' + funString + '; fun;');
-		});
-
-		goog.object.forEach(obj, function(val, key) {
-			data[key] = this.deserialize(val);
-		}, this);	
-	}
-
-	delete data.__functions;
-
-	return data;
+	return constr.fromObj(obj.comp);
 };
 
 /**
@@ -545,13 +535,13 @@ CrunchJS.Internal.ComponentManager.prototype.deserialize = function(obj) {
 CrunchJS.Internal.ComponentManager.prototype.getSnapshot = function() {
 	var data = {};
 
-	data._compIndecies = this._compIndecies.toObject();
-
 	data._componentMaps = goog.array.map(this._componentMaps, function(el, index) {
-		return el.toObject();
-	});
+		return goog.structs.map(el, function(comp) {
+			return this.serializeComponent(comp);
+		},this);
+	}, this);
 
-	data._entityCompostitions= this._entityCompostitions;
+	data._entityCompostitions = this._entityCompostitions;
 
 	data._destroyedEntities = this._destroyedEntities.getValues();
 
@@ -563,15 +553,101 @@ CrunchJS.Internal.ComponentManager.prototype.getSnapshot = function() {
  * @param  {Object} data The new state
  */
 CrunchJS.Internal.ComponentManager.prototype.sync = function(data) {
-	this._compIndecies = new goog.structs.Map(data._compIndecies);
+	
 	this._componentMaps = goog.array.map(data._componentMaps, function(el, index) {
-		return new goog.structs.Map(el);
-	});
+		return new goog.structs.Map(goog.object.map(el, function(comp) {
+			return this.deserializeComponent(comp);
+		}, this));
+	}, this);
 
 	this._entityCompostitions = data._entityCompostitions;
 
 	this._destroyedEntities = new goog.structs.Set(data._destroyedEntities);
 };
+
+/**
+ * Gets the updates for the frame, then resets the updates
+ * @return {Object} The updates
+ */
+CrunchJS.Internal.ComponentManager.prototype.getUpdates = function() {
+	var updates = {};
+	
+	// Send all of the components to add or remove
+	updates.addRemove = goog.structs.map(this.updates.addRemove, function(set, id) {
+		
+		return goog.structs.map(set, function(name) {
+
+			// Send the component if it has it
+			if(this.hasComponent(id, name)){
+				var comp = this.getComponent(id, name);
+				comp.resetUpdates();
+
+				return this.serializeComponent(comp);
+			}
+
+			// Else send null to signify that it hase been removed
+			return {
+				name : name,
+				comp : null
+			};
+
+		}, this);
+	}, this);
+
+	// Send all of the components to update 
+	updates.updatedComponents = goog.structs.map(this.updates.updatedComponents, function(set ,id) {
+
+		return goog.structs.map(set, function(name) {
+			var comp = this.getComponent(id, name),
+				data = comp.getUpdates();
+
+			comp.resetUpdates();
+
+			return {
+				name : name,
+				data : data
+			};
+
+		}, this);
+
+	}, this);
+
+	return updates;
+};
+
+/**
+ * Update the components with the new data 
+ * @param  {Object} obj The new data
+ */
+CrunchJS.Internal.ComponentManager.prototype.update = function(obj) {
+
+	goog.object.forEach(obj.addRemove, function(comps, id) {
+
+		id = goog.string.parseInt(id, 10);
+		goog.array.forEach(comps, function(comp) {
+
+			// If the components are null, remove them
+			if(comp.comp == null)
+				this._removeComponent(id, comp.name);
+			// Else deserialize and add
+			else
+				this._setComponent(id, this.deserializeComponent(comp));
+
+		}, this);
+
+	}, this);
+
+	goog.object.forEach(obj.updatedComponents, function(comps, id) {
+
+		goog.array.forEach(comps, function(comp) {
+			// Update each one with the data
+			this.getComponent(id, comp.name).update(comp.data);
+
+		}, this);
+
+	}, this);
+};
+
 
 /**
  * Cleans up the destroyed entitites
@@ -593,4 +669,7 @@ CrunchJS.Internal.ComponentManager.prototype.clean = function() {
 	goog.structs.forEach(this._destroyedEntities, goog.bind(iterator, this));
 
 	this._destroyedEntities.clear();
+
+	this.updates.addRemove.clear();
+	this.updates.updatedComponents.clear();
 };

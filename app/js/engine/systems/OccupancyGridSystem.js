@@ -4,8 +4,7 @@
 
 goog.provide('CrunchJS.Systems.OccupancyGridSystem');
 
-goog.require('CrunchJS.System');
-goog.require('CrunchJS.Helpers.OccupancyGridHelper');
+goog.require('CrunchJS.System'); 
 
 goog.require('goog.structs.Set');
 goog.require('goog.structs');
@@ -41,22 +40,11 @@ CrunchJS.Systems.OccupancyGridSystem.prototype.process = function(frame) {
 		var gridComp = this.getScene().getComponent(gridId, 'OccupancyGrid');
 
 		goog.structs.forEach(this.getActiveEntities(), function(ent) {
-			this.getHelper().updateEntity(gridComp, ent);
+			gridComp.updateEntity(ent);
 		}, this);
-
-		this.getScene().fireEvent(CrunchJS.Events.ComponentUpdated, {
-			entityId : gridId,
-			compName : 'OccupancyGrid'
-		});
 
 	}, this);
 
-};
-
-CrunchJS.Systems.OccupancyGridSystem.prototype.getHelper = function() {
-	var helper = CrunchJS.Helpers.OccupancyGridHelper.getInstance();
-	helper.setScene(this.getScene());
-	return helper;
 };
 
 CrunchJS.Systems.OccupancyGridSystem.prototype.checkEntity = function(entityId) {
