@@ -51,6 +51,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
   var sprite,                                       // the PIXI sprite object for this entity
       scene = this.getScene(),                      // the CrunchJS Scene object in which this entity resides
       transf = scene.getComponent(eId, 'Transform'),// the transform component for this entity
+      body = scene.getComponent(eId, 'Body'),       // body component for this entity
       imgRenC = scene.getComponent(eId, 'RenderImage'),  // the RenderImage component for this entity (which it may not have)
       shapeRenC = scene.getComponent(eId, 'RenderShape'),// the RenderShape component for this entity (which it may not have)
       cameraC = scene.getComponent(eId, 'Camera')   // this entity's Camera component (which it may not have)
@@ -84,6 +85,19 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
     // translate the Transform position to the onscreen position
     sprite.position.x = this.translatePosition(transf, 'x');
     sprite.position.y = this.translatePosition(transf, 'y');
+    // translate the in-game object Size (Body or RenderImage) to the onscreen object size
+    if(body != null && imgRenC.size.x == -1 && imgRenC.size.y == -1){
+      var bSize = {
+        x: body.width,
+        y: body.height
+      };
+      sprite.width = this.translateScale(bSize, 'x');
+      sprite.height = this.translateScale(bSize, 'y');
+    } else if( imgRenC.size.x != -1 && imgRenC.size.y != -1){
+      sprite.width = this.translateScale(imgRenC.size, 'x');
+      sprite.height = this.translateScale(imgRenC.size, 'y');
+    } 
+    // else, imgRenC is default, and no body, means the scale is set to whatever the image size is, automatically.
   }
 };
 
@@ -132,6 +146,44 @@ CrunchJS.Systems.RenderingSystem.prototype.translatePosition = function(transCom
       case 'Y':
       default:
         return eYpos;
+    }
+  }
+};
+
+// size is an obj like {x: number, y: number}
+// partName is a string like "x" or "Y"
+CrunchJS.Systems.RenderingSystem.prototype.translateScale = function(size, partName) {
+  // if the camera hasn't been assigned, just do a direct translation
+  if(this.cam == null){
+    switch(partName) {
+      case 'x':
+      case 'X':
+        return size.x;
+      case 'y':
+      case 'Y':
+      default:
+        return size.y;
+    }
+  } else {
+    // this is the lengths of the onscreen viewport
+    var screenX = this.cam.cam.screenSpace.lx - this.cam.cam.screenSpace.ux;
+    var screenY = this.cam.cam.screenSpace.ly - this.cam.cam.screenSpace.uy;
+
+    // this is the ratio of game-units to pixels (pixels/game units)
+    var xFactor = screenX/this.cam.cam.lensSize.width;
+    var yFactor = screenY/this.cam.cam.lensSize.height;
+
+    var objWidth = xFactor * size.x;
+    var objHeight = yFactor * size.y;
+
+    switch(partName) {
+      case 'x':
+      case 'X':
+        return objWidth;
+      case 'y':
+      case 'Y':
+      default:
+        return objHeight;
     }
   }
 };

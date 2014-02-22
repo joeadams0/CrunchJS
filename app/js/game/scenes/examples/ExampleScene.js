@@ -16,6 +16,7 @@ goog.require('CrunchJS.Systems.OccupancyGridSystem');
 // Comps
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
+goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
@@ -51,7 +52,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		CrunchJS.Components.Body,
 		CrunchJS.Components.OccupancyGrid,
 		CrunchJS.Components.Occupancy,
-		CrunchJS.Components.RenderImage
+		CrunchJS.Components.RenderImage,
+		CrunchJS.Components.Camera
 	];
 	goog.array.forEach(comps, function(comp) {
 		this.registerComponent(comp)
@@ -93,30 +95,44 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			tileHeight :3
 		}));
 
+		this.addComponent(entity, new CrunchJS.Components.Camera({
+      isActive: true,
+      screenSpace: {
+        ux: 0, uy: 0,
+        lx: 400, ly:400
+      },
+      lensSize: {
+        width: 200,
+        height: 200
+      }
+    }));
+
 		var ent2 = this.createEntity();
 
 		this.addComponent(ent2, new CrunchJS.Components.Transform({
-			x : -15,
-			y : -15,
+			x : 10,
+			y : 0,
 			layer : 0x00000001
 
 		}));
 
-		// this.addComponent(ent2, new CrunchJS.Components.RenderImage('star-on.png'));
+		this.addComponent(ent2, new CrunchJS.Components.RenderImage({
+      image: 'star-on.png',
+      size: {x: 50, y: 50}
+    }));
 
-
-		this.addComponent(ent2, new CrunchJS.Components.Body({
+		/*this.addComponent(ent2, new CrunchJS.Components.Body({
 			width : 3,
 			height : 3
-		}));
+		}));*/
 		
 		var occ = new CrunchJS.Components.Occupancy();
 		this.addComponent(ent2, occ);
 
 
-		// var sys = new CrunchJS.Systems.RenderingSystem({});
+		var sys = new CrunchJS.Systems.RenderingSystem({});
 
-		// this.addSystem(sys);
+		this.addSystem(sys);
 	}
 
 };
