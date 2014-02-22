@@ -68,6 +68,5 @@ CrunchJS.Network.Channel.WebWorkerChannel.prototype.postEvent = function(eventNa
 		data : data
 	};
 
-
 	this.worker.postMessage(newData);
 };

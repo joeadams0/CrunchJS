@@ -130,7 +130,7 @@ CrunchJS.Scene.prototype.activate = function(data) {
  * Called when the scene is deactivated. Made to be overwritten, but should call super in overwritten method.
  */
 CrunchJS.Scene.prototype.deactivate = function() {
-	console.log('Deactivating ', this.name);	
+	CrunchJS.world.log('Deactivating ', this.name);	
 	this._isActive = false;
 
 	this._entityManager.deactivate();
@@ -160,6 +160,7 @@ CrunchJS.Scene.prototype.hasSim = function() {
  */
 CrunchJS.Scene.prototype.process = function(frame) {
 	this._systemManager.process(frame);
+	this.sendUpdate();
 	this._componentManager.clean();
 };
 
@@ -247,6 +248,14 @@ CrunchJS.Scene.prototype.getEntityByName = function(name) {
 };
 
 /**
+ * Registers the component with the system. Do this for all components at the beginning of the scene
+ * @param  {Function} constr The constructor for the component. Make sure the name property is specifed
+ */
+CrunchJS.Scene.prototype.registerComponent = function(constr) {
+	this._componentManager.registerComponent(constr);
+};
+
+/**
  * Adds a component to the entity corresponding to the given id.
  * @param {Number} entityId  The Entity Id
  * @param {CrunchJS.Internal.Component} component The Component to add
@@ -309,6 +318,22 @@ CrunchJS.Scene.prototype.findEntities = function(entityComp) {
  */
 CrunchJS.Scene.prototype.getComponentsByType = function(compName) {
 	return this._componentManager.getComponentsByType(compName);
+};
+
+/**
+ * Sends the updates to the remote engine
+ */
+CrunchJS.Scene.prototype.sendUpdate = function() {
+	if(this.hasSim() || CrunchJS.world.isSim())
+		this.postEventToRemoteEngine(CrunchJS.EngineCommands.UpdateComponents, this._componentManager.getUpdates());
+};
+
+/**
+ * Called to update the components
+ * @param  {object} obj The update object
+ */
+CrunchJS.Scene.prototype.onComponentsUpdate = function(obj) {
+	this._componentManager.update(obj);
 };
 
 /**

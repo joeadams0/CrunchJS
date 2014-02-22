@@ -62,14 +62,6 @@ CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.destroyEntity = func
 };
 
 /**
- * Changes an entity in the remote system
- * @param  {Object} data Data describing the nature of the change
- */
-CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.changeEntity = function(data) {
-	this.postEvent(CrunchJS.EngineCommands.UpdateComponent, data);
-};
-
-/**
  * Enables an entity in the remote system
  * @param  {number} id The id of the entity to enable
  */
@@ -146,3 +138,4 @@ CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onSync = function(da
 CrunchJS.Network.RemoteEngine.TrustedRemoteEngine.prototype.onWrite = function(data) {
 	CrunchJS.world.write(data);
 };
+

@@ -4,17 +4,21 @@
 
 goog.provide('Moba.ExampleScene');
 
+goog.require('goog.array');
+
 goog.require('CrunchJS.Scene');
 goog.require('CrunchJS.Network.RemoteEngine.WWRemoteEngine');
-goog.require('Moba.ExampleSystem');
-goog.require('Moba.ExampleSystem1');
-goog.require('Moba.ExampleComp');
-goog.require('Moba.ExampleComp1');
+
+// Systems
 goog.require('CrunchJS.Systems.RenderingSystem');
+goog.require('CrunchJS.Systems.OccupancyGridSystem');
+
+// Comps
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.OccupancyGrid');
-//goog.require('CrunchJS.Systems.PhysicsSystem');
+goog.require('CrunchJS.Components.Body');
+goog.require('CrunchJS.Components.Occupancy');
 
 /**
  * Creates an example scene
@@ -41,8 +45,26 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
+	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
+	var comps = [
+		CrunchJS.Components.Transform,
+		CrunchJS.Components.Body,
+		CrunchJS.Components.OccupancyGrid,
+		CrunchJS.Components.Occupancy,
+		CrunchJS.Components.RenderImage
+	];
+	goog.array.forEach(comps, function(comp) {
+		this.registerComponent(comp)
+	}, this);
+
+
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
+		
+		var sys = new CrunchJS.Systems.OccupancyGridSystem();
+
+		this.addSystem(sys);
+
 	}
 	// If it is the main window
 	else{
@@ -58,12 +80,43 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var entity = this.createEntity();
 
-		this.addComponent(entity, new CrunchJS.Components.Transform());
-		this.addComponent(entity, new CrunchJS.Components.RenderImage('star-on.png'));
+		this.setEntityName('master', entity);
 
-		var sys = new CrunchJS.Systems.RenderingSystem({});
+		this.addComponent(entity, new CrunchJS.Components.Transform({
+			layer : 0x00000001
+		}));
 
-		this.addSystem(sys);
+		this.addComponent(entity, new CrunchJS.Components.OccupancyGrid({
+			width : 10,
+			height : 10,
+			tileWidth : 3,
+			tileHeight :3
+		}));
+
+		var ent2 = this.createEntity();
+
+		this.addComponent(ent2, new CrunchJS.Components.Transform({
+			x : -15,
+			y : -15,
+			layer : 0x00000001
+
+		}));
+
+		// this.addComponent(ent2, new CrunchJS.Components.RenderImage('star-on.png'));
+
+
+		this.addComponent(ent2, new CrunchJS.Components.Body({
+			width : 3,
+			height : 3
+		}));
+		
+		var occ = new CrunchJS.Components.Occupancy();
+		this.addComponent(ent2, occ);
+
+
+		// var sys = new CrunchJS.Systems.RenderingSystem({});
+
+		// this.addSystem(sys);
 	}
 
 };

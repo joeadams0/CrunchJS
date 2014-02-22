@@ -146,7 +146,7 @@ CrunchJS.System.prototype.getActiveEntities = function() {
  * Checks if we are interested in the entity. If we are, it adds it to the actives set
  * @param  {number} entityId The entity Id
  */
-CrunchJS.System.prototype.check = function(entityId) {
+CrunchJS.System.prototype.checkEntity = function(entityId) {
 	
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(entityId, this.getEntityComposition())){
 		this.getActiveEntities().add(entityId);
@@ -166,7 +166,7 @@ CrunchJS.System.prototype.check = function(entityId) {
  * @param  {number} entityId The entity id
  */
 CrunchJS.System.prototype.entityChanged = function(entityId) {
-	this.check(entityId);
+	this.checkEntity(entityId);
 };
 
 /**
@@ -174,11 +174,7 @@ CrunchJS.System.prototype.entityChanged = function(entityId) {
  * @param  {number} entityId The entity id
  */
 CrunchJS.System.prototype.entityDestroyed = function(entityId) {
-	
-	var success = this.getActiveEntities().remove(entityId);
-
-	if(success)
-		this.getScene().log("Entity " +entityId + " removed from " + this.name, CrunchJS.LogLevels.DEBUG);
+	this.removeEntity(entityId);
 };
 
 /**
@@ -186,7 +182,7 @@ CrunchJS.System.prototype.entityDestroyed = function(entityId) {
  * @param  {number} entityId The entity id
  */
 CrunchJS.System.prototype.entityEnabled = function(entityId) {
-	this.check(entityId);
+	this.checkEntity(entityId);
 };
 
 /**
@@ -194,10 +190,15 @@ CrunchJS.System.prototype.entityEnabled = function(entityId) {
  * @param  {number} entityId The Id of the entity
  */
 CrunchJS.System.prototype.entityDisabled = function(entityId) {
-	var success = this.getActiveEntities().remove(entityId);
+	this.removeEntity(entityId);
+};
 
-	if(success)
-		this.getScene().log("Entity " +entityId + " removed from " + this.name, CrunchJS.LogLevels.DEBUG);
+/**
+ * Called to remove an entity from the system
+ * @param  {number} entityId The entity Id
+ */
+CrunchJS.System.prototype.removeEntity = function(entityId) {
+	this.getActiveEntities().remove(entityId);
 };
 
 /**
