@@ -114,6 +114,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
  
 /**
  * Sets up data handling on a connection
+ * Can handle data of type 'connect', 'should_connect', and unlabeled.
  * @param {Object} conn Connection object on which data collection is defined
  */
 CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
@@ -214,6 +215,9 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.connectedPeers.push(pId);
 		this.connections.push(conn);
 	}.bind(this));
+	conn.on('close', function(){
+		console.log("Disconnected from: " + pId);
+	}.bind(this));
 	setTimeout(function()
 	{
 		console.log("I have connections to these peers...");
@@ -228,5 +232,5 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 				this.initialize(true);
 			}
 		}
-	}.bind(this), 2500);
+	}.bind(this), 5000);
 };
