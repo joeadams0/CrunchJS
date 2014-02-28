@@ -27,6 +27,27 @@ Moba.PhysicsSystem.prototype.activate = function() {
 
 
 /**
+ *
+    var b2AABB = box2d.AABB;
+	var worldAABB = new b2AABB();
+	var b2Vec2 = box2d.Vec2;
+	worldAABB.minVertex.Set(-1000, -1000);
+	worldAABB.maxVertex.Set(1000, 1000);
+	var gravity = new b2Vec2(0, 0);
+	var doSleep = true;
+	var world = new box2d.World(worldAABB, gravity, doSleep); 
+	console.log(world);
+ *
+ *
+ *
+ * 
+ */
+
+
+
+
+
+/**
  * Sets gravity to be having no effect on the world
  * @define {int}
  */
@@ -106,14 +127,16 @@ Moba.PhysicsSystem.prototype = function update(){
  */
 Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight){
 	//create rectangle
-	var bodyDef = new b2BodyDef;
-	var fixDef = new b2FixtureDef;
-	xDef.density = 0.4;
+	var canvaswidth = 100;
+	var canvasheight = 100;
+	var bodyDef = new box2d.BodyDef;
+	var fixDef = new box2d.FixtureDef;
+	box2d.xDef.density = 0.4;
 	fixDef.friction = 0.2;
 	fixDef.restitution = 0.2;
 
-	bodyDef.type = b2Body.b2_dynamicBody;
-	fixDef.shape = new b2PolygonShape;
+	bodyDef.type = box2d.b2Body.b2_dynamicBody;
+	fixDef.shape = new box2d.b2PolygonShape;
 	var scale = 30;
 	fixDef.shape.SetAsArray([
 		new b2Vec2(scale*0.866 , scale*0.5),
@@ -121,7 +144,7 @@ Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight){
 				new b2Vec2(0, scale*1),
 				new b2Vec2(0, scale*-1)
 			  	]);
-	bodyDef.position.x = (canvaswidth-scale*2)*Math.random()+scale*2;
+	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
 	world.CreateBody(bodyDef).CreateFixture(fixDef);
 };

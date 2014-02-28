@@ -15,32 +15,38 @@ goog.require('CrunchJS.Component');
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Box2DBody = function(velocity, force, mass) {
+CrunchJS.Components.Box2DBody = function(params) {
 
 	/**
-	 * The velocity of the entity	
+	 * The velocity of the entity x
 	 * @type {Object}
 	 */
-	this.velocity = velocity ? velocity : {
-		x : 0,
-		y : 0
-	};
+	this.velocityX = velocityX.params;
 
 	/**
-	 * The force on the entity
+	 * The Velocity of the entity in the y
+	 * @type {[type]}
+	 */
+	this.velocityY = velocityY.params;
+
+	/**
+	 * The force on the entity x
 	 * @type {Object}
 	 */
-	this.force = force ? force : {
-		x : 0,
-		y : 0
-	}
+	this.forceX = forceX.params;
+
+	/**
+	 * The force on the entity y
+	 * @type {Object}
+	 */
+	this.forceY = forceY.params;
 
 	/**
 	 * Mass of the entity
 	 * Can be calculated using Box2D
 	 * @type {number}
 	 */
-	this.mass = mass;
+	this.mass = mass.params;
 };
 
 goog.inherits(CrunchJS.Components.Box2DBody, CrunchJS.Component);

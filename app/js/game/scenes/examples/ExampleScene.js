@@ -12,6 +12,16 @@ goog.require('CrunchJS.Network.RemoteEngine.WWRemoteEngine');
 // Systems
 goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
+goog.require('box2d.World');
+goog.require('box2d.AABB');
+//goog.require('box2d.dynamics');
+//goog.require('box2d.Collision.b2AABB');
+goog.require('box2d.Vec2');
+goog.require('box2d.PolyShape');
+goog.require('box2d.CircleDef');
+goog.require('box2d.BodyDef');
+
+//goog.require('CrunchJS._libs.box2D');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -45,6 +55,9 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
+
+	
+
 	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
 	var comps = [
 		CrunchJS.Components.Transform,
@@ -57,6 +70,38 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.registerComponent(comp)
 	}, this);
 
+
+	var worldAABB = new box2d.AABB();
+	worldAABB.minVertex.Set(-1000, -1000);
+	worldAABB.maxVertex.Set(1000, 1000);
+	var gravity = new box2d.Vec2(0, 0);
+	var doSleep = true;
+	var world = new box2d.World(worldAABB, gravity, doSleep);
+
+	console.log(world);
+
+	var circleSd = new box2d.CircleDef();
+	circleSd.density = 1.0;
+	circleSd.radius = 20;
+	circleSd.restitution = 1.0;
+	circleSd.friction = 0;
+	var circleBd = new box2d.BodyDef();
+	circleBd.AddShape(circleSd);
+	circleBd.position.Set(50,50);
+	var circleBody = world.CreateBody(circleBd);
+
+
+	//var bodyList = box2d.World.getBodyList();
+	
+	var count = 0;
+	while (count > -1)
+	{
+	var timeStep = 1.0/60;
+	var iteration = 1;
+	world.Step(timeStep, iteration);
+	count++;
+	console.log('Box2d physics count ' + count);
+	}	
 
 	// If it is the sim
 	if(CrunchJS.world.isSim()){

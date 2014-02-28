@@ -20,61 +20,37 @@ goog.require('CrunchJS.Component');
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Rectangle = function(vertex1, vertex2, vertex3, vertex4, density, friction, restitution) {
+CrunchJS.Components.Rectangle = function(params) {
 
 	/**
-	 * The velocity of the entity	
+	 * The height of the entity	
 	 * @type {Object}
 	 */
-	this.vertex1 = vertex1 ? vertex1 : {
-		x : 0,
-		y : 0
-	};
+	this.height = height.params;
 
 	/**
-	 * The velocity of the entity	
+	 * The height of the entity	
 	 * @type {Object}
 	 */
-	this.vertex2 = vertex2 ? vertex2 : {
-		x : 0,
-		y : 0
-	};
-
-	/**
-	 * The velocity of the entity	
-	 * @type {Object}
-	 */
-	this.vertex3 = vertex3 ? vertex3 : {
-		x : 0,
-		y : 0
-	};
-
-	/**
-	 * The velocity of the entity	
-	 * @type {Object}
-	 */
-	this.vertex4 = vertex4 ? vertex4 : {
-		x : 0,
-		y : 0
-	};
+	this.width = width.params;
 
 	/**
 	 * Density of the entity
 	 * @type {number}
 	 */
-	this.density = density;
+	this.density = density.params;
 
 	/**
 	 * Friction of the entity
 	 * @type {number}
 	 */
-	this.friction = friction;
+	this.friction = friction.params;
 
 	/**
 	 * Restitution of the entity
 	 * @type {number}
 	 */
-	this.restitution = restitution;
+	this.restitution = restitution.params;
 };
 
 goog.inherits(CrunchJS.Components.Rectangle, CrunchJS.Component);
