@@ -69,7 +69,7 @@ CrunchJS.Internal.NetworkManager.prototype.deactivate = function() {
 CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 {
 	//only run Network Manager in main window
-	if(typeof(Peer) === 'undefined')
+	if(CrunchJS.world.isSim())
 	{
 		return;
 	}
