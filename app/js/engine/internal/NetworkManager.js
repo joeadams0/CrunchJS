@@ -147,8 +147,8 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 		var message = this.createShouldConnectMessage(otherPeer);
 		this.sendMessageToAllPeers(message);
 	}
-			
-	//If somebody connected to me then I should connect back (if necessary).
+	
+	//If somebody connected to peer then it should connect back.
 	if(this.connectedPeers.indexOf(otherPeer) == -1)
 	{
 		this.connect(otherPeer);
@@ -270,7 +270,7 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		if(this.contains(this.connectedPeers, pId) == false)
 		{
 			console.log("Could not connect to: " + pId);
-			
+			//if failed to connect to host
 			if(pId == 'host')
 			{
 				//become host
