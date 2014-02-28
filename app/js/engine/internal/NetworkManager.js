@@ -43,8 +43,6 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * @type {Array}
 	 */
 	 this.connections = [];
-	 
-	 return this;
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -122,33 +120,11 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 	conn.on('data', function(data){
 		if(data['type'] == 'connect')
 		{
-			var otherPeer = data['data'];
-			
-			//If I am the host, I should tell everybody to connect to this person
-			if(this.peerId == 'host')
-			{
-				for (var i=0;i<this.connections.length;i++)
-				{
-					this.connections[i].send({'type': 'should_connect', 'data': otherPeer});
-				}
-			}
-			
-			//If somebody connected to me then I should connect back (if necessary).
-			if(this.connectedPeers.indexOf(otherPeer) == -1)
-			{
-				this.connect(otherPeer);
-				console.log("I am reciprocating a conn with: " + otherPeer);
-			}
+			this.connectMessageLogic(data);
 		}
 		else if(data['type'] == 'should_connect')
 		{
-			//The host will broadcast new players to everybody and say that they should connect
-			var otherPeer = data['data'];
-			if(this.connectedPeers.indexOf(otherPeer) == -1)
-			{
-				this.connect(otherPeer);
-				console.log("Host told me to create a conn with: " + otherPeer);
-			}
+			this.shouldConnectMessageLogic(data);
 		}
 		else
 		{
@@ -157,6 +133,75 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 	}.bind(this));
 };
 
+/**
+ * Helper for the logic for a "connect" message
+ * @param {Object} data JSON object identified as a "connect" message
+ */
+CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
+{
+	var otherPeer = data['data'];
+			
+	//If I am the host, I should tell everybody to connect to this person
+	if(this.peerId == 'host')
+	{
+		var message = this.createShouldConnectMessage(otherPeer);
+		this.sendMessageToAllPeers(message);
+	}
+			
+	//If somebody connected to me then I should connect back (if necessary).
+	if(this.connectedPeers.indexOf(otherPeer) == -1)
+	{
+		this.connect(otherPeer);
+		console.log("I am reciprocating a conn with: " + otherPeer);
+	}
+};
+
+/**
+ * Helper for the logic for a "should_connect" message
+ * @param {Object} data JSON object identified as a "should_connect" message
+ */
+CrunchJS.Internal.NetworkManager.prototype.shouldConnectMessageLogic = function(data)
+{
+	//The host will broadcast new players to everybody and say that they should connect
+	var otherPeer = data['data'];
+	if(this.connectedPeers.indexOf(otherPeer) == -1)
+	{
+		this.connect(otherPeer);
+		console.log("Host told me to create a conn with: " + otherPeer);
+	}
+}
+
+/**
+ * Sends a JSON message to all connection objects
+ * @param {Object} message JSON message object
+ */
+CrunchJS.Internal.NetworkManager.prototype.sendMessageToAllPeers = function(message)
+{
+	for (var i=0;i<this.connections.length;i++)
+	{
+		this.connections[i].send(message);
+	}
+};
+
+/**
+ * Returns JSON for a "connect" message
+ * @return {Object} JSON object for a "connect" message
+ */
+CrunchJS.Internal.NetworkManager.prototype.createConnectMessage = function()
+{
+	return {'type':'connect','data':this.peerId}
+};
+
+/**
+ * Returns JSON for a "should_connect" message.
+ * @param {string} otherPeerId peer ID to populate the message with
+ * @return {Object} JSON object for a "should_connect" message
+ */
+CrunchJS.Internal.NetworkManager.prototype.createShouldConnectMessage = function(otherPeerId)
+{
+	return {'type': 'should_connect', 'data': otherPeerId};
+};
+ 
 /**
  * Checks the peer ID to see if this is the host
  * @return {boolean} Whether this is the host or not
@@ -171,11 +216,10 @@ CrunchJS.Internal.NetworkManager.prototype.isHost = function()
 	{
 		return false;
 	}
-}
+};
 
 /**
- * Checks if there is not a host
- * @return {boolean} Whether this peer should become the host or not
+ * Probes for a host causing this peer to become the host if it cannot find the host
  */
 CrunchJS.Internal.NetworkManager.prototype.probeHost = function()
 {
@@ -210,7 +254,8 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 	conn.on('open', function(){
 		console.log("Connected to: " + pId);
 		//Tell the peer that you want to connect with him.
-		conn.send({'type':'connect','data':this.peerId});
+		var message = this.createConnectMessage();
+		conn.send(message);
 		//Save the connection.
 		this.connectedPeers.push(pId);
 		this.connections.push(conn);
