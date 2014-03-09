@@ -110,6 +110,12 @@ CrunchJS.Events = {
 	 * @type {String}
 	 */
 	SendCommand : 'send_command',
+	
+	/**
+	 * Sends network commands to all peers
+	 * @type {String}
+	 */
+	SendNetworkCommand : 'send_network_command',
 
 	/**
 	 * Fired when the data has been refreshed
@@ -396,6 +402,12 @@ CrunchJS.World.prototype.step = function() {
 	this._sceneManager.process(frame);
 
 	this._frameManager.frameOver();
+	
+	//demonstrate SendNetworkCommand event
+	if(frame.id % 5 == 0)
+	{
+		this.fireEvent(CrunchJS.Events.SendNetworkCommand, frame.id);
+	}
 };
 
 

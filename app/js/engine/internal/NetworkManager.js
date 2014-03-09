@@ -43,9 +43,19 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * @type {Array}
 	 */
 	 this.connections = [];
+	 
+	 this.getScene().addEventListener(CrunchJS.Events.SendNetworkCommand, goog.bind(this.sendNetworkCommand, this));
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
+
+/**
+ * Sends a network command
+ * @param {Object} data The event data
+ */
+CrunchJS.Internal.NetworkManager.prototype.sendNetworkCommand = function(data) {
+	this.sendMessageToAllPeers({'type':'command', 'data':data});
+};
 
 /**
  * Called to activate the Network Manager
@@ -126,9 +136,10 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		{
 			this.shouldConnectMessageLogic(data);
 		}
-		else
+		else if(data['type'] == 'command')
 		{
-			console.log("GOT DATA: " + data);
+			console.log("Data from " + conn.peer + ": " + data['data']);
+			//FIRE EVENTS TO PASS DATA
 		}
 	}.bind(this));
 };
