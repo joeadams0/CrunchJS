@@ -95,7 +95,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 	//on a connection
 	peer.on('open', this.peerOnOpen.bind(this));
 	peer.on('connection', this.onConnectionOnData.bind(this));
-	
+	peer.on('error', this.peerOnError.bind(this));
 	this.peer = peer;
 };
 
@@ -115,9 +115,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnOpen = function(id) {
  * @param {Object} err An err object
  */
 CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
-
-
-
+	this.log(err, CrunchJS.LogLevels.DEBUG);
 }
  
 /**
