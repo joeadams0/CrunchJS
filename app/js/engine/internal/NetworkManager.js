@@ -106,7 +106,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 CrunchJS.Internal.NetworkManager.prototype.peerOnOpen = function(id) {
 	//record the generated ID
 	this.peerId = id;
-	console.log("PeerJS ID: " + this.peerId);
+	this.log("PeerJS ID: " + this.peerId, CrunchJS.LogLevels.DEBUG);
 	this.probeHost();
 }
 
@@ -138,7 +138,7 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		}
 		else if(data['type'] == 'command')
 		{
-			console.log("Data from " + conn.peer + ": " + data['data']);
+			this.log("Data from " + conn.peer + ": " + data['data'], CrunchJS.LogLevels.DEBUG);
 			//FIRE EVENTS TO PASS DATA
 		}
 	}.bind(this));
@@ -163,7 +163,7 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 	if(this.connectedPeers.indexOf(otherPeer) == -1)
 	{
 		this.connect(otherPeer);
-		console.log("I am reciprocating a conn with: " + otherPeer);
+		this.log("I am reciprocating a conn with: " + otherPeer, CrunchJS.LogLevels.DEBUG);
 	}
 };
 
@@ -178,7 +178,7 @@ CrunchJS.Internal.NetworkManager.prototype.shouldConnectMessageLogic = function(
 	if(this.connectedPeers.indexOf(otherPeer) == -1)
 	{
 		this.connect(otherPeer);
-		console.log("Host told me to create a conn with: " + otherPeer);
+		this.log("Host told me to create a conn with: " + otherPeer, CrunchJS.LogLevels.DEBUG);
 	}
 }
 
@@ -259,11 +259,11 @@ CrunchJS.Internal.NetworkManager.prototype.contains = function(list, item) {
  */
 CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 {
-	console.log("Trying to connect to: " + pId);
+	this.log("Trying to connect to: " + pId, CrunchJS.LogLevels.DEBUG);
 	var conn = this.peer.connect(pId);
 	//open a connection
 	conn.on('open', function(){
-		console.log("Connected to: " + pId);
+		this.log("Connected to: " + pId, CrunchJS.LogLevels.DEBUG);
 		//Tell the peer that you want to connect with him.
 		var message = this.createConnectMessage();
 		conn.send(message);
@@ -272,15 +272,15 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.connections.push(conn);
 	}.bind(this));
 	conn.on('close', function(){
-		console.log("Disconnected from: " + pId);
+		this.log("Disconnected from: " + pId, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
 	setTimeout(function()
 	{
-		console.log("I have connections to these peers...");
-		console.log(this.connectedPeers);
+		this.log("I have connections to these peers...", CrunchJS.LogLevels.DEBUG);
+		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 		if(this.contains(this.connectedPeers, pId) == false)
 		{
-			console.log("Could not connect to: " + pId);
+			this.log("Could not connect to: " + pId, CrunchJS.LogLevels.DEBUG);
 			//if failed to connect to host
 			if(pId == 'host')
 			{
@@ -289,4 +289,13 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 			}
 		}
 	}.bind(this), 5000);
+};
+
+/**
+ * Logs a message
+ * @param  {Object} message The object to log
+ * @param  {CrunchJS.LogLevel} level   The log level
+ */
+CrunchJS.Internal.NetworkManager.prototype.log = function(message, level) {
+	CrunchJS.world.log(message, level);
 };
