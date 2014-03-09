@@ -12,14 +12,19 @@ goog.require('CrunchJS.Component');
  * @class
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.RenderImage = function(image) {
+CrunchJS.Components.RenderImage = function(obj) {
   goog.base(this);
 
   /**
    * The image name/path
    * @type {String}
    */
-  this.image = image ? image : 'http://i.imgur.com/mzcrP01.jpg';
+  this.image = obj.image ? obj.image : 'star-on.png';
+
+  // -1 indicates for the RenderingSystem to use the default size of the image as the size of the object.
+  this.size = obj.size ? obj.size : {x: -1, y: -1};
+  this.size.x = this.size.x ? this.size.x : -1;
+  this.size.y = this.size.y ? this.size.y : -1;
 };
 
 goog.inherits(CrunchJS.Components.RenderImage, CrunchJS.Component);
