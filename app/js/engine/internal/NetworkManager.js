@@ -242,15 +242,20 @@ CrunchJS.Internal.NetworkManager.prototype.probeHost = function()
 	}
 };
 
+/**
+ * Helper for contains boolean check
+ * @param {Array.<string>} list
+ * @param {string} item Item to check for in the list
+ */
 CrunchJS.Internal.NetworkManager.prototype.contains = function(list, item) {
-    var i = list.length;
-	//decreasing while loop is faster than others in JS
-    while (i--) {
-       if (list[i] === item) {
-           return true;
-       }
-    }
-    return false;
+    if(list.indexOf(item) == -1)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 };
 
 /**
@@ -273,6 +278,9 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 	}.bind(this));
 	conn.on('close', function(){
 		this.log("Disconnected from: " + pId, CrunchJS.LogLevels.DEBUG);
+		var position = this.connectedPeers.indexOf(pId);
+		this.connectedPeers.splice(position, 1);
+		this.connections.splice(position, 1);
 	}.bind(this));
 	setTimeout(function()
 	{
