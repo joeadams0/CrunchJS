@@ -404,7 +404,7 @@ CrunchJS.World.prototype.step = function() {
 	this._frameManager.frameOver();
 	
 	//demonstrate SendNetworkCommand event
-	if(frame.id % 5 == 0)
+	if(frame.id % 10 == 0)
 	{
 		this.fireEvent(CrunchJS.Events.SendNetworkCommand, frame.id);
 	}
