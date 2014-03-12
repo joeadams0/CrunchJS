@@ -2,12 +2,12 @@
  * @author Justin White
  */
 
-goog.provide('CrunchJS.Components.Box2DBodyDef');
+goog.provide('CrunchJS.Components.Physics');
 
 goog.require('CrunchJS.Component');
 
 /**
- * [Box2DBodyDef description]
+ * [Physics description]
  * @param {Object}  positionX        Position of the entity
  * @param {Object}  positionY        Position of the entity
  * @param {number}  rotation        Rotation of the entity
@@ -18,7 +18,7 @@ goog.require('CrunchJS.Component');
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Box2DBodyDef = function(params) {
+CrunchJS.Components.Physics = function(params) {
 
 	
 	/**
@@ -33,6 +33,38 @@ CrunchJS.Components.Box2DBodyDef = function(params) {
 	 */
 	this.positionY = positionY.params;
 	
+
+	/**
+	 * The velocity of the entity x
+	 * @type {Object}
+	 */
+	this.velocityX = velocityX.params;
+
+	/**
+	 * The Velocity of the entity in the y
+	 * @type {[type]}
+	 */
+	this.velocityY = velocityY.params;
+
+	/**
+	 * The force on the entity x
+	 * @type {Object}
+	 */
+	this.forceX = forceX.params;
+
+	/**
+	 * The force on the entity y
+	 * @type {Object}
+	 */
+	this.forceY = forceY.params;
+
+	/**
+	 * Mass of the entity
+	 * Can be calculated using Box2D
+	 * @type {number}
+	 */
+	this.mass = mass.params;
+
 	/**
 	 * Rotation of the entity
 	 * @type {number}
@@ -58,6 +90,6 @@ CrunchJS.Components.Box2DBodyDef = function(params) {
 	this.preventrotation = preventrotation.params;
 };
 
-goog.inherits(CrunchJS.Components.Box2DBodyDef, CrunchJS.Component);
+goog.inherits(CrunchJS.Components.Physics, CrunchJS.Component);
 
-CrunchJS.Components.Box2DBodyDef.prototype.name = 'Box2DBodyDef';
+CrunchJS.Components.Physics.prototype.name = 'Physics';
