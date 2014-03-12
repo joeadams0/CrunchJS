@@ -110,6 +110,12 @@ CrunchJS.Events = {
 	 * @type {String}
 	 */
 	SendCommand : 'send_command',
+	
+	/**
+	 * Sends network commands to all peers
+	 * @type {String}
+	 */
+	SendNetworkCommand : 'send_network_command',
 
 	/**
 	 * Fired when the data has been refreshed

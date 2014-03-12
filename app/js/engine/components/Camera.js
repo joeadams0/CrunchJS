@@ -18,20 +18,20 @@ goog.require('CrunchJS.Component');
  * @class
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Camera = function(isActive, screenSpace, lensSize) {
+CrunchJS.Components.Camera = function(o) {
   goog.base(this);
 
   /**
    * If true, RenderingSystem will draw from this viewpoint
    * @type {Boolean}
    */
-  this.isActive = isActive ? isActive : false;
+  this.isActive = o.isActive ? o.isActive : false;
 
   /**
    * properties: ux,uy,lx,ly form the Upper left and Lower right pixel coordinates available to be rendered in
    * @type {Object}
    */
-  this.screenSpace = screenSpace ? screenSpace : {ux:0,uy:0,lx:400,ly:400};
+  this.screenSpace = o.screenSpace ? o.screenSpace : {ux:0,uy:0,lx:400,ly:400};
   this.screenSpace.ux = this.screenSpace.ux ? this.screenSpace.ux : 0;
   this.screenSpace.uy = this.screenSpace.uy ? this.screenSpace.uy : 0;
   this.screenSpace.lx = this.screenSpace.lx ? this.screenSpace.lx : 400;
@@ -42,7 +42,7 @@ CrunchJS.Components.Camera = function(isActive, screenSpace, lensSize) {
    * properties: width,height the Transform/gameworld positions to render
    * @type {Object}
    */
-  this.lensSize = lensSize ? lensSize : {width:400,height:400};
+  this.lensSize = o.lensSize ? o.lensSize : {width:400,height:400};
   this.lensSize.width = this.lensSize.width ? this.lensSize.width : 400;
   this.lensSize.height = this.lensSize.height ? this.lensSize.height : 400;
 };
