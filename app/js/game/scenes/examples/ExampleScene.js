@@ -73,29 +73,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 	}, this);
 
 
-	var worldAABB = new box2d.AABB();
-	worldAABB.minVertex.Set(-1000, -1000);
-	worldAABB.maxVertex.Set(1000, 1000);
-	var gravity = new box2d.Vec2(0, 0);
-	var doSleep = true;
-	var world = new box2d.World(worldAABB, gravity, doSleep);
-
-	console.log(world);
-
 	
-
-
-	//var bodyList = box2d.World.getBodyList();
-	
-	var count = 0;
-	while (count > -1)
-	{
-	var timeStep = 1.0/60;
-	var iteration = 1;
-	world.Step(timeStep, iteration);
-	count++;
-	console.log('Box2d physics count ' + count);
-	}	
+		
 
 	// If it is the sim
 	if(CrunchJS.world.isSim()){

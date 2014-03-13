@@ -55,27 +55,6 @@ Moba.PhysicsSystem.prototype.activate = function() {
 
 
 
-/**
- * Sets gravity to be having no effect on the world
- * @define {int}
- */
-var b2Vec2 = Box2D.Common.Math.b2Vec2;
-var gravity = new b2Vec2(0, 0);
-/**
- * Allows objects in the world to enter the sleep state.  Sleep state allows for reduction in cpu usage when an object is not being moved.
- * @define {boolean}
- */
-var doSleep = true;
-/**
- * Declares and initializes the world object used in the Box2D simulation
- * @define {b2World}
- */
-var world = new b2World(gravity, doSleep);
-/**
- * Deletes an object once it is x pixels off the screen
- * @define {int}
- */
-//var deletionBuffer = x;
 
 var canvasw;
 Moba.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
@@ -92,11 +71,21 @@ function setcanvaswidth(canvaswidth){
  * Initializes world and objects.  Sets regular interval
  */
 Moba.PhysicsSystem.prototype = function init(){
-	//create ground here if needed
+	
+	var worldAABB = new box2d.AABB();
+	worldAABB.minVertex.Set(-1000, -1000);
+	worldAABB.maxVertex.Set(1000, 1000);
+	var gravity = new box2d.Vec2(0, 0);
+	var doSleep = true;
+	var world = new box2d.World(worldAABB, gravity, doSleep);	
 
+	/**
+	 * Calls update() method repeatedly at the rate indiciated by the int passed into the method
+	 * @type {int}
+	 */
+	window.setInterval(update(world), (1000/50));
 
-	//create any objects that are needed in the scene at first
-	addRectangle(canvasw, canvash);
+	return world;
 };
 
 
@@ -109,21 +98,17 @@ Moba.PhysicsSystem.prototype = function init(){
 Moba.PhysicsSystem.prototype = function collisionAlert(object1, object2){
 };
 
+
 /**
  * main function
  * called at the regular interval as defined in init()
  * edits the transform component once an object moves after a step()
  */
-Moba.PhysicsSystem.prototype = function update(){
-	world.Step(1 / 60, 10, 10);
-
-/**
- * Calls update() method repeatedly at the rate indiciated by the int passed into the method
- * @type {int}
- */
-	window.setInterval(update, (1000/50));
-
-
+Moba.PhysicsSystem.prototype = function update(world){
+	
+	var timeStep = 1.0/60;
+	var iteration = 1;
+	world.Step(timeStep, iteration);
 };
 
 /**
