@@ -5,6 +5,14 @@
 goog.provide('CrunchJS.Systems.PhysicsSystem');
 goog.require('box2d.World');
 goog.require('CrunchJS.System');
+goog.require('box2d.World');
+goog.require('box2d.AABB');
+//goog.require('box2d.dynamics');
+//goog.require('box2d.Collision.b2AABB');
+goog.require('box2d.Vec2');
+goog.require('box2d.PolyShape');
+goog.require('box2d.CircleDef');
+goog.require('box2d.BodyDef');
 //goog.require('Moba');
 /**
  * Creates the Physics System
@@ -125,7 +133,7 @@ Moba.PhysicsSystem.prototype = function update(){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight){
+Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight, world){
 	//create rectangle
 	var canvaswidth = 100;
 	var canvasheight = 100;
@@ -148,6 +156,19 @@ Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight){
 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
 	world.CreateBody(bodyDef).CreateFixture(fixDef);
 };
+
+
+Moba.PhysicsSystem.prototype = function addCircle(radius, world){
+	var circleSd = new box2d.CircleDef();
+	circleSd.density = 1.0;
+	circleSd.radius = radius;
+	circleSd.restitution = 1.0;
+	circleSd.friction = 0;
+	var circleBd = new box2d.BodyDef();
+	circleBd.AddShape(circleSd);
+	circleBd.position.Set(50,50);
+	var circleBody = world.CreateBody(circleBd);
+}
 
 /**
  * Adds force to objectID within in physics simulation

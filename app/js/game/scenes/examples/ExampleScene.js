@@ -82,15 +82,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 	console.log(world);
 
-	var circleSd = new box2d.CircleDef();
-	circleSd.density = 1.0;
-	circleSd.radius = 20;
-	circleSd.restitution = 1.0;
-	circleSd.friction = 0;
-	var circleBd = new box2d.BodyDef();
-	circleBd.AddShape(circleSd);
-	circleBd.position.Set(50,50);
-	var circleBody = world.CreateBody(circleBd);
+	
 
 
 	//var bodyList = box2d.World.getBodyList();
