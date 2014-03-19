@@ -21,6 +21,8 @@ goog.require('CrunchJS.Component');
 CrunchJS.Components.Physics = function(params) {
 
 	
+
+	this.objectId = objectId.params; 
 	/**
 	 * Position of the entity in x direction
 	 * @type {int}
@@ -93,6 +95,15 @@ CrunchJS.Components.Physics = function(params) {
 goog.inherits(CrunchJS.Components.Physics, CrunchJS.Component);
 
 CrunchJS.Components.Physics.prototype.name = 'Physics';
+
+CrunchJS.Components.Physics.prototype.getObjectId = function() {
+return this.objectId;
+}
+
+CrunchJS.Components.Physics.prototype.getObjectId = function(objectId) {
+if(objectId === this.objectId){
+		this.objectId = objectId;
+}
 
 /**
  * Gets x-cooridinate of component

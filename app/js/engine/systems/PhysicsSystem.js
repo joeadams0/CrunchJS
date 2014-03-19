@@ -13,6 +13,7 @@ goog.require('box2d.Vec2');
 goog.require('box2d.PolyShape');
 goog.require('box2d.CircleDef');
 goog.require('box2d.BodyDef');
+
 //goog.require('Moba');
 /**
  * Creates the Physics System
@@ -20,15 +21,15 @@ goog.require('box2d.BodyDef');
  * @constructor
  * @class Physics System
  */
-Moba.PhysicsSystem = function() {
+CrunchJS.Systems.PhysicsSystem = function() {
 	goog.base(this);
 };
 
-goog.inherits(Moba.PhysicsSystem, CrunchJS.System);
+goog.inherits(CrunchJS.Systems.PhysicsSystem, CrunchJS.System);
 
-Moba.PhysicsSystem.prototype.name = 'PhysicsSystem';
+CrunchJS.Systems.PhysicsSystem.prototype.name = 'PhysicsSystem';
 
-Moba.PhysicsSystem.prototype.activate = function() {
+CrunchJS.Systems.PhysicsSystem.prototype.activate = function() {
 	goog.base(this, 'activate');
 	this.setEntityComposition(this.getScene().createEntityComposition().one('ExampleComp', 'ExampleComp1').exclude('ExampleComp'));
 };
@@ -51,21 +52,21 @@ Moba.PhysicsSystem.prototype.activate = function() {
  * 
  */
 
-var canvasw;
-Moba.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
-	return canvasw = canvaswidth;
-}
+//var canvasw;
+// CrunchJS.Systems.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
+// 	return canvasw = canvaswidth;
+// }
 
-var canvash;
-function setcanvaswidth(canvaswidth){
-	return canvash = canvaswidth;
-}
+// var canvash;
+// function setcanvaswidth(canvaswidth){
+// 	return canvash = canvaswidth;
+// }
 
 
 /**
  * Initializes world and objects.  Sets regular interval
  */
-Moba.PhysicsSystem.prototype = function init(){
+CrunchJS.Systems.PhysicsSystem.prototype = function init(){
 	
 	var worldAABB = new box2d.AABB();
 	worldAABB.minVertex.Set(-1000, -1000);
@@ -73,24 +74,26 @@ Moba.PhysicsSystem.prototype = function init(){
 	var gravity = new box2d.Vec2(0, 0);
 	var doSleep = true;
 	var world = new box2d.World(worldAABB, gravity, doSleep);	
-
+	return world;
 	/**
 	 * Calls update() method repeatedly at the rate indiciated by the int passed into the method
 	 * @type {int}
 	 */
-	window.setInterval(update(world), (1000/50));
+	//window.setInterval(update(world), (1000/50));
 
-	return world;
+	
 };
 
 
 
- /*
- * Send notfication of collision event to engine core
- * @param {int} object1 id (entity) of first object involved in collision
- * @param {int} object2 id (entity) of second object involved in collision
+ /**
+ * Helper method to get collisions that have happened during that step
  */
-Moba.PhysicsSystem.prototype = function collisionAlert(object1, object2){
+//b is linked list of bodies in world
+CrunchJS.Systems.PhysicsSystem.prototype = function collisionCollect(b){
+	var edge = b.box2d.GetContactList();
+	return edge;
+	//can iterate over edges to evaluate the collisions that happened
 };
 
 
@@ -99,11 +102,13 @@ Moba.PhysicsSystem.prototype = function collisionAlert(object1, object2){
  * called at the regular interval as defined in init()
  * edits the transform component once an object moves after a step()
  */
-Moba.PhysicsSystem.prototype = function update(world){
-	
+CrunchJS.Systems.PhysicsSystem.prototype = function update(world){
+
 	var timeStep = 1.0/60;
 	var iteration = 1;
 	world.Step(timeStep, iteration);
+	var b = world.getBodyList;
+	var listCollisions = this.collisionCollect(b);
 };
 
 /**
@@ -113,32 +118,32 @@ Moba.PhysicsSystem.prototype = function update(world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-Moba.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight, world){
-	//create rectangle
-	var canvaswidth = 100;
-	var canvasheight = 100;
-	var bodyDef = new box2d.BodyDef;
-	var fixDef = new box2d.FixtureDef;
-	box2d.xDef.density = 0.4;
-	fixDef.friction = 0.2;
-	fixDef.restitution = 0.2;
+// CrunchJS.Systems.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight, world){
+// 	//create rectangle
+// 	var canvaswidth = 100;
+// 	var canvasheight = 100;
+// 	var bodyDef = new box2d.BodyDef();
+// 	var fixDef = new box2d.FixtureDef();
+// 	fixDef.density = 0.4;
+// 	fixDef.friction = 0.2;
+// 	fixDef.restitution = 0.2;
 
-	bodyDef.type = box2d.b2Body.b2_dynamicBody;
-	fixDef.shape = new box2d.b2PolygonShape;
-	var scale = 30;
-	fixDef.shape.SetAsArray([
-		new b2Vec2(scale*0.866 , scale*0.5),
-		new b2Vec2(scale*-0.866, scale*0.5),
-				new b2Vec2(0, scale*1),
-				new b2Vec2(0, scale*-1)
-			  	]);
-	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
-	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
-	world.CreateBody(bodyDef).CreateFixture(fixDef);
-};
+// 	bodyDef.type = box2d.b2Body.b2_dynamicBody;
+// 	fixDef.shape = new box2d.b2_PolygonShape;
+// 	var scale = 30;
+// 	fixDef.shape.SetAsArray([
+// 		new box2d.Vec2(scale*0.866 , scale*0.5),
+// 		new box2d.Vec2(scale*-0.866, scale*0.5),
+// 				new box2d.Vec2(0, scale*1),
+// 				new box2d.Vec2(0, scale*-1)
+// 			  	]);
+// 	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
+// 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
+// 	world.CreateBody(bodyDef).CreateFixture(fixDef);
+// };
 
 
-Moba.PhysicsSystem.prototype = function addCircle(radius, world){
+CrunchJS.Systems.PhysicsSystem.prototype = function addCircle(radius, world){
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
 	circleSd.radius = radius;
@@ -156,10 +161,10 @@ Moba.PhysicsSystem.prototype = function addCircle(radius, world){
  * @param  {int} degree    angle of force to be applied
  * @param  {int} power     magnitude of the force
  */
-Moba.PhysicsSystem.prototype = function addForce(objectID, degree, power){
+CrunchJS.Systems.PhysicsSystem.prototype = function addForce(objectID, degree, power){
 	var body = this.bodiesMap[objectID];
-	body.ApplyForce(new b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power,
-        Math.sin(degrees * (Math.PI / 180)) * power),
+	body.ApplyForce(new box2d.Vec2(Math.cos(degree * (Math.PI / 180)) * power,
+        Math.sin(degree * (Math.PI / 180)) * power),
         body.GetWorldCenter());
 }
 
@@ -172,10 +177,10 @@ Moba.PhysicsSystem.prototype = function addForce(objectID, degree, power){
  * @param {int} objectID Entity
  * @param {vector} v is a vector composed of x and y components representing velocity in each direction
  */
-Moba.PhysicsSystem.prototype = function addImpulse(objectID, degree, power){
+CrunchJS.Systems.PhysicsSystem.prototype = function addImpulse(objectID, degree, power){
 	var body = this.bodiesMap[objectID];
-    body.ApplyImpulse(new b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power,
-        Math.sin(degrees * (Math.PI / 180)) * power),
+    body.ApplyImpulse(new box2d.Vec2(Math.cos(degree * (Math.PI / 180)) * power,
+        Math.sin(degree * (Math.PI / 180)) * power),
         body.GetWorldCenter());
 };
 
@@ -183,6 +188,6 @@ Moba.PhysicsSystem.prototype = function addImpulse(objectID, degree, power){
  * Stops the execution of the setInterval
  * @param  {int} intervalVariable global variable set by initial setInterval() call
  */
-Moba.PhysicsSystem.prototype = function cancelUpdate(intervalVariable){
+CrunchJS.Systems.PhysicsSystem.prototype = function cancelUpdate(intervalVariable){
 	window.clearInterval(intervalVariable);
 };

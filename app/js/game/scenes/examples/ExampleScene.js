@@ -30,7 +30,7 @@ goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
-
+goog.require('CrunchJS.Systems.PhysicsSystem');
 /**
  * Creates an example scene
  * @constructor
@@ -123,6 +123,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
       }
     }));
 
+		
+
 		var ent2 = this.createEntity();
 
 		this.addComponent(ent2, new CrunchJS.Components.Transform({
@@ -148,6 +150,9 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		var sys = new CrunchJS.Systems.RenderingSystem({});
 
+		this.addSystem(sys);
+
+		var physSys = new CrunchJS.Systems.PhysicsSystem({});
 		this.addSystem(sys);
 	}
 
