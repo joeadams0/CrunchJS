@@ -51,11 +51,6 @@ Moba.PhysicsSystem.prototype.activate = function() {
  * 
  */
 
-
-
-
-
-
 var canvasw;
 Moba.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
 	return canvasw = canvaswidth;
@@ -90,11 +85,11 @@ Moba.PhysicsSystem.prototype = function init(){
 
 
 
-*
+ /*
  * Send notfication of collision event to engine core
  * @param {int} object1 id (entity) of first object involved in collision
  * @param {int} object2 id (entity) of second object involved in collision
- 
+ */
 Moba.PhysicsSystem.prototype = function collisionAlert(object1, object2){
 };
 
@@ -156,6 +151,19 @@ Moba.PhysicsSystem.prototype = function addCircle(radius, world){
 }
 
 /**
+ * Adds force to objectID over time
+ * @param  {String} objectID id of object
+ * @param  {int} degree    angle of force to be applied
+ * @param  {int} power     magnitude of the force
+ */
+Moba.PhysicsSystem.prototype = function addForce(objectID, degree, power){
+	var body = this.bodiesMap[objectID];
+	body.ApplyForce(new b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power,
+        Math.sin(degrees * (Math.PI / 180)) * power),
+        body.GetWorldCenter());
+}
+
+/**
  * Adds force to objectID within in physics simulation
  *
  * ApplyImpulse method signiture from Box2D file
@@ -164,8 +172,11 @@ Moba.PhysicsSystem.prototype = function addCircle(radius, world){
  * @param {int} objectID Entity
  * @param {vector} v is a vector composed of x and y components representing velocity in each direction
  */
-Moba.PhysicsSystem.prototype = function addImpulse(objectID, v){
-
+Moba.PhysicsSystem.prototype = function addImpulse(objectID, degree, power){
+	var body = this.bodiesMap[objectID];
+    body.ApplyImpulse(new b2Vec2(Math.cos(degrees * (Math.PI / 180)) * power,
+        Math.sin(degrees * (Math.PI / 180)) * power),
+        body.GetWorldCenter());
 };
 
 /**

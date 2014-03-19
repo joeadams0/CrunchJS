@@ -42,7 +42,7 @@ CrunchJS.Components.Physics = function(params) {
 
 	/**
 	 * The Velocity of the entity in the y
-	 * @type {[type]}
+	 * @type {Object}
 	 */
 	this.velocityY = velocityY.params;
 
