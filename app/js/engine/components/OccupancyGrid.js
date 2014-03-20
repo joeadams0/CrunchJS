@@ -277,6 +277,100 @@ CrunchJS.Components.OccupancyGrid.prototype.removeEntity = function(id) {
 };
 
 /**
+ * Translates world coordinates to tile coordinates
+ * @param  {Number} x The x world coordinate
+ * @param  {Number} y They y world coord
+ * @return {Object}   The tile coords
+ */
+CrunchJS.Components.OccupancyGrid.prototype.coordToTile = function(x, y) {
+	var transform = this.getScene().getComponent(this.entityId, 'Transform'),
+		offset = {},
+		tile = {};
+
+	// Offset the coords by the transform of the occupancy grid
+	offset.x = x - (transform.getX() - this.width/2*this.tileWidth);
+	offset.y = y - (transform.getY() - this.height/2*this.tileHeight);
+
+	tile.x = goog.math.safeFloor(offset.x/this.tileWidth);
+	tile.y = goog.math.safeFloor(offset.y/this.tileHeight);
+
+	return tile;
+};
+
+/**
+ * Takes tile coords and returns the world coords for the center of the tile
+ * @param  {Number} x The x tile coord
+ * @param  {Number} y The y tile coord
+ * @return {Object}   The world coords
+ */
+CrunchJS.Components.OccupancyGrid.prototype.tileToCoord = function(x,y) {
+	var coords = {},
+		transform = this.getScene().getComponent(this.entityId, 'Transform');
+
+	coords.x = this.tileWidth*x+this.tileWidth/2;
+	coords.y = this.tileHeight*y+this.tileHeight/2;
+
+	coords.x += transform.x - this.width/2*this.tileWidth;
+	coords.y += transform.y - this.height/2*this.tileHeight;
+
+	return coords;
+};
+
+
+/**
+ * Finds the nearest unoccupied tile to the specified location
+ * @param  {Number} params.x The X coord
+ * @param {Number} params.y The Y coord 
+ * @return {Object}        The tile
+ */
+CrunchJS.Components.OccupancyGrid.prototype.findNearestUnoccupiedTile = function(params) {
+	var tile = this.coordToTile(params.x, params.y),
+		openList = [],
+		closedList = [],
+		currentTile;
+
+	if(!this.isOccupied({
+		x : tile.x,
+		y : tile.y
+	})){
+		return tile;
+	}
+
+	openList.push(tile);
+
+	while(openList.length != 0){
+		currentTile = openList.pop();
+
+
+		if(!this.isOccupied({
+			x : currentTile.x,
+			y : currentTile.y
+		}))
+			return currentTile;
+
+		closedList.push(currentTile);
+
+		var neighbors = this.getNeighbors({
+			x : currentTile.x,
+			y : currentTile.y,
+			diag : true
+		});
+
+		goog.structs.forEach(neighbors, function(tile) {
+			var t = goog.array.find(closedList, function(alreadySearchedTile) {
+				return alreadySearchedTile.x == tile.x && alreadySearchedTile.y == tile.y;
+			});
+			if(!t){
+				openList.push(tile);
+			}
+
+		}, this);
+
+	}
+
+};
+
+/**
  * Updates an entity's position
  * @param  {number} id   The entity id
  */
@@ -292,7 +386,7 @@ CrunchJS.Components.OccupancyGrid.prototype.updateEntity = function(id) {
  * @return {Boolean}      True if it is in bounds
  */
 CrunchJS.Components.OccupancyGrid.prototype.isInBounds = function(x, y) {
-	return this.map.length>x && this.map[x].length > y;
+	return x >= 0 && y >= 0 && this.map.length>x && this.map[x].length > y ;
 };
 
 /**
@@ -439,7 +533,7 @@ CrunchJS.Components.OccupancyGrid.prototype.getNeighbors = function(params) {
 			for(var y = params.y-1; y<=params.y+1; y++){
 
 				// Not the center tile, and is in bounds
-				if(x != params.x || y != params.y && this.isInBounds(x, y)){
+				if(!(x == params.x && y == params.y) && this.isInBounds(x, y)){
 
 					if(params.diag){
 

@@ -27,6 +27,7 @@ if(typeof COMPILED == "undefined"){
 	};
 
 	importScripts(
+		'/js/vendor/buckets.js',
 		CLOSURE_BASE_PATH+'bootstrap/webworkers.js',
 	  	CLOSURE_BASE_PATH+'base.js',
 	  	'/js/deps.js');	

@@ -154,7 +154,8 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		}
 		else if(data['type'] == 'command')
 		{
-			this.log("Data from " + conn.peer + ": " + data['data'], CrunchJS.LogLevels.DEBUG);
+			CrunchJS.world.log('Command: ' + data.data.command);
+			this.getScene().fireEvent(data.data.command, data.data.data);
 			//FIRE EVENTS TO PASS DATA
 		}
 	}.bind(this));

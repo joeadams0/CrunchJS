@@ -494,7 +494,7 @@ CrunchJS.Internal.ComponentManager.prototype.addUpdatedComp = function(id, name)
 		this.updates.updatedComponents.set(id, new goog.structs.Set());
 
 
-	if(!this.updates.addRemove.containsKey(id))
+	if(!this.updates.addRemove.containsKey(id) || !this.updates.addRemove.get(id).contains(name))
 		this.updates.updatedComponents.get(id).add(name);
 };
 

@@ -121,7 +121,9 @@ CrunchJS.Events = {
 	 * Fired when the data has been refreshed
 	 * @type {String}
 	 */
-	RefreshData : 'refresh_data'
+	RefreshData : 'refresh_data',
+
+	Move : 'move'
 
 };
 

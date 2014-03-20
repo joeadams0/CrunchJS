@@ -13,6 +13,7 @@ goog.require('CrunchJS.Internal.NetworkManager');
 goog.require('CrunchJS.Network.Channel.WebWorkerChannel');
 
 goog.require('goog.object');
+goog.require('goog.array');
 
 /**
  * Constructs a new Scene. This class is meant to be extended so that you can override 
@@ -274,6 +275,19 @@ CrunchJS.Scene.prototype.registerComponent = function(constr) {
 CrunchJS.Scene.prototype.addComponent = function(entityId, component) {
 	return this._componentManager.addComponent(entityId, component);
 }
+
+/**
+ * Adds all of the components to the entity
+ * @param {Number} entityId The entity Id
+ * @param {...CrunchJS.Component} Components The component(s) to add
+ */
+CrunchJS.Scene.prototype.addComponents = function(entityId) {
+	var arr = goog.array.splice(arguments, 1);
+
+	goog.array.forEach(arr, function(comp) {
+		this.addComponent(entityId, comp);
+	}, this);
+};
 
 /**
  * Removes the component from the entity
