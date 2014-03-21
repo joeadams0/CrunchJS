@@ -1,5 +1,10 @@
 /**
  * @author Justin White
+ * The formula for accessing methods and properties from box2d were adapted from
+ * http://www.jeremyhubble.com/box2d.html
+ * The method calls to box2d.js used in PhysicsSystem.js do not exactly match up to 
+ * the methods outlined in the above url since the box2d versions used differ between the url
+ * and this project.
  */
 
 goog.provide('CrunchJS.Systems.PhysicsSystem');
@@ -75,13 +80,13 @@ CrunchJS.Systems.PhysicsSystem.prototype = function init(){
 	var doSleep = true;
 	var world = new box2d.World(worldAABB, gravity, doSleep);	
 	return world;
+
+	//This will be called from the scene not from the init() function
 	/**
 	 * Calls update() method repeatedly at the rate indiciated by the int passed into the method
 	 * @type {int}
 	 */
 	//window.setInterval(update(world), (1000/50));
-
-	
 };
 
 
@@ -110,7 +115,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function update(world){
 	var b = world.getBodyList;
 	var listCollisions = this.collisionCollect(b);
 };
-
+//TO DO: Have to adjust how vertexes are added to Box2D world
 /**
  * Adds rectangle to Box2D simulation
  * Sets width, height, mass, and placement of object
@@ -123,20 +128,11 @@ CrunchJS.Systems.PhysicsSystem.prototype = function update(world){
 // 	var canvaswidth = 100;
 // 	var canvasheight = 100;
 // 	var bodyDef = new box2d.BodyDef();
-// 	var fixDef = new box2d.FixtureDef();
-// 	fixDef.density = 0.4;
-// 	fixDef.friction = 0.2;
-// 	fixDef.restitution = 0.2;
-
 // 	bodyDef.type = box2d.b2Body.b2_dynamicBody;
-// 	fixDef.shape = new box2d.b2_PolygonShape;
 // 	var scale = 30;
-// 	fixDef.shape.SetAsArray([
-// 		new box2d.Vec2(scale*0.866 , scale*0.5),
-// 		new box2d.Vec2(scale*-0.866, scale*0.5),
-// 				new box2d.Vec2(0, scale*1),
-// 				new box2d.Vec2(0, scale*-1)
-// 			  	]);
+// 	
+////fixDef() doesnt exist in this version of box2D we are using
+//
 // 	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
 // 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
 // 	world.CreateBody(bodyDef).CreateFixture(fixDef);

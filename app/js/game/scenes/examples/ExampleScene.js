@@ -70,12 +70,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 	];
 	goog.array.forEach(comps, function(comp) {
 		this.registerComponent(comp)
-	}, this);
-
-
+	}, this);	
 	
-		
-
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
 		
@@ -83,6 +79,17 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 		this.addSystem(sys);
 
+		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
+		//Not used in the demo for Project Report 2
+		//var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		//this.addSystem(physSys);
+
+		//var worldP = physSys.init();
+		//physSys.addCircle(5, worldP);
+		//CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
+		//CrunchJS.world.log('TESTETS', CrunchJS.LogLevels.DEBUG);
+
+			
 	}
 	// If it is the main window
 	else{
@@ -153,7 +160,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.addSystem(sys);
 
 		var physSys = new CrunchJS.Systems.PhysicsSystem({});
-		this.addSystem(sys);
+		this.addSystem(physSys);
 	}
 
 };
