@@ -264,7 +264,8 @@ CrunchJS.Components.Physics.prototype.setRotation = function(rotation) {
 	}
 };
 
-
+//Decided these methods were unnecessary
+//at least at this stage of the project
 // /**
 //  * Returns if sleeping is allowed for the component
 //  * @return {Boolean} rotation

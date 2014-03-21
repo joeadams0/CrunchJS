@@ -1,5 +1,5 @@
 /**
- * @author Joe Adams
+ * @author Joe Adams, Justin White
  */
 
 goog.provide('Moba.ExampleScene');
@@ -14,14 +14,11 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('box2d.World');
 goog.require('box2d.AABB');
-//goog.require('box2d.dynamics');
-//goog.require('box2d.Collision.b2AABB');
 goog.require('box2d.Vec2');
 goog.require('box2d.PolyShape');
 goog.require('box2d.CircleDef');
 goog.require('box2d.BodyDef');
-
-//goog.require('CrunchJS._libs.box2D');
+goog.require('CrunchJS.Systems.PhysicsSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -30,7 +27,7 @@ goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
-goog.require('CrunchJS.Systems.PhysicsSystem');
+
 /**
  * Creates an example scene
  * @constructor

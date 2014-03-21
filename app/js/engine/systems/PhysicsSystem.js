@@ -12,14 +12,11 @@ goog.require('box2d.World');
 goog.require('CrunchJS.System');
 goog.require('box2d.World');
 goog.require('box2d.AABB');
-//goog.require('box2d.dynamics');
-//goog.require('box2d.Collision.b2AABB');
 goog.require('box2d.Vec2');
 goog.require('box2d.PolyShape');
 goog.require('box2d.CircleDef');
 goog.require('box2d.BodyDef');
 
-//goog.require('Moba');
 /**
  * Creates the Physics System
  * @extends {CrunchJS.System}
