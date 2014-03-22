@@ -8,6 +8,7 @@
 goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
 goog.provide('CrunchJS.Events');
+goog.provide('CrunchJS.NetworkEvents');
 goog.provide('CrunchJS.DEBUG');
 goog.provide('CrunchJS.LogLevels');
 goog.provide('CrunchJS.EngineCommands');
@@ -196,6 +197,7 @@ CrunchJS.EngineCommands = {
 	SetEntityName : 'set_entity_name'
 
 };
+
 
 
 
@@ -470,7 +472,6 @@ CrunchJS.World.prototype.getScene = function(sceneName) {
  */
 CrunchJS.World.prototype.transitionScene = function(sceneName, data) {
 	var success = this._sceneManager.transitionScene(sceneName, data);
-	this.setListeners();
 	return success;
 };
 

@@ -18,7 +18,7 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * API key for PeerJS-Server
 	 * @type {string}
 	 */
-	this.apiKey = 'i45z4s9chvv7k3xr';
+	this.apiKey = 'nhc2blm0184zpvi';
 	
 	/**
 	 * The string ID of this peer
@@ -44,10 +44,63 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 */
 	 this.connections = [];
 	 
-	 this.getScene().addEventListener(CrunchJS.Events.SendNetworkCommand, goog.bind(this.sendNetworkCommand, this));
+	/**
+	 * Communication turn length
+	 * @type {number}
+	 */
+	 this.communicationTurnLength = 100;
+	
+	/**
+	 * Current communication turn number
+	 * @type {number}
+	 */
+	 this.communicationTurn = 0;
+	 
+	/**
+	 * Communication events hash table
+	 * @type {Object.<number, Object>}
+	 */
+	 this.communicationEvents = {}
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
+
+/**
+ * Logs a message
+ * @param  {Object} message The object to log
+ * @param  {CrunchJS.LogLevel} level   The log level
+ */
+CrunchJS.Internal.NetworkManager.prototype.log = function(message, level) {
+	CrunchJS.world.log(message, level);
+};
+
+/**
+ * Logic that is executed every communication turn
+ */
+CrunchJS.Internal.NetworkManager.prototype.everyCommunicationTurn = function() {
+	this.communicationTurn++;
+	var currentEvents = this.communicationEvents[this.communicationTurn];
+	if (typeof currentEvents !== 'undefined') {
+		for (var i=0;i<currentEvents.length;i++)
+		{ 
+			this.log("Event on current communication turn: " + this.communicationTurn);
+			this.log(currentEvents[i], CrunchJS.LogLevels.DEBUG);
+			//Fire event to pass data
+			this.fireEventLogic(currentEvents[i]);
+			delete this.communicationEvents[this.communicationTurn];
+		}
+		
+	}
+};
+
+/**
+ * Logic to fire proper event based on network command data
+ * @param {Object} data The event data
+ */
+CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
+	CrunchJS.world.log('COMMAND: ' + data.command);
+	this.getScene().fireEvent(data.command, data.data);
+};
 
 /**
  * Sends a network command
@@ -97,6 +150,8 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 	peer.on('connection', this.onConnectionOnData.bind(this));
 	peer.on('error', this.peerOnError.bind(this));
 	this.peer = peer;
+	this.getScene().addEventListener(CrunchJS.Events.SendNetworkCommand, goog.bind(this.sendNetworkCommand, this));
+	setInterval(goog.bind(this.everyCommunicationTurn, this), this.communicationTurnLength);
 };
 
 /**
@@ -108,7 +163,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnOpen = function(id) {
 	this.peerId = id;
 	this.log("PeerJS ID: " + this.peerId, CrunchJS.LogLevels.DEBUG);
 	this.probeHost();
-}
+};
 
 /**
  * Function for when a peer has an error
@@ -134,7 +189,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
 		this.initialize(true);
 	}
 	this.log(err, CrunchJS.LogLevels.DEBUG);
-}
+};
  
 /**
  * Sets up data handling on a connection
@@ -154,9 +209,14 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		}
 		else if(data['type'] == 'command')
 		{
-			CrunchJS.world.log('Command: ' + data.data.command);
-			this.getScene().fireEvent(data.data.command, data.data.data);
 			//FIRE EVENTS TO PASS DATA
+			//this.log("Data from " + conn.peer + " received on comm. turn: " + this.communicationTurn, CrunchJS.LogLevels.DEBUG);
+			//Place data in communication turn queue with delay
+			var insertEvent = this.communicationTurn + 2;
+			if (typeof this.communicationEvents[insertEvent] === 'undefined') {
+				this.communicationEvents[insertEvent] = [];
+			}
+			this.communicationEvents[insertEvent].push(data['data']);
 		}
 	}.bind(this));
 };
@@ -290,6 +350,15 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.connections.push(conn);
 		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
+		if(this.peerId == "host"){
+			conn.send({
+				type : 'command',
+				data : {
+					command : CrunchJS.EngineCommands.Sync,
+					data : this.getScene().getSnapshot()
+				}
+			})
+		}
 	}.bind(this));
 	conn.on('close', function(){
 		var position = this.connectedPeers.indexOf(pId);
@@ -298,13 +367,4 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
-};
-
-/**
- * Logs a message
- * @param  {Object} message The object to log
- * @param  {CrunchJS.LogLevel} level   The log level
- */
-CrunchJS.Internal.NetworkManager.prototype.log = function(message, level) {
-	CrunchJS.world.log(message, level);
 };

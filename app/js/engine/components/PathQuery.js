@@ -17,6 +17,8 @@ goog.require('CrunchJS.Component');
  * @constructor
  */
 CrunchJS.Components.PathQuery = function(params) {
+	goog.base(this, params);
+	
 	this.start = params.start;
 	this.end = params.end;
 

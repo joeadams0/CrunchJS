@@ -14,6 +14,8 @@ goog.require('CrunchJS.Component');
  * @class 
  */
 CrunchJS.Components.Path = function(params) {
+	goog.base(this, params);
+
 	this.steps = params.steps;
 
 	this.step = params.steps ? params.step : 0;

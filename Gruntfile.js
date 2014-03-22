@@ -35,7 +35,7 @@ module.exports = function (grunt) {
     externsPath: 'build/externs/',
 
     // define the main namespace of your app.
-    entryPoint: 'game',
+    entryPoint: 'CloseContact',
     
     // The path to the installed bower components
     componentPath: 'app/components',

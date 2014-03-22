@@ -30,7 +30,7 @@ CrunchJS.Systems.PathMovementSystem.prototype.activate = function() {
 };
 
 CrunchJS.Systems.PathMovementSystem.prototype.processEntity = function(frame, ent) {
-	if(frame.id % 30 == 0){
+	if(frame.id % 15 == 0){
 		var path = this.getScene().getComponent(ent, 'Path'),
 			transform = this.getScene().getComponent(ent, 'Transform');
 

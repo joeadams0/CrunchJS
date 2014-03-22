@@ -13,14 +13,15 @@ goog.require('goog.math.Size');
  * @constructor
  * @class 
  */
-CrunchJS.Components.Occupancy = function(size) {
+CrunchJS.Components.Occupancy = function(params) {
+	goog.base(this, params);
 
-	if(size && size.width && size.height){
+	if(params && params.size && params.size.width && params.size.height){
 		/**
 		 * Optional size of the occupancy
 		 * @type {Boolean}
 		 */
-		this.size = new goog.math.Size(size.width, size.height);
+		this.size = new goog.math.Size(params.size.width, params.size.height);
 	}
 	this.updates = {};
 };
@@ -60,11 +61,12 @@ CrunchJS.Components.Occupancy.prototype.getUpdates = function() {
 };
 
 CrunchJS.Components.Occupancy.prototype.toObj = function() {
+	var obj = goog.base(this, 'toObj', {});
+
 	if(goog.isDefAndNotNull(this.getSize())){
-		return {
-			width : this.getSize().width,
-			height : this.getSize().height
-		};
+		obj.size = {};
+		obj.size.width = this.getSize().width;
+		obj.size.height = this.getSize().height;
 	}
-	return {};
+	return obj;
 };

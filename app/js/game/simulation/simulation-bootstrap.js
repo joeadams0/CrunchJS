@@ -27,7 +27,6 @@ if(typeof COMPILED == "undefined"){
 	};
 
 	importScripts(
-		'/js/vendor/buckets.js',
 		CLOSURE_BASE_PATH+'bootstrap/webworkers.js',
 	  	CLOSURE_BASE_PATH+'base.js',
 	  	'/js/deps.js');	
@@ -35,4 +34,4 @@ if(typeof COMPILED == "undefined"){
 
 goog.provide('SimulationBootstrap');
 
-goog.require('Moba');
+goog.require('CloseContact');

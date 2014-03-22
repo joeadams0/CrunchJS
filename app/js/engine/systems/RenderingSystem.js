@@ -30,10 +30,10 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
   };
 
   this.renderer = new PIXI.autoDetectRenderer(
-    (canvasData.width ? canvasData.width : 900),
+    (canvasData.width ? canvasData.width : 600),
     (canvasData.height ? canvasData.height : 600)
   );
-  document.body.appendChild(this.renderer.view);
+  $('#game').append(this.renderer.view);
   this.sprites = []; // an array of Entities that are in the stage
   this.cam = null;
 };

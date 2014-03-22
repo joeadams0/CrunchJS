@@ -1,6 +1,3 @@
-goog.provide('game');
+goog.provide('CloseContact');
 
-goog.require('Moba');
-
-
-
+goog.require('CloseContact.Core');

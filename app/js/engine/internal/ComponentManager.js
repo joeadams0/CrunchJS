@@ -328,7 +328,7 @@ CrunchJS.Internal.ComponentManager.prototype.findEntities = function(entityCompo
 	var set = new goog.structs.Set();
 
 	goog.array.forEach(this._entityCompostitions, function(comp, id) {
-		if(this.matchesComposition(id, entityComposition))
+		if(comp && this.matchesComposition(id, entityComposition))
 			set.add(id);
 	}, this);
 

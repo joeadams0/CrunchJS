@@ -150,13 +150,13 @@ CrunchJS.System.prototype.checkEntity = function(entityId) {
 	
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(entityId, this.getEntityComposition())){
 		this.getActiveEntities().add(entityId);
-		this.getScene().log("Entity " +entityId + " added to " + this.name, CrunchJS.LogLevels.DEBUG);
+		// this.getScene().log("Entity " +entityId + " added to " + this.name, CrunchJS.LogLevels.DEBUG);
 	}
 	else{
 		var success = this.getActiveEntities().remove(entityId);
 
-		if(success)
-			this.getScene().log("Entity " +entityId + " removed from " + this.name, CrunchJS.LogLevels.DEBUG);
+		// if(success)
+			// this.getScene().log("Entity " +entityId + " removed from " + this.name, CrunchJS.LogLevels.DEBUG);
 
 	}
 };

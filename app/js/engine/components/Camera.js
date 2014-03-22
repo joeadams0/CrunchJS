@@ -19,7 +19,7 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.Camera = function(o) {
-  goog.base(this);
+  goog.base(this, o);
 
   /**
    * If true, RenderingSystem will draw from this viewpoint

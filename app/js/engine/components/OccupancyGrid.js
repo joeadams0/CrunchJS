@@ -23,6 +23,7 @@ goog.require('goog.math.Rect');
  * @class 
  */
 CrunchJS.Components.OccupancyGrid = function(params) {
+	goog.base(this, params);
 
 	/**
 	 * The width of the grid in number of tiles
@@ -86,12 +87,12 @@ CrunchJS.Components.OccupancyGrid = function(params) {
 	 * Maps the entities to the rectangle of tiles they occupy in the map 
 	 * @type {goog.structs.Map}
 	 */
-	this.entityToTilesMap;
+	this.entityToTilesMap = new goog.structs.Map();
 	if(params.entityToTilesMap){
-		this.entityToTilesMap = new goog.structs.Map(params.entityToTilesMap);
+		goog.object.forEach(params.entityToTilesMap, function(rect) {
+			return new goog.math.Rect(rect);
+		});
 	}
-	else
-		this.entityToTilesMap = new goog.structs.Map();
 
 	this.updates = {
 		// A set of tile locations that have changed
@@ -600,7 +601,7 @@ CrunchJS.Components.OccupancyGrid.prototype.getTileRange = function(rect) {
 };
 
 CrunchJS.Components.OccupancyGrid.prototype.toObj = function() {
-	var obj = {};
+	var obj = goog.base(this, 'toObj', {});
 
 	obj.width = this.width;
 	obj.height = this.height;
@@ -619,7 +620,14 @@ CrunchJS.Components.OccupancyGrid.prototype.toObj = function() {
 
 	}, this);
 
-	obj.entityToTilesMap = this.entityToTilesMap.toObject();
+	obj.entityToTilesMap = goog.structs.map(this.entityToTilesMap, function(rect) {
+		return {
+			x : rect.left,
+			y : rect.top,
+			w : rect.width,
+			h : rect.height
+		};
+	});
 
 	return obj;
 };

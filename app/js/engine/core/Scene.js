@@ -86,12 +86,6 @@ CrunchJS.Scene = function() {
 	 */
 	this._componentManager = new CrunchJS.Internal.ComponentManager(this);
 
-	/**
-	 * The NetworkManager for the scene
-	 * @type {CrunchJS.Internal.NetworkManager}
-	 * @protected
-	 */
-	this._networkManager = new CrunchJS.Internal.NetworkManager(this);
 	
 	/**
 	 * The remote engine for the web worker 
@@ -133,7 +127,6 @@ CrunchJS.Scene.prototype.activate = function(data) {
 	this._entityManager.activate();
 	this._componentManager.activate();
 	this._systemManager.activate();
-	this._networkManager.activate();
 };
 
 /**
@@ -146,7 +139,6 @@ CrunchJS.Scene.prototype.deactivate = function() {
 	this._entityManager.deactivate();
 	this._componentManager.deactivate();
 	this._systemManager.deactivate();
-	this._networkManager.deactivate();
 };
 
 /**

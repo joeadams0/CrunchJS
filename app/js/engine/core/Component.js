@@ -39,12 +39,15 @@ goog.provide('CrunchJS.Component');
  * // True
  * world.getComponent(entityId, 'Position').x == 10;
  */
-CrunchJS.Component = function() {
+CrunchJS.Component = function(data) {
 	/**
 	 * The scene that the component is a part of
 	 * @type {CrunchJS.Scene}
 	 */
 	this._scene = null;
+
+	if(data)
+		this.entityId = data.entityId;
 };
 
 /**
@@ -60,7 +63,11 @@ CrunchJS.Component.__proto__.fromObj = function(obj) {
  * Creates a JSON serializable object out of the component
  * @return {Object} The JSON serializable object
  */
-CrunchJS.Component.prototype.toObj = function() {
+CrunchJS.Component.prototype.toObj = function(o) {
+	if(o){
+		o.entityId = this.entityId;
+		return o;
+	}
 	var obj = goog.object.filter(this, function(val, key){
 		return !goog.isFunction(val);
 	}, this);

@@ -18,6 +18,7 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.Transform = function(params) {
+	goog.base(this, params);
 
 	/**
 	 * The x position

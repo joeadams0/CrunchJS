@@ -2,11 +2,10 @@
  * @author Joe Adams
  */
 
-goog.provide('Moba.ExampleScene');
-
-goog.require('goog.array');
+goog.provide('CloseContact.Scenes.GameScene');
 
 goog.require('CrunchJS.Scene');
+
 goog.require('CrunchJS.Network.RemoteEngine.WWRemoteEngine');
 
 // Systems
@@ -26,29 +25,32 @@ goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 
 /**
- * Creates an example scene
+ * The Game Scene
  * @constructor
- * @class An Example Scene
- * @extends {CrunchJS.Scene}
+ * @class 
  */
-Moba.ExampleScene = function() {
+CloseContact.Scenes.GameScene = function() {
 	goog.base(this);
+
+	/**
+	 * The NetworkManager for the scene
+	 * @type {CrunchJS.Internal.NetworkManager}
+	 * @protected
+	 */
+	this._networkManager = new CrunchJS.Internal.NetworkManager(this);
 };
 
-goog.inherits(Moba.ExampleScene, CrunchJS.Scene);
+goog.inherits(CloseContact.Scenes.GameScene, CrunchJS.Scene);
 
-/**
- * Set the name of the Scene
- * @type {String}
- */
-Moba.ExampleScene.prototype.name = 'ExampleScene';
+CloseContact.Scenes.GameScene.prototype.name = 'GameScene';
 
-/**
- * Print a message when you activate
- * @param  {?Object} data The data if any
- */
-Moba.ExampleScene.prototype.activate = function(data) {
-	goog.base(this, "activate", data);
+CloseContact.Scenes.GameScene.prototype.activate = function(data) {
+	goog.base(this, 'activate', data);
+
+	if(!CrunchJS.world.isSim())
+		$('#desc').html('Welcome to Close Contact. On the map below, you can click on the grass tiles to move the player to that tile. The player cannot move onto or through the tree tiles. Once you have moved the player around some, open up a second browser window and load the same webpage. These pages will communicate to each other, so if you move the player on one page, it will move on the other. The first page is the host and it will sync the state with the second page. The any action taken on either page is automatically synced.');
+
+	this._networkManager.activate();
 
 	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
 	var comps = [
@@ -66,7 +68,6 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.registerComponent(comp)
 	}, this);
 
-
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
 		
@@ -79,6 +80,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.addSystem(pathMoveSys);
 
 	}
+
 	// If it is the main window
 	else{
 		var sim;
@@ -133,7 +135,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			[0,1,1,0,1,1,1,0,1,0],
 			[0,1,1,0,1,0,0,0,1,0],
 			[0,1,1,1,1,1,1,1,1,0],
-			[0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0]
 		];
 
 		goog.array.forEach(tiles, function(row, y) {
@@ -256,9 +258,9 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 };
 
-/**
- * Print a message when deactivating
- */
-Moba.ExampleScene.prototype.deactivate = function() {
-	goog.base(this, "deactivate");
+CloseContact.Scenes.GameScene.prototype.deactivate = function() {
+	if(!CrunchJS.world.isSim())
+		$("#game").html('');
+
+	this._networkManager.deactivate();
 };

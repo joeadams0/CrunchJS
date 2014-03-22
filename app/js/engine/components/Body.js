@@ -16,6 +16,8 @@ goog.require('goog.math.Size');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.Body = function(params) {
+	goog.base(this, params);
+	
 	var width = goog.isNumber(params.width) ? params.width : 10;
 	var height = goog.isNumber(params.height) ? params.height : 10;
 
