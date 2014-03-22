@@ -4,8 +4,7 @@
 
 goog.provide('CrunchJS.Components.Rectangle');
 
-goog.require('CrunchJS.Component');
-
+goog.require('CrunchJS.Component'); 
 
 
 /**
@@ -14,47 +13,44 @@ goog.require('CrunchJS.Component');
  * @param {Object} vertex2 Defines the location of one point of a rectangle with a x, y vector
  * @param {Object} vertex3 Defines the location of one point of a rectangle with a x, y vector
  * @param {Object} vertex4 Defines the location of one point of a rectangle with a x, y vector
+ * @param {number} density Density of the entity
+ * @param {number} friction Friction of the entity
+ * @param {number} restitution Restitution of the entity
  * @constructor
  * @class 
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.Rectangle = function(vertex1, vertex2, vertex3, vertex4) {
+CrunchJS.Components.Rectangle = function(params) {
 
 	/**
-	 * The velocity of the entity	
+	 * The height of the entity	
 	 * @type {Object}
 	 */
-	this.vertex1 = vertex1 ? vertex1 : {
-		x : 0,
-		y : 0
-	};
+	this.height = height.params;
 
 	/**
-	 * The velocity of the entity	
+	 * The height of the entity	
 	 * @type {Object}
 	 */
-	this.vertex2 = vertex2 ? vertex2 : {
-		x : 0,
-		y : 0
-	};
+	this.width = width.params;
 
 	/**
-	 * The velocity of the entity	
-	 * @type {Object}
+	 * Density of the entity
+	 * @type {number}
 	 */
-	this.vertex3 = vertex3 ? vertex3 : {
-		x : 0,
-		y : 0
-	};
+	this.density = density.params;
 
 	/**
-	 * The velocity of the entity	
-	 * @type {Object}
+	 * Friction of the entity
+	 * @type {number}
 	 */
-	this.vertex4 = vertex4 ? vertex4 : {
-		x : 0,
-		y : 0
-	};
+	this.friction = friction.params;
+
+	/**
+	 * Restitution of the entity
+	 * @type {number}
+	 */
+	this.restitution = restitution.params;
 };
 
 goog.inherits(CrunchJS.Components.Rectangle, CrunchJS.Component);

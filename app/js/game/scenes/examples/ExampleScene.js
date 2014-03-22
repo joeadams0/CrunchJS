@@ -1,5 +1,5 @@
 /**
- * @author Joe Adams
+ * @author Joe Adams, Justin White
  */
 
 goog.provide('Moba.ExampleScene');
@@ -14,6 +14,13 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
+goog.require('box2d.World');
+goog.require('box2d.AABB');
+goog.require('box2d.Vec2');
+goog.require('box2d.PolyShape');
+goog.require('box2d.CircleDef');
+goog.require('box2d.BodyDef');
+goog.require('CrunchJS.Systems.PhysicsSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -50,6 +57,9 @@ Moba.ExampleScene.prototype.name = 'ExampleScene';
 Moba.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
+
+	
+
 	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
 	var comps = [
 		CrunchJS.Components.Transform,
@@ -64,9 +74,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 
 	goog.array.forEach(comps, function(comp) {
 		this.registerComponent(comp)
-	}, this);
-
-
+	}, this);	
+	
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
 		
@@ -78,6 +87,17 @@ Moba.ExampleScene.prototype.activate = function(data) {
 		this.addSystem(pathSys);
 		this.addSystem(pathMoveSys);
 
+		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
+		//Not used in the demo for Project Report 2
+		//var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		//this.addSystem(physSys);
+
+		//var worldP = physSys.init();
+		//physSys.addCircle(5, worldP);
+		//CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
+		//CrunchJS.world.log('TESTETS', CrunchJS.LogLevels.DEBUG);
+
+			
 	}
 	// If it is the main window
 	else{
@@ -135,9 +155,11 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			[0,1,1,1,1,1,1,1,1,0],
 			[0,0,0,0,0,0,0,0,0,0],
 		];
-
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
+		
+
+		var ent2 = this.createEntity();
 
 				var id = this.createEntity();
 
@@ -252,6 +274,8 @@ Moba.ExampleScene.prototype.activate = function(data) {
 				data : dater
 			});
 		});
+		var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		this.addSystem(physSys);
 	}
 
 };
