@@ -7,6 +7,7 @@ goog.provide('CloseContact.Scenes')
 goog.require('CrunchJS');
 goog.require('CloseContact.Scenes.MainMenuScene');
 goog.require('CloseContact.Scenes.GameScene');
+goog.require('CloseContact.Scenes.ExampleScene');
 
 goog.require('box2d.World');
 goog.require('goog.array');

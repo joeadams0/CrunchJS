@@ -101,8 +101,9 @@ return this.objectId;
 }
 
 CrunchJS.Components.Physics.prototype.getObjectId = function(objectId) {
-if(objectId === this.objectId){
+	if(objectId === this.objectId){
 		this.objectId = objectId;
+	}
 }
 
 /**

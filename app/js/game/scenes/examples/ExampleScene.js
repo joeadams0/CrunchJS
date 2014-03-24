@@ -2,7 +2,7 @@
  * @author Joe Adams, Justin White
  */
 
-goog.provide('Moba.ExampleScene');
+goog.provide('CloseContact.Scenes.ExampleScene');
 
 goog.require('goog.array');
 
@@ -31,6 +31,7 @@ goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
+goog.require('CrunchJS.Components.Physics');
 
 /**
  * Creates an example scene
@@ -38,23 +39,23 @@ goog.require('CrunchJS.Components.Path');
  * @class An Example Scene
  * @extends {CrunchJS.Scene}
  */
-Moba.ExampleScene = function() {
+CloseContact.Scenes.ExampleScene = function() {
 	goog.base(this);
 };
 
-goog.inherits(Moba.ExampleScene, CrunchJS.Scene);
+goog.inherits(CloseContact.Scenes.ExampleScene, CrunchJS.Scene);
 
 /**
  * Set the name of the Scene
  * @type {String}
  */
-Moba.ExampleScene.prototype.name = 'ExampleScene';
+CloseContact.Scenes.ExampleScene.prototype.name = 'ExampleScene';
 
 /**
  * Print a message when you activate
  * @param  {?Object} data The data if any
  */
-Moba.ExampleScene.prototype.activate = function(data) {
+CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 	goog.base(this, "activate", data);
 
 
@@ -153,7 +154,7 @@ Moba.ExampleScene.prototype.activate = function(data) {
 			[0,1,1,0,1,1,1,0,1,0],
 			[0,1,1,0,1,0,0,0,1,0],
 			[0,1,1,1,1,1,1,1,1,0],
-			[0,0,0,0,0,0,0,0,0,0],
+			[0,0,0,0,0,0,0,0,0,0]
 		];
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
@@ -283,6 +284,6 @@ Moba.ExampleScene.prototype.activate = function(data) {
 /**
  * Print a message when deactivating
  */
-Moba.ExampleScene.prototype.deactivate = function() {
+CloseContact.Scenes.ExampleScene.prototype.deactivate = function() {
 	goog.base(this, "deactivate");
 };
