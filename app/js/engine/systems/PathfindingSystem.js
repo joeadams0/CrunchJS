@@ -62,6 +62,8 @@ CrunchJS.Systems.PathfindingSystem.prototype.astar = function(occGrid, start, en
 		}),
 		currentNode, neighbors, steps, success = false;
 
+	CrunchJS.world.log(endTile);
+
 	openList.push(this.createSearchNode(startTile,0,endTile));
 
 	while(openList.length != 0){

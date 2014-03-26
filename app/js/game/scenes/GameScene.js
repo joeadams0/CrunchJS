@@ -23,6 +23,7 @@ goog.require('CrunchJS.Components.Body');
 goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
+goog.require('CrunchJS.Components.Viewport');
 
 /**
  * The Game Scene
@@ -47,9 +48,6 @@ CloseContact.Scenes.GameScene.prototype.name = 'GameScene';
 CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 	goog.base(this, 'activate', data);
 
-	if(!CrunchJS.world.isSim())
-		$('#desc').html('Welcome to Close Contact. On the map below, you can click on the grass tiles to move the player to that tile. The player cannot move onto or through the tree tiles. Once you have moved the player around some, open up a second browser window and load the same webpage. These pages will communicate to each other, so if you move the player on one page, it will move on the other. The first page is the host and it will sync the state with the second page. The any action taken on either page is automatically synced.');
-
 	this._networkManager.activate();
 
 	// Register all of the components so they have the same index no matter if they are in the webworker or the main window. Just add the constructor to this array
@@ -61,7 +59,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.RenderImage,
 		CrunchJS.Components.Camera,
 		CrunchJS.Components.PathQuery,
-		CrunchJS.Components.Path
+		CrunchJS.Components.Path,
+		CrunchJS.Components.Viewport
 	];
 
 	goog.array.forEach(comps, function(comp) {
@@ -97,15 +96,63 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		this.setEntityName('master', entity);
 
+
+		var camEntity = this.createEntity();
+
+		
+			
+
+		/*this.addComponent(ent2, new CrunchJS.Components.Body({
+			width : 3,
+			height : 3
+		}));*/
+
+		var tiles = [
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,1,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		];
+		
+		// var tiles = [
+		// 	[0,0,0,0,0,0,0,0,0,0],
+		// 	[0,1,1,1,1,1,1,1,1,0],
+		// 	[0,1,1,1,1,0,0,0,1,0],
+		// 	[0,1,1,1,0,0,1,0,1,0],
+		// 	[0,1,1,0,0,1,1,0,1,0],
+		// 	[0,1,1,0,1,1,1,1,1,0],
+		// 	[0,1,1,0,1,1,1,0,1,0],
+		// 	[0,1,1,0,1,0,0,0,1,0],
+		// 	[0,1,1,1,1,1,1,1,1,0],
+		// 	[0,0,0,0,0,0,0,0,0,0]
+		// ];
+
+		
+		var xStart = -95,
+			yStart = -50;
+
 		this.addComponents(entity, 
 			new CrunchJS.Components.Transform({
 				layer : 0x00000001
 			}),
 			new CrunchJS.Components.OccupancyGrid({
-				width : 10,
-				height : 10,
+				width : tiles[0].length,
+				height : tiles.length,
 				tileWidth : 10,
 				tileHeight : 10
+			})
+		);
+
+		this.addComponents(camEntity, 
+			new CrunchJS.Components.Transform({
+				layer : 0x00000001
 			}),
 			new CrunchJS.Components.Camera({
 		      isActive: true,
@@ -115,28 +162,20 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		      },
 		      lensSize: {
 		        width: 100,
-		        height: 100
+		        height: 56.25
+		      },
+		      constraints : {
+		      	topLeft : {
+		      		x : xStart-5,
+		      		y : yStart-5
+		      	},
+		      	bottomRight : {
+		      		x : xStart-5 + tiles[0].length*10,
+		      		y : yStart-5 + tiles.length*10
+		      	}
 		      }
 	    	})
 		);
-
-		/*this.addComponent(ent2, new CrunchJS.Components.Body({
-			width : 3,
-			height : 3
-		}));*/
-
-		var tiles = [
-			[0,0,0,0,0,0,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,0],
-			[0,1,1,1,1,0,0,0,1,0],
-			[0,1,1,1,0,0,1,0,1,0],
-			[0,1,1,0,0,1,1,0,1,0],
-			[0,1,1,0,1,1,1,1,1,0],
-			[0,1,1,0,1,1,1,0,1,0],
-			[0,1,1,0,1,0,0,0,1,0],
-			[0,1,1,1,1,1,1,1,1,0],
-			[0,0,0,0,0,0,0,0,0,0]
-		];
 
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
@@ -145,8 +184,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 				this.addComponents(id, 
 					new CrunchJS.Components.Transform({
-						x : -45+x*10,
-						y : -45+y*10,
+						x : xStart+x*10,
+						y : yStart+y*10,
 						layer : 0x00000001
 					}),
 					new CrunchJS.Components.Body({
@@ -164,8 +203,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 					this.addComponents(id, 
 						new CrunchJS.Components.Transform({
-							x : -45+x*10,
-							y : -45+y*10,
+							x : xStart+x*10,
+							y : yStart+y*10,
 							layer : 0x00000001
 						}),
 						new CrunchJS.Components.Body({
@@ -189,8 +228,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		this.addComponents(ent2, 
 			new CrunchJS.Components.Transform({
-				x : -35,
-				y : -35,
+				x : xStart + 10,
+				y : yStart + 10,
 				layer : 0x00000001
 			}),
 
@@ -205,7 +244,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		);
 
 	
-		var sys = new CrunchJS.Systems.RenderingSystem({});
+		var sys = new CrunchJS.Systems.RenderingSystem({
+			entityId : 1
+		});
 
 		this.addSystem(sys);
 
@@ -233,10 +274,21 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			}));
 		});
 
-		this.addEventListener('click', function(data) {
+		this.addEventListener('click', function() {	
+			var viewport = self.getComponent(1, 'Viewport'),
+        		transform = self.getComponent(2, 'Transform'),
+        		camera = self.getComponent(2, 'Camera');
+
+			var width = viewport.getWidth(),
+				height = viewport.getHeight(),
+				xOffset = (viewport.getMousePosition().x/width)*camera.lensSize.width,
+				yOffset = (viewport.getMousePosition().y/height)*camera.lensSize.height,
+				left = (transform.x-camera.lensSize.width/2),
+				top = (transform.y-camera.lensSize.height/2);
+
 			var end = {
-				x : (data.x/600)*100-50,
-				y : (data.y/600)*100-50
+				x : xOffset+left,
+				y : yOffset+top
 			};
 
 			var dater = {
@@ -254,8 +306,61 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 				data : dater
 			});
 		});
+
+		this.addEventListener(CrunchJS.EngineCommands.Sync, function() {			
+			self.fireEvent('Resize');	
+		});
 	}
 
+};
+
+CloseContact.Scenes.GameScene.prototype.process = function(frame) {
+	goog.base(this, 'process', frame);
+
+	if(!CrunchJS.world.isSim()){
+		var viewport = this.getComponent(1, 'Viewport'),
+	        transform = this.getComponent(2, 'Transform'),
+	        camera = this.getComponent(2, 'Camera');
+
+	    var pt = viewport.getMousePosition(),
+	    	width = viewport.getWidth(),
+	    	height = viewport.getHeight();
+
+	    if(pt.x <= width*.05){
+	    	// Move outside left contstraints 
+	    	if(camera.constraints.topLeft.x > transform.x-1-camera.lensSize.width/2){
+	    		transform.x = camera.constraints.topLeft.x + camera.lensSize.width/2;
+	    	}
+	    	else{
+	      		transform.x = transform.x - 1;
+	      	}
+	    }
+	    else if(pt.x >= width*.95){
+	    	if(camera.constraints.bottomRight.x < transform.x+1+camera.lensSize.width/2){
+	    		transform.x = camera.constraints.bottomRight.x - camera.lensSize.width/2;
+	    	}
+	    	else{
+	      		transform.x = transform.x + 1;
+	      	}
+	    }
+
+	    if(pt.y <= height*.05){
+	    	if(camera.constraints.topLeft.y > transform.y-1-camera.lensSize.height/2){
+	    		transform.y = camera.constraints.topLeft.y + camera.lensSize.height/2;
+	    	}
+	    	else{
+	      		transform.y = transform.y - 1;
+	      	}
+	    }
+	    else if(pt.y >= height*.95){
+	    	if(camera.constraints.bottomRight.y < transform.y+1+camera.lensSize.height/2){
+	    		transform.y = camera.constraints.bottomRight.y - camera.lensSize.height/2;
+	    	}
+	    	else{
+	      		transform.y = transform.y + 1;
+	      	}
+	    }
+	}
 };
 
 CloseContact.Scenes.GameScene.prototype.deactivate = function() {

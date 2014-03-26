@@ -45,6 +45,8 @@ CrunchJS.Components.Camera = function(o) {
   this.lensSize = o.lensSize ? o.lensSize : {width:400,height:400};
   this.lensSize.width = this.lensSize.width ? this.lensSize.width : 400;
   this.lensSize.height = this.lensSize.height ? this.lensSize.height : 400;
+
+  this.constraints = o.constraints;
 };
 
 goog.inherits(CrunchJS.Components.Camera, CrunchJS.Component);

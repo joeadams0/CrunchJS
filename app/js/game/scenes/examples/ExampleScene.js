@@ -226,7 +226,10 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 		);
 
 	
-		var sys = new CrunchJS.Systems.RenderingSystem({});
+		var sys = new CrunchJS.Systems.RenderingSystem({
+			width : 1024,
+			height : 640
+		});
 
 		this.addSystem(sys);
 

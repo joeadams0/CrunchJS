@@ -438,7 +438,7 @@ CrunchJS.Components.OccupancyGrid.prototype.refreshTile = function(x, y) {
 
 	goog.structs.forEach(tile.entities, function(entityId) {
 		occupancy = occupancy | this.getScene().getComponent(entityId, 'Transform').layer;
-	});
+	}, this);
 
 	tile.occupancy = occupancy;
 };

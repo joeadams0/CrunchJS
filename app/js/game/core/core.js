@@ -2,12 +2,12 @@
  * @author Joe Adams
  */
 goog.provide('CloseContact.Core');
-goog.provide('CloseContact.Scenes')
+goog.provide('CloseContact.Scenes');
+goog.provide('CloseContact.Components');
 
 goog.require('CrunchJS');
 goog.require('CloseContact.Scenes.MainMenuScene');
 goog.require('CloseContact.Scenes.GameScene');
-goog.require('CloseContact.Scenes.ExampleScene');
 
 goog.require('box2d.World');
 goog.require('goog.array');
