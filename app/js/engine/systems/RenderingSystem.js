@@ -158,7 +158,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       // create the PIXI Sprite for this entity
       if (imgRenC == null) {
         // TODO: utilize info from RenderShape component to actually draw the thing
-        sprite = new PIXI.Sprite( PIXI.Texture.fromImage('star-on.png') );
+        sprite = new PIXI.Graphics();
+        if (shapeRenC.type.toLowerCase() == 'rectangle') {
+           sprite.beginFill(0x000000);
+           sprite.drawRect(0,0,screenSize.width, screenSize.height);
+        }
       } else {
         sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
       }

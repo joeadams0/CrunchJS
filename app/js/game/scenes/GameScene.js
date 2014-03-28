@@ -251,14 +251,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(sys);
 
 
-
-
-
-
-
-
-
-
 		var self = this;
 
 		this.addEventListener(CrunchJS.Events.Move, function(data) {
