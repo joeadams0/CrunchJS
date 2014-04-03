@@ -108,18 +108,46 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		}));*/
 
 		var tiles = [
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,1,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+			[11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,1,1,1,15],
+			[14,1,1,1,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,1,1,1,15],
+			[14,1,1,1,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,10,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[16,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,18]
 		];
+
+		var tileSet = [
+			'assets/tree.png', // 0
+			'assets/grass.png', // 1
+			'assets/path-top-left.png', // 2
+			'assets/path-top-middle.png', // 3
+			'assets/path-top-right.png', // 4
+			'assets/path-middle-left.png', // 5
+			'assets/path-middle-middle.png', // 6
+			'assets/path-middle-right.png', // 7
+			'assets/path-bottom-left.png', // 8
+			'assets/path-bottom-middle.png', // 9
+			'assets/path-bottom-right.png', // 10
+			'assets/wall-top-left.png', // 11
+			'assets/wall-top-middle.png', // 12
+			'assets/wall-top-right.png', // 13
+			'assets/wall-middle-left.png', // 14
+			'assets/wall-middle-right.png', // 15
+			'assets/wall-bottom-left.png', // 16
+			'assets/wall-bottom-middle.png', // 17
+			'assets/wall-bottom-right.png', // 18
+			'assets/tower.png' // 19
+
+		]
 		
 		// var tiles = [
 		// 	[0,0,0,0,0,0,0,0,0,0],
@@ -135,8 +163,13 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		// ];
 
 		
-		var xStart = -95,
-			yStart = -50;
+		var xStart = -170,
+			yStart = -70;
+
+		var width = tiles[0].length,
+			height = tiles.length;
+		console.log(width);
+		console.log(height);
 
 		this.addComponents(entity, 
 			new CrunchJS.Components.Transform({
@@ -161,8 +194,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		        lx: 600, ly:600
 		      },
 		      lensSize: {
-		        width: 100,
-		        height: 56.25
+		        width: 200,
+		        height: 112.5
 		      },
 		      constraints : {
 		      	topLeft : {
@@ -180,26 +213,21 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
 
-				var id = this.createEntity();
-
-				this.addComponents(id, 
-					new CrunchJS.Components.Transform({
+				var id = this.createEntity(),
+					trans = {
 						x : xStart+x*10,
 						y : yStart+y*10,
 						layer : 0x00000001
-					}),
-					new CrunchJS.Components.Body({
+					},
+					body = {
 						width : 10,
 						height : 10
-					}),
+					};
 
-					new CrunchJS.Components.RenderImage({
-						image : 'grass.jpg'
-					})
-				);
-
-				if(!tile){
-					id = this.createEntity();
+				if(tile == 19){
+					body.height=20;
+				}
+				if(tile){
 
 					this.addComponents(id, 
 						new CrunchJS.Components.Transform({
@@ -213,11 +241,25 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 						}),
 
 						new CrunchJS.Components.RenderImage({
-							image : 'tree.png'
-						}),
+							image : 'assets/grass.png'
+						})
+					);					
+					if(tile>1){
+						id = this.createEntity();
 
-						new CrunchJS.Components.Occupancy()
-					);
+						this.addComponents(id, 
+							new CrunchJS.Components.Transform(trans),
+							new CrunchJS.Components.Body(body),
+
+							new CrunchJS.Components.RenderImage({
+								image : tileSet[tile]
+							})
+						);
+					}
+				}
+
+				if(tile>=11){
+					this.addComponent(id, new CrunchJS.Components.Occupancy());
 				}
 
 			}, this);
@@ -241,6 +283,49 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	width : 10,
 		    	height : 10
 		    })
+		);
+
+		var tower1 = this.createEntity(),
+			tower2 = this.createEntity();
+
+		this.addComponents(tower1,
+			new CrunchJS.Components.Transform({
+				x : xStart+25,
+				y : yStart+height/2*10-17,
+				layer : 0x00000001
+			}),
+			new CrunchJS.Components.RenderImage({
+		      image: 'assets/tower.png',
+		      size : {
+		      	x : 17,
+		      	y : 34
+		      }
+		    }),
+		    new CrunchJS.Components.Body({
+		    	width : 15,
+		    	height : 15
+		    }),
+		    new CrunchJS.Components.Occupancy()
+		);
+
+		this.addComponents(tower2,
+			new CrunchJS.Components.Transform({
+				x : xStart+width*10-35,
+				y : yStart+height/2*10-17,
+				layer : 0x00000001
+			}),
+			new CrunchJS.Components.RenderImage({
+		      image: 'assets/tower.png',
+		      size : {
+		      	x : 17,
+		      	y : 34
+		      }
+		    }),
+		    new CrunchJS.Components.Body({
+		    	width : 15,
+		    	height : 15
+		    }),
+		    new CrunchJS.Components.Occupancy()
 		);
 
 	
