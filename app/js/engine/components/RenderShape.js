@@ -20,12 +20,14 @@ CrunchJS.Components.RenderShape = function(obj) {
    * The code-name of the kind of shape to draw (Rectangle, Triangle...)
    * @type {String}
    */
-  this.type = obj.type ? obj.type : 'Rectangle';
+  this.type = obj.type ? obj.type : 'rectangle';
 
   // -1 indicates for the RenderingSystem to use the default size of the image as the size of the object.
   this.size = obj.size ? obj.size : {x: -1, y: -1};
   this.size.x = this.size.x ? this.size.x : -1;
   this.size.y = this.size.y ? this.size.y : -1;
+
+  this.color = obj.color ? obj.color : 0x999999;
 };
 
 goog.inherits(CrunchJS.Components.RenderShape, CrunchJS.Component);

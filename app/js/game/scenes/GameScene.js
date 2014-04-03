@@ -17,6 +17,7 @@ goog.require('CrunchJS.Systems.PathMovementSystem');
 // Comps
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
+goog.require('CrunchJS.Components.RenderShape');
 goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
@@ -57,6 +58,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.OccupancyGrid,
 		CrunchJS.Components.Occupancy,
 		CrunchJS.Components.RenderImage,
+		CrunchJS.Components.RenderShape,
 		CrunchJS.Components.Camera,
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
@@ -98,9 +100,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 
 		var camEntity = this.createEntity();
-
-		
-			
 
 		/*this.addComponent(ent2, new CrunchJS.Components.Body({
 			width : 3,
@@ -147,21 +146,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			'assets/wall-bottom-right.png', // 18
 			'assets/tower.png' // 19
 
-		]
-		
-		// var tiles = [
-		// 	[0,0,0,0,0,0,0,0,0,0],
-		// 	[0,1,1,1,1,1,1,1,1,0],
-		// 	[0,1,1,1,1,0,0,0,1,0],
-		// 	[0,1,1,1,0,0,1,0,1,0],
-		// 	[0,1,1,0,0,1,1,0,1,0],
-		// 	[0,1,1,0,1,1,1,1,1,0],
-		// 	[0,1,1,0,1,1,1,0,1,0],
-		// 	[0,1,1,0,1,0,0,0,1,0],
-		// 	[0,1,1,1,1,1,1,1,1,0],
-		// 	[0,0,0,0,0,0,0,0,0,0]
-		// ];
-
+		];
 		
 		var xStart = -170,
 			yStart = -70;
@@ -328,6 +313,27 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    new CrunchJS.Components.Occupancy()
 		);
 
+  /* Testing Render Shape Section  */
+		var testEnt = this.createEntity();
+
+		this.addComponents(testEnt, 
+			new CrunchJS.Components.Transform({
+				x : xStart + 10,
+				y : yStart + 2,
+				layer : 0x00000001
+			}),
+
+			new CrunchJS.Components.RenderShape({
+        type: 'rectangle',
+        color: 0x00FFF6
+		  }),
+
+		  new CrunchJS.Components.Body({
+		  	width : 10,
+		    height : 2
+		  })
+		);
+// END TESTING RENDER SHAPE SECTION //
 	
 		var sys = new CrunchJS.Systems.RenderingSystem({
 			entityId : 1

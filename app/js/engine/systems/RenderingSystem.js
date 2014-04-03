@@ -102,6 +102,10 @@ goog.inherits(CrunchJS.Systems.RenderingSystem, CrunchJS.System);
 
 CrunchJS.Systems.RenderingSystem.prototype.name = 'RenderingSystem';
 
+/**
+  responsible for defining what entites go in the system.
+  also handles the viewport magic
+*/
 CrunchJS.Systems.RenderingSystem.prototype.activate = function() {
   goog.base(this, 'activate');
   this.setEntityComposition(
@@ -160,7 +164,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         // TODO: utilize info from RenderShape component to actually draw the thing
         sprite = new PIXI.Graphics();
         if (shapeRenC.type.toLowerCase() == 'rectangle') {
-           sprite.beginFill(0x000000);
+           sprite.beginFill(shapeRenC.color);
            sprite.drawRect(0,0,screenSize.width, screenSize.height);
         }
       } else {
@@ -198,16 +202,30 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
 CrunchJS.Systems.RenderingSystem.prototype.getSize = function(id) { 
   var body = this.getScene().getComponent(id, 'Body'),
     imgRenC = this.getScene().getComponent(id, 'RenderImage'),
+    shapeRenC = this.getScene().getComponent(id, 'RenderShape'),
     size = {};
 
-  if(body && imgRenC.size.x == -1 && imgRenC.size.y == -1){
-      size.width = body.getSize().width;
-      size.height = body.getSize().height;
+  if (imgRenC) {  // if the entity uses an image for rendering
+    if(body && imgRenC.size.x == -1 && imgRenC.size.y == -1){
+        size.width = body.getSize().width;
+        size.height = body.getSize().height;
+    }
+    else if(imgRenC.size.x != -1 && imgRenC.size.y != -1){
+      size.width = imgRenC.size.x;
+      size.height = imgRenC.size.y;
+    } 
+  } else if (shapeRenC) {
+    if(body && shapeRenC.size.x == -1 && shapeRenC.size.y == -1){
+        size.width = body.getSize().width;
+        size.height = body.getSize().height;
+    }
+    else if(shapeRenC.size.x != -1 && shapeRenC.size.y != -1){
+      size.width = shapeRenC.size.x;
+      size.height = shapeRenC.size.y;
+    } 
+  } else {
+    console.log('bad component');
   }
-  else if(imgRenC.size.x != -1 && imgRenC.size.y != -1){
-    size.width = imgRenC.size.x;
-    size.height = imgRenC.size.y;
-  } 
   return size;
 };
 
