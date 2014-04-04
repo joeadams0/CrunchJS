@@ -262,12 +262,21 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 			new CrunchJS.Components.RenderImage({
 		      image: 'warrior.png'
-		    }),
+		  }),
 
-		    new CrunchJS.Components.Body({
-		    	width : 10,
-		    	height : 10
-		    })
+			new CrunchJS.Components.RenderShape({
+        type: 'rectangle',
+        color: 0x00FFF6,
+        size: {
+          x: 5,
+          y: 5
+        }
+		  }),
+
+		  new CrunchJS.Components.Body({
+		  	width : 10,
+		   	height : 10
+		  })
 		);
 
 		var tower1 = this.createEntity(),

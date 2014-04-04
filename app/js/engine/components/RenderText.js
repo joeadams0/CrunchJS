@@ -2,18 +2,18 @@
  * @author Daniel Zapata
  */
 
-goog.provide('CrunchJS.Components.RenderShape');
+goog.provide('CrunchJS.Components.RenderText');
 goog.require('CrunchJS.Component');
 
 /**
- * Contains data necessarry for an entity to be drawn with a defined shape
+ * Contains data necessarry for an entity to be drawn with a text label
  * @param {String} type The code-name of the kind of shape to draw (Rectangle, Triangle...)
  * @param {String} size The dimensions used by the rendering system to scale the shape
  * @constructor
  * @class
  * @extends {CrunchJS.Component}
  */
-CrunchJS.Components.RenderShape = function(obj) {
+CrunchJS.Components.RenderText = function(obj) {
   goog.base(this);
 
   /**
@@ -28,15 +28,8 @@ CrunchJS.Components.RenderShape = function(obj) {
   this.size.y = this.size.y ? this.size.y : -1;
 
   this.color = obj.color ? obj.color : 0x999999;
-
-  this.fill = obj.fill? obj.fill : true;
-
-  // where, in game co-ordinates, to place the shape relative to the center of mass
-  this.offset = obj.offset ? obj.offset : {x: 0, y: 0};
-  this.offset.x = this.offset.x ? this.offset.x : 0;
-  this.offset.y = this.offset.y ? this.offset.y : 0;
 };
 
-goog.inherits(CrunchJS.Components.RenderShape, CrunchJS.Component);
+goog.inherits(CrunchJS.Components.RenderText, CrunchJS.Component);
 
-CrunchJS.Components.RenderShape.prototype.name = 'RenderShape';
+CrunchJS.Components.RenderText.prototype.name = 'RenderText';

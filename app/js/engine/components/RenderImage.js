@@ -25,6 +25,11 @@ CrunchJS.Components.RenderImage = function(obj) {
   this.size = obj.size ? obj.size : {x: -1, y: -1};
   this.size.x = this.size.x ? this.size.x : -1;
   this.size.y = this.size.y ? this.size.y : -1;
+
+  // where, in game co-ordinates, to place the shape relative to the center of mass
+  this.offset = obj.offset ? obj.offset : {x: 0, y: 0};
+  this.offset.x = this.offset.x ? this.offset.x : 0;
+  this.offset.y = this.offset.y ? this.offset.y : 0;
 };
 
 goog.inherits(CrunchJS.Components.RenderImage, CrunchJS.Component);

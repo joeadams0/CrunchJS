@@ -109,7 +109,7 @@ CrunchJS.Systems.RenderingSystem.prototype.name = 'RenderingSystem';
 CrunchJS.Systems.RenderingSystem.prototype.activate = function() {
   goog.base(this, 'activate');
   this.setEntityComposition(
-    this.getScene().createEntityComposition().one('RenderImage', 'RenderShape', 'Camera').all('Transform')
+    this.getScene().createEntityComposition().one('RenderImage', 'RenderShape', 'RenderText', 'Camera').all('Transform')
   );
 
   // Add the viewport
@@ -130,102 +130,218 @@ CrunchJS.Systems.RenderingSystem.prototype.process = function(f){
 
 CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
   // variable declarations
-  var sprite,                                       // the PIXI sprite object for this entity
-      scene = this.getScene(),                      // the CrunchJS Scene object in which this entity resides
-      transf = scene.getComponent(eId, 'Transform'),// the transform component for this entity
-      imgRenC = scene.getComponent(eId, 'RenderImage'),  // the RenderImage component for this entity (which it may not have)
-      shapeRenC = scene.getComponent(eId, 'RenderShape'),// the RenderShape component for this entity (which it may not have)
-      cameraC = scene.getComponent(eId, 'Camera'),   // this entity's Camera component (which it may not have)
+  var sprite,                                             // the PIXI sprite object for this entity
+      scene     = this.getScene(),                        // the CrunchJS Scene object in which this entity resides
+      transf    = scene.getComponent(eId, 'Transform'),   // the transform component for this entity
+      imgRenC   = scene.getComponent(eId, 'RenderImage'), // the RenderImage component for this entity (which it may not have)
+      shapeRenC = scene.getComponent(eId, 'RenderShape'), // the RenderShape component for this entity (which it may not have)
+      textRenC  = scene.getComponent(eId, 'RenderText'),  // the RenderText component for this entity (which it may not have)
+      cameraC   = scene.getComponent(eId, 'Camera'),      // this entity's Camera component (which it may not have)
       screenSize = {};
   // is this THE camera?
   if (cameraC != null && cameraC.isActive) {
     this.setCam(cameraC, eId);
   }
   
-  if (imgRenC != null || shapeRenC != null) {
-    var size = this.getSize(eId);
+  // only proceed on entities which are visible
+  if (imgRenC != null || shapeRenC != null || textRenC != null) {
+    // count how many visible parts there are
+    var parts = 0;
+    if (imgRenC != null) {parts++;}
+    if (shapeRenC != null) {parts++;}
+    if (textRenC != null) {parts++;}
 
-    if(size){
-      var bSize = {
-        x: size.width,
-        y: size.height
-      };
-
-      screenSize.width = this.translateScale(bSize, 'x');
-      screenSize.height = this.translateScale(bSize, 'y');  
-    }
-
-    // Does the PIXI sprite list have a representation of this entity?
-    if (this.sprites[eId] != undefined){
-      sprite = this.sprites[eId];  // access the sprite
-    } else {  // the entity has no PIXI representation, so we give it one
-      // create the PIXI Sprite for this entity
-      if (imgRenC == null) {
-        // TODO: utilize info from RenderShape component to actually draw the thing
-        sprite = new PIXI.Graphics();
-        if (shapeRenC.type.toLowerCase() == 'rectangle') {
-           sprite.beginFill(shapeRenC.color);
-           sprite.drawRect(0,0,screenSize.width, screenSize.height);
+    // match to the PIXI sprite list
+    if (this.sprites[eId] == undefined){ // no PIXI representation yet, so embark on creating new represenations
+      if (parts == 1){ // only need to make the one sprite
+        if (imgRenC != null) {
+          sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+        } else if (shapeRenC != null){  // shapeRendering requires more complex painting right now.
+          sprite = new PIXI.Graphics();
+          // deal with the sizing of the thing
+          var size = this.getSize(eId, 'RenderShape');
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
+          // PIXI code for drawing rectangles
+          if (shapeRenC.type.toLowerCase() == 'rectangle') {
+             sprite.beginFill(shapeRenC.color);
+             sprite.drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+          }
+        } else {
+          sprite = new PIXI.Text(textRenC.text, textRenC.style);
         }
-      } else {
-        sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+        this.stage.addChild(sprite); // add the sprite to the PIXI stage
+      } else {         // need to make an array of sprites [image, shape, text] in that order
+        sprite = [];
+        if (imgRenC != null) { // make the imageRendering sprite
+          sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          this.stage.addChild(sprite[0]);  // add it to the stage
+        }
+        if (shapeRenC != null) {
+          sprite[1] = new PIXI.Graphics();
+          // deal with the sizing of the thing
+          var size = this.getSize(eId, 'RenderShape');
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
+          // PIXI code for drawing rectangles
+          if (shapeRenC.type.toLowerCase() == 'rectangle') {
+             sprite[1].beginFill(shapeRenC.color);
+             sprite[1].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+          }
+          this.stage.addChild(sprite[1]);  // add it to the stage
+        }
+        if (textRenC != null) {
+          sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
+          this.stage.addChild(sprite[2]);  // add it to the stage
+        }
       }
-      this.stage.addChild(sprite);  // add it to the stage
-      this.sprites[eId] = sprite;   // and the stage's sprite-list
+      this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list
+    } else {  // already a PIXI representation (or array of them) exsists
+      sprite = this.sprites[eId]; // access the sprite
     }
-
-    // after handling PIXI representations of entity
-    // (sprite => entity)
-    ///////////////////////////////////
-    // Do the actual visual updating //
-    ///////////////////////////////////
-    // translate the Transform position to the onscreen position
     
-    var transformX = this.translatePosition(transf, 'x'),
-        transformY = this.translatePosition(transf, 'y');
+    // aside from some array/object checking, here is where we start to actually process the entity
 
-    // Get top left for rendering
-    var left = transformX - screenSize.width/2,
-        right = transformY - screenSize.height/2;
+    // ensure that the sprite is an array/a sprite depending upon reality
+    if (parts == 1){  // it should be a sprite
+      if (Object.prototype.toString.call( sprite ) == '[object Array]'){ // but it is an array! oh noes!
+        // we fix the issue by removing the PIXI representation of the renderables, and then returning.
+        // this works, because the next frame, this very method will re-add the stuff it needs.
+        for (var q = 0; q < sprite.length; q++){
+          this.stage.removeChild(sprite[q]);
+        }
+        this.sprites[eId] = undefined;
+        return;
+      } else {        // and we found out that the sprite is what its supposed to be
+        // handle the single renderable
+        if (imgRenC != null) {            // it is a RenderImage PIXI.Sprite
+          // first, deal with the sizing of the thing
+          var size = this.getSize(eId, 'RenderImage');
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
 
-    sprite.position.x = left;
-    sprite.position.y = right;
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
+        } else if (shapeRenC != null) {   // it is a RenderShape PIXI.Graphics
+          // first, deal with the sizing of the thing
+          var size = this.getSize(eId, 'RenderShape');
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
 
-    // translate the in-game object Size (Body or RenderImage) to the onscreen object size
-    sprite.width = screenSize.width;
-    sprite.height =  screenSize.height
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
 
-    // else, imgRenC is default, and no body, means the scale is set to whatever the image size is, automatically.
+          // check for changes
+
+        } else {                          // it is a RenderText PIXI.Text
+          // first, deal with the sizing of the thing
+          var size = this.getSize(eId, 'RenderText');
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
+
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
+          // check for changes
+        }
+        // after handling PIXI representations of entity
+        // (sprite => entity)
+        ///////////////////////////////////
+        // Do the actual visual updating //
+        ///////////////////////////////////
+        // offest the transform
+        transf.x = transf.x + 
+
+
+        // translate the Transform position to the onscreen position
+        var transformX = this.translatePosition(transf, 'x'),
+            transformY = this.translatePosition(transf, 'y');
+
+        // Get top left for rendering
+        var left = transformX - screenSize.width/2,
+            right = transformY - screenSize.height/2;
+
+        sprite.position.x = left;
+        sprite.position.y = right;
+
+        // translate the in-game object Size (Body or RenderImage) to the onscreen object size
+        sprite.width = screenSize.width;
+        sprite.height =  screenSize.height
+      }
+    } else {         // it should be an array
+      if (Object.prototype.toString.call(sprite) != '[object Array]'){ // but it is not an array!!! oh noes!
+        // fix by removing the PIXI representation of the renderable, and returning. will be re-made next frame.
+        this.stage.removeChild(sprite[q]); // remove from PIXI
+        this.sprites[eId] = undefined;     // clear from self
+        return;                            // we done
+      } else {
+        // handle the array of renderables
+        for (var p = 0; p < 3; p++) {
+          if(sprite[p] == undefined) {continue;}
+          // first, deal with the sizing of the thing
+          var cName,offX,offY;
+          if(p==0){cName='RenderImage';offX=imgRenC.offset.x;offY=imgRenC.offset.y;}
+          else if(p==1){cName='RenderShape';offX=shapeRenC.offset.x;offY=shapeRenC.offset.y;}
+          else{cName='RenderText';offX=textRenC.offset.x;offY=textRenC.offset.y;}
+          var size = this.getSize(eId, cName);
+          var bSize = {
+            x: size.width,
+            y: size.height
+          };
+          screenSize.width = this.translateScale(bSize, 'x');
+          screenSize.height = this.translateScale(bSize, 'y');  
+          
+          // actual visual updating
+          // translate the Transform position to the onscreen position
+          
+          var transformX = this.translatePosition(transf, 'x'),
+              transformY = this.translatePosition(transf, 'y');
+
+          // Get top left for rendering
+          var left = transformX - screenSize.width/2,
+              right = transformY - screenSize.height/2;
+
+          sprite[p].position.x = left;
+          sprite[p].position.y = right;
+
+          // translate the in-game object Size (Body or RenderImage) to the onscreen object size
+          sprite[p].width = screenSize.width;
+          sprite[p].height =  screenSize.height
+        }
+      }
+    }
   }
 };
 
-CrunchJS.Systems.RenderingSystem.prototype.getSize = function(id) { 
+/**
+  Takes the entity ID{id} and the string component name{componentName} in order to determine the size object from that rendering component
+*/
+CrunchJS.Systems.RenderingSystem.prototype.getSize = function(id, componentName) { 
   var body = this.getScene().getComponent(id, 'Body'),
-    imgRenC = this.getScene().getComponent(id, 'RenderImage'),
-    shapeRenC = this.getScene().getComponent(id, 'RenderShape'),
+    xRenC = this.getScene().getComponent(id, componentName),
     size = {};
 
-  if (imgRenC) {  // if the entity uses an image for rendering
-    if(body && imgRenC.size.x == -1 && imgRenC.size.y == -1){
-        size.width = body.getSize().width;
-        size.height = body.getSize().height;
-    }
-    else if(imgRenC.size.x != -1 && imgRenC.size.y != -1){
-      size.width = imgRenC.size.x;
-      size.height = imgRenC.size.y;
-    } 
-  } else if (shapeRenC) {
-    if(body && shapeRenC.size.x == -1 && shapeRenC.size.y == -1){
-        size.width = body.getSize().width;
-        size.height = body.getSize().height;
-    }
-    else if(shapeRenC.size.x != -1 && shapeRenC.size.y != -1){
-      size.width = shapeRenC.size.x;
-      size.height = shapeRenC.size.y;
-    } 
-  } else {
-    console.log('bad component');
+  if(body && xRenC.size.x == -1 && xRenC.size.y == -1){
+    size.width = body.getSize().width;
+    size.height = body.getSize().height;
   }
+  else if(xRenC.size.x != -1 && xRenC.size.y != -1){
+    size.width = xRenC.size.x;
+    size.height = xRenC.size.y;
+  } 
   return size;
 };
 
