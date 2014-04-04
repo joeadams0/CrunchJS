@@ -37,7 +37,7 @@ CloseContact.Systems.TowerSystem.prototype.process = function(frame) {
 		goog.structs.some(actors, function(actor) {
 
 			// Dont attack youself
-			if(entity == actor.entityId)
+			if(entity == actor.entityId || towerActor.getTeam() == actor.getTeam())
 				return;
 
 

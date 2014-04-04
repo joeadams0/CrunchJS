@@ -208,6 +208,8 @@ CrunchJS.Internal.EntityManager.prototype.activateEntity = function(id) {
 CrunchJS.Internal.EntityManager.prototype.destroyEntity = function(id) {
 	this._destroyEntity(id);
 
+	this.getScene().removeAllComponents(id);
+
 	this.getScene().postEventToRemoteEngine(CrunchJS.EngineCommands.DestroyEntity, id);
 };
 

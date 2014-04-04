@@ -16,12 +16,13 @@ CloseContact.Components.Actor = function(params) {
 
 	// The default actor
 	var defaultConfigs = {
-		fullHealth : 100,
+		maxHealth : 100,
 		attackDmg : 10,
 		armor : 0,
 		movementSpeed : 1,
 		attackSpeed : 1,
-		attackRange : 50
+		attackRange : 50,
+		team : 0
 	};
 
 	if(!params)
@@ -44,7 +45,7 @@ CloseContact.Components.Actor = function(params) {
 	 * The health of the actor
 	 * @type {Number}
 	 */
-	this.health = params.health;
+	this.health = params.health ? params.health : params.maxHealth;
 
 	/**
 	 * The attack damage of the actor
@@ -75,6 +76,12 @@ CloseContact.Components.Actor = function(params) {
 	 * @type {Number}
 	 */
 	this.attackRange = params.attackRange;
+
+	/**
+	 * The Team this actor is on
+	 * @type {Number}
+	 */
+	this.team = params.team;
 
 	/**
 	 * The last time this actor attacked
@@ -145,6 +152,14 @@ CloseContact.Components.Actor.prototype.getAttackSpeed = function() {
  */
 CloseContact.Components.Actor.prototype.getAttackRange = function() {
 	return this.attackRange;
+};
+
+/**
+ * Gets the team this actor is on
+ * @return {Number} The team
+ */
+CloseContact.Components.Actor.prototype.getTeam = function() {
+	return this.team;
 };
 
 CloseContact.Components.Actor.prototype.getLastAttackTime = function() {
@@ -244,12 +259,31 @@ CloseContact.Components.Actor.prototype.setAttackRange = function(attackRange) {
 	}
 };
 
+CloseContact.Components.Actor.prototype.setTeam = function(team) {
+	if(this.team != team){
+		this.team = team;
+		this.updates.team = true;
+		this.hasBeenUpdated();
+	}
+};
+
 CloseContact.Components.Actor.prototype.setLastAttackTime = function(lastAttackTime) {
 	if(this.lastAttackTime != lastAttackTime){
 		this.lastAttackTime = lastAttackTime;
 		this.updates.lastAttackTime = true;
 		this.hasBeenUpdated();
 	}
+};
+
+
+CloseContact.Components.Actor.prototype.takeAttackDmg = function(dmg) {
+	dmg = dmg - this.getArmor();
+	this.takeTrueDmg(dmg);
+};
+
+CloseContact.Components.Actor.prototype.takeTrueDmg = function(dmg) {
+	CrunchJS.world.log(this.getHealth());
+	this.setHealth(Math.max(this.getHealth()-dmg, 0));
 };
 
 

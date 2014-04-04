@@ -427,6 +427,13 @@ CrunchJS.Internal.ComponentManager.prototype.getComponentIndex = function(compon
  * @param  {Number} entityId The entity id
  */
 CrunchJS.Internal.ComponentManager.prototype.removeAllComponents = function(entityId) {
+	this._removeAllComponents(entityId);
+
+
+	this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
+};
+
+CrunchJS.Internal.ComponentManager.prototype._removeAllComponents = function(entityId) {
 	var composition = this.getEntityComposition(entityId),
 		len = this.bitSetOperator.length(composition);
 
@@ -442,9 +449,6 @@ CrunchJS.Internal.ComponentManager.prototype.removeAllComponents = function(enti
 			this.addRemoveUpdate(entityId, newMap.get(i));
 		}
 	}
-
-
-	this.getScene().fireEvent(CrunchJS.Events.EntityChanged, entityId);
 };
 
 /**
@@ -597,18 +601,23 @@ CrunchJS.Internal.ComponentManager.prototype.getUpdates = function() {
 	// Send all of the components to update 
 	updates.updatedComponents = goog.structs.map(this.updates.updatedComponents, function(set ,id) {
 
-		return goog.structs.map(set, function(name) {
-			var comp = this.getComponent(id, name),
-				data = comp.getUpdates();
+		return goog.structs.map(
+			goog.structs.filter(set, function(name) {
+				return this.hasComponent(id, name);
+			}, this), 
+			function(name) {
+				var comp = this.getComponent(id, name)
+					data = comp.getUpdates();
 
-			comp.resetUpdates();
+				comp.resetUpdates();
 
-			return {
-				name : name,
-				data : data
-			};
+				return {
+					name : name,
+					data : data
+				};
 
-		}, this);
+			}, 
+		this);
 
 	}, this);
 
@@ -653,20 +662,6 @@ CrunchJS.Internal.ComponentManager.prototype.update = function(obj) {
  * Cleans up the destroyed entitites
  */
 CrunchJS.Internal.ComponentManager.prototype.clean = function() {
-	var iterator = function(entityId) {
-		var composition = this.getEntityComposition(entityId),
-			len = this.bitSetOperator.length(composition);
-
-		for(var i = 0; i<len; i++){
-			
-			// If the bit is set, remove the component
-			if(this.bitSetOperator.get(i)){
-				this.getComponentMap(i).remove(entityId);
-				this.bitSetOperator.clear(i);
-			}
-		}
-	};
-	goog.structs.forEach(this._destroyedEntities, goog.bind(iterator, this));
 
 	this._destroyedEntities.clear();
 

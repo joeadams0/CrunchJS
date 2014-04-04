@@ -294,7 +294,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	height : 10
 		    }),
 
-		    new CloseContact.Components.Actor()
+		    new CloseContact.Components.Actor({
+		    	team : 0
+		    })
 		);
 
 		var tower1 = this.createEntity(),
@@ -320,7 +322,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    new CrunchJS.Components.Occupancy(),
 
 		    new CloseContact.Components.Actor({
-		    	attackDmg : 100
+		    	attackDmg : 100,
+		    	team : 0
 		    }),
 		    new CloseContact.Components.Tower()
 		);
@@ -345,7 +348,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    new CrunchJS.Components.Occupancy(),
 
 		    new CloseContact.Components.Actor({
-		    	attackDmg : 100
+		    	attackDmg : 100,
+		    	team : 1
 		    }),
 
 		    new CloseContact.Components.Tower()

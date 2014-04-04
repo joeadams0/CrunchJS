@@ -36,10 +36,16 @@ CloseContact.Systems.AttackSystem.prototype.processEntity = function(frame, enti
 		if(attackerTrans.distance(enemyTrans) <= attackerActor.getAttackRange()){
 			CrunchJS.world.log(entity+' ATTACKED: '+attack.getEntity());
 
+			enemyActor.takeAttackDmg(attackerActor.getAttackDmg());
+
+			if(enemyActor.getHealth()<=0){
+				this.getScene().destroyEntity(attack.getEntity());
+				this.getScene().removeComponent(entity, 'Attack');
+			}
+
 			attackerActor.setLastAttackTime(currentTime);
 		}
 		else{
-			debugger;
 			this.getScene().removeComponent(entity, 'Attack');
 		}
 	}
