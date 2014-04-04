@@ -95,7 +95,7 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 		var worldP = physSys.init();
 		physSys.addCircle(5, worldP);
 		CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
-		CrunchJS.world.log('TESTETS', CrunchJS.LogLevels.DEBUG);
+		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
 
 			
 	}
@@ -143,6 +143,8 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 			height : 3
 		}));*/
 
+		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		
 		var tiles = [
 			[0,0,0,0,0,0,0,0,0,0],
 			[0,1,1,1,1,1,1,1,1,0],

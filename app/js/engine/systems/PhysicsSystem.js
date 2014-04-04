@@ -68,7 +68,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.activate = function() {
 /**
  * Initializes world and objects.  Sets regular interval
  */
-CrunchJS.Systems.PhysicsSystem.prototype = function init(){
+CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
 	
 	var worldAABB = new box2d.AABB();
 	worldAABB.minVertex.Set(-1000, -1000);
@@ -92,7 +92,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function init(){
  * Helper method to get collisions that have happened during that step
  */
 //b is linked list of bodies in world
-CrunchJS.Systems.PhysicsSystem.prototype = function collisionCollect(b){
+CrunchJS.Systems.PhysicsSystem.prototype.collisionCollect = function (b){
 	var edge = b.box2d.GetContactList();
 	return edge;
 	//can iterate over edges to evaluate the collisions that happened
@@ -104,7 +104,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function collisionCollect(b){
  * called at the regular interval as defined in init()
  * edits the transform component once an object moves after a step()
  */
-CrunchJS.Systems.PhysicsSystem.prototype = function update(world){
+CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 
 	var timeStep = 1.0/60;
 	var iteration = 1;
@@ -136,7 +136,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function update(world){
 // };
 
 
-CrunchJS.Systems.PhysicsSystem.prototype = function addCircle(radius, world){
+CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (radius, world){
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
 	circleSd.radius = radius;
@@ -146,7 +146,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function addCircle(radius, world){
 	circleBd.AddShape(circleSd);
 	circleBd.position.Set(50,50);
 	var circleBody = world.CreateBody(circleBd);
-}
+};
 
 /**
  * Adds force to objectID over time
@@ -154,12 +154,12 @@ CrunchJS.Systems.PhysicsSystem.prototype = function addCircle(radius, world){
  * @param  {int} degree    angle of force to be applied
  * @param  {int} power     magnitude of the force
  */
-CrunchJS.Systems.PhysicsSystem.prototype = function addForce(objectID, degree, power){
+CrunchJS.Systems.PhysicsSystem.prototype.addForce = function (objectID, degree, power){
 	var body = this.bodiesMap[objectID];
 	body.ApplyForce(new box2d.Vec2(Math.cos(degree * (Math.PI / 180)) * power,
         Math.sin(degree * (Math.PI / 180)) * power),
         body.GetWorldCenter());
-}
+};
 
 /**
  * Adds force to objectID within in physics simulation
@@ -170,7 +170,7 @@ CrunchJS.Systems.PhysicsSystem.prototype = function addForce(objectID, degree, p
  * @param {int} objectID Entity
  * @param {vector} v is a vector composed of x and y components representing velocity in each direction
  */
-CrunchJS.Systems.PhysicsSystem.prototype = function addImpulse(objectID, degree, power){
+CrunchJS.Systems.PhysicsSystem.prototype.addImpulse = function (objectID, degree, power){
 	var body = this.bodiesMap[objectID];
     body.ApplyImpulse(new box2d.Vec2(Math.cos(degree * (Math.PI / 180)) * power,
         Math.sin(degree * (Math.PI / 180)) * power),
@@ -181,6 +181,6 @@ CrunchJS.Systems.PhysicsSystem.prototype = function addImpulse(objectID, degree,
  * Stops the execution of the setInterval
  * @param  {int} intervalVariable global variable set by initial setInterval() call
  */
-CrunchJS.Systems.PhysicsSystem.prototype = function cancelUpdate(intervalVariable){
+CrunchJS.Systems.PhysicsSystem.prototype.cancelUpdate = function (intervalVariable){
 	window.clearInterval(intervalVariable);
 };

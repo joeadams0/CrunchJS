@@ -13,6 +13,7 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
+goog.require('CrunchJS.Systems.PhysicsSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -74,15 +75,31 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			pathSys = new CrunchJS.Systems.PathfindingSystem(),
 			pathMoveSys = new CrunchJS.Systems.PathMovementSystem();
 
+
+
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
 		this.addSystem(pathMoveSys);
+
+
+		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
+		var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		this.addSystem(physSys);
+
+		var worldP = physSys.init();
+		physSys.addCircle(5, worldP);
+		//for (var x = 0; x>-1; x++){
+		CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
+		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		//}
 
 	}
 
 	// If it is the main window
 	else{
 		var sim;
+		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		//Console.log("TESTESTEST");
 		if(COMPILED){
 			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/game.js');
 		}
