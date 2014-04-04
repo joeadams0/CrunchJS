@@ -36,8 +36,104 @@ CrunchJS.Components.RenderShape = function(obj) {
   this.offset = obj.offset ? obj.offset : {x: 0, y: 0};
   this.offset.x = this.offset.x ? this.offset.x : 0;
   this.offset.y = this.offset.y ? this.offset.y : 0;
+
+  this.updates={};
 };
 
 goog.inherits(CrunchJS.Components.RenderShape, CrunchJS.Component);
 
 CrunchJS.Components.RenderShape.prototype.name = 'RenderShape';
+
+CrunchJS.Components.RenderShape.prototype.getType = function() {
+  return this.type;
+};
+
+CrunchJS.Components.RenderShape.prototype.setType = function(type) {
+  if(this.type != type){
+    this.type = type;
+    this.hasBeenUpdated();
+    this.updates.type = true;
+  }
+};
+/**
+ * Gets the size
+ * @return {Object} The size
+ */
+CrunchJS.Components.RenderShape.prototype.getSize = function() {
+	return this.size;
+};
+
+/**
+ * Sets the size
+ * @param {Number} x  The width
+ * @param {Number} y The height
+ */
+CrunchJS.Components.RenderShape.prototype.setSize = function(x, y) {
+	if(this.size.x != x){
+		this.size.x = x;
+		this.hasBeenUpdated();
+		this.updates.size = {};
+    this.updates.size.x = x;
+	}
+	if(this.size.y != y){
+		this.size.y = y;
+		this.hasBeenUpdated();
+		this.updates.size = {};
+    this.updates.size.y = y;
+	}
+};
+
+CrunchJS.Components.RenderShape.prototype.getColor = function() {
+  return this.color;
+};
+
+CrunchJS.Components.RenderShape.prototype.setColor = function(color) {
+  if(this.color != color){
+    this.color = color;
+    this.hasBeenUpdated();
+    this.updates.color = true;
+  }
+};
+CrunchJS.Components.RenderShape.prototype.getFill = function() {
+  return this.fill;
+};
+
+CrunchJS.Components.RenderShape.prototype.setFill = function(fill) {
+  if(this.fill != fill){
+    this.fill = fill;
+    this.hasBeenUpdated();
+    this.updates.fill = true;
+  }
+};
+CrunchJS.Components.RenderShape.prototype.getOffset = function() {
+  return this.offset;
+};
+
+CrunchJS.Components.RenderShape.prototype.setOffset = function(x,y) {
+  if(this.offset.x != x){
+    this.offset.x = x;
+    this.hasBeenUpdated();
+    this.updates.offset = {};
+    this.updates.offset.x=true;
+  }
+  if(this.offset.y != y){
+    this.offset.y = y;
+    this.hasBeenUpdated();
+    this.updates.offset = this.updates.offset ? this.updates.offset : {};
+    this.updates.offset.y=true;
+  }
+};
+
+CrunchJS.Components.RenderShape.prototype.getUpdates = function() {
+	return goog.object.filter(this, function(obj, key) {
+		if(!goog.isFunction(obj))
+      if(!goog.isObject(obj))
+			  return this.updates[key];
+      else
+        return true;
+	}, this);
+};
+
+CrunchJS.Components.RenderShape.prototype.resetUpdates = function() {
+	this.updates = undefined;
+};

@@ -294,7 +294,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
     } else {         // it should be an array
       if (Object.prototype.toString.call(sprite) != '[object Array]'){ // but it is not an array!!! oh noes!
         // fix by removing the PIXI representation of the renderable, and returning. will be re-made next frame.
-        this.stage.removeChild(sprite[q]); // remove from PIXI
+        this.stage.removeChild(sprite); // remove from PIXI
         this.sprites[eId] = undefined;     // clear from self
         return;                            // we done
       } else {
@@ -514,5 +514,13 @@ CrunchJS.Systems.RenderingSystem.prototype.entityDestroyed = function(eId) {
 
 CrunchJS.Systems.RenderingSystem.prototype.entityDisabled = function(eId) {
   goog.base(this, 'entityDisabled', eId);
-  this.sprites[eId] = undefined;
+  if (Object.prototype.toString.call(this.sprites[eId]) == '[object Array]'){ // we're dealing with an array of PIXI objects
+    for(var q=0; q<3; q++){
+      if (this.sprites[eId][q] == undefined) continue;
+      this.stage.removeChild(this.sprites[eId][q]); // remove from PIXI
+    }
+  } else { // we've only got the one PIXI object to clear
+    this.stage.removeChild(this.sprites[eId]);
+  }
+  this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
 };
