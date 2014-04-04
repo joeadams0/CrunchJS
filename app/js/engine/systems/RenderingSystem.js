@@ -168,7 +168,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.height = this.translateScale(bSize, 'y');  
           // PIXI code for drawing rectangles
           if (shapeRenC.type.toLowerCase() == 'rectangle') {
-            if(shapeRenC.fill == true){
+            if(shapeRenC.fill === true){
               sprite.beginFill(shapeRenC.color);
             }
             sprite.lineStyle(1, shapeRenC.color, 1);
@@ -196,7 +196,6 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.height = this.translateScale(bSize, 'y');  
           // PIXI code for drawing rectangles
           if (shapeRenC.type.toLowerCase() == 'rectangle') {
-            console.log(shapeRenC);
             if(shapeRenC.fill === true){
               sprite[1].beginFill(shapeRenC.color);
             }

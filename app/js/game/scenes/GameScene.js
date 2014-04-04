@@ -18,6 +18,7 @@ goog.require('CrunchJS.Systems.PathMovementSystem');
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
 goog.require('CrunchJS.Components.RenderShape');
+goog.require('CrunchJS.Components.RenderText');
 goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
@@ -59,6 +60,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.Occupancy,
 		CrunchJS.Components.RenderImage,
 		CrunchJS.Components.RenderShape,
+		CrunchJS.Components.RenderText,
 		CrunchJS.Components.Camera,
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
@@ -151,6 +153,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		console.log(width);
 		console.log(height);
 
+    // add components to the occupancyGrid entity
 		this.addComponents(entity, 
 			new CrunchJS.Components.Transform({
 				layer : 0x00000001
@@ -163,6 +166,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			})
 		);
 
+    // add components to the camEntity
 		this.addComponents(camEntity, 
 			new CrunchJS.Components.Transform({
 				layer : 0x00000001
@@ -264,7 +268,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.RenderShape({
         type: 'rectangle',
         color: 0x00CC00,
-        fill: true,
         size: {
           x: 10,
           y: 1.5
@@ -272,6 +275,18 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
         offset: {
           x: 0,
           y: -5.5
+        }
+		  }),
+
+			new CrunchJS.Components.RenderText({
+        text: "I'm gay",
+        style: {
+          font: "bold 20px Arial",
+          fill: "red"
+        },
+        offset: {
+          x: 0,
+          y: 5.5
         }
 		  }),
 
