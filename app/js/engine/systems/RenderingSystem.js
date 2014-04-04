@@ -168,8 +168,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.height = this.translateScale(bSize, 'y');  
           // PIXI code for drawing rectangles
           if (shapeRenC.type.toLowerCase() == 'rectangle') {
-             sprite.beginFill(shapeRenC.color);
-             sprite.drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+            if(shapeRenC.fill == true){
+              sprite.beginFill(shapeRenC.color);
+            }
+            sprite.lineStyle(1, shapeRenC.color, 1);
+            sprite.drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
           }
         } else {
           sprite = new PIXI.Text(textRenC.text, textRenC.style);
@@ -193,8 +196,12 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.height = this.translateScale(bSize, 'y');  
           // PIXI code for drawing rectangles
           if (shapeRenC.type.toLowerCase() == 'rectangle') {
-             sprite[1].beginFill(shapeRenC.color);
-             sprite[1].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+            console.log(shapeRenC);
+            if(shapeRenC.fill === true){
+              sprite[1].beginFill(shapeRenC.color);
+            }
+            sprite[1].lineStyle(1, shapeRenC.color, 1);
+            sprite[1].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
           }
           this.stage.addChild(sprite[1]);  // add it to the stage
         }

@@ -29,7 +29,8 @@ CrunchJS.Components.RenderShape = function(obj) {
 
   this.color = obj.color ? obj.color : 0x999999;
 
-  this.fill = obj.fill? obj.fill : true;
+  // must explicitly set to true, or it won't fill
+  this.fill = obj.fill ? obj.fill : false;
 
   // where, in game co-ordinates, to place the shape relative to the center of mass
   this.offset = obj.offset ? obj.offset : {x: 0, y: 0};

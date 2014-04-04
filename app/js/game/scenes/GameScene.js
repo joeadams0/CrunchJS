@@ -264,6 +264,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.RenderShape({
         type: 'rectangle',
         color: 0x00CC00,
+        fill: true,
         size: {
           x: 10,
           y: 1.5
