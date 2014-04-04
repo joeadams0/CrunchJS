@@ -13,6 +13,8 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
+goog.require('CloseContact.Systems.TowerSystem');
+goog.require('CloseContact.Systems.AttackSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -24,6 +26,9 @@ goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 goog.require('CrunchJS.Components.Viewport');
+goog.require('CloseContact.Components.Actor');
+goog.require('CloseContact.Components.Tower');
+goog.require('CloseContact.Components.Attack');
 
 /**
  * The Game Scene
@@ -60,23 +65,31 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.Camera,
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
-		CrunchJS.Components.Viewport
+		CrunchJS.Components.Viewport,
+		CloseContact.Components.Actor,
+		CloseContact.Components.Tower,
+		CloseContact.Components.Attack
 	];
 
 	goog.array.forEach(comps, function(comp) {
 		this.registerComponent(comp)
 	}, this);
 
+
 	// If it is the sim
 	if(CrunchJS.world.isSim()){
 		
 		var occSys = new CrunchJS.Systems.OccupancyGridSystem(),
 			pathSys = new CrunchJS.Systems.PathfindingSystem(),
-			pathMoveSys = new CrunchJS.Systems.PathMovementSystem();
+			pathMoveSys = new CrunchJS.Systems.PathMovementSystem(),
+			towerSystem = new CloseContact.Systems.TowerSystem(),
+			attackSystem = new CloseContact.Systems.AttackSystem();
 
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
 		this.addSystem(pathMoveSys);
+		this.addSystem(towerSystem);
+		this.addSystem(attackSystem)
 
 	}
 
@@ -224,9 +237,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 						height : 10
 					};
 
-				if(tile == 19){
-					body.height=20;
-				}
 				if(tile){
 
 					this.addComponents(id, 
@@ -282,7 +292,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    new CrunchJS.Components.Body({
 		    	width : 10,
 		    	height : 10
-		    })
+		    }),
+
+		    new CloseContact.Components.Actor()
 		);
 
 		var tower1 = this.createEntity(),
@@ -305,7 +317,12 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	width : 15,
 		    	height : 15
 		    }),
-		    new CrunchJS.Components.Occupancy()
+		    new CrunchJS.Components.Occupancy(),
+
+		    new CloseContact.Components.Actor({
+		    	attackDmg : 100
+		    }),
+		    new CloseContact.Components.Tower()
 		);
 
 		this.addComponents(tower2,
@@ -325,7 +342,13 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	width : 15,
 		    	height : 15
 		    }),
-		    new CrunchJS.Components.Occupancy()
+		    new CrunchJS.Components.Occupancy(),
+
+		    new CloseContact.Components.Actor({
+		    	attackDmg : 100
+		    }),
+
+		    new CloseContact.Components.Tower()
 		);
 
 	

@@ -33,8 +33,9 @@ CrunchJS.Utils.BitSetOperator.prototype.set = function(set, pos) {
   return set[this.wordIndex(pos - 1)] |= 1 << pos - 1;
 };
 
+// Edited this function to make it work
 CrunchJS.Utils.BitSetOperator.prototype.clear = function(set, pos) {
-  return set[this.wordIndex(pos - 1)] &= 0xFF ^ (1 << pos - 1);
+  return set[this.wordIndex(pos - 1)] &= ~(1 << pos - 1);
 };
 
 CrunchJS.Utils.BitSetOperator.prototype.get = function(set, pos) {

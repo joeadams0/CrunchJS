@@ -20,8 +20,12 @@ CloseContact.Components.Actor = function(params) {
 		attackDmg : 10,
 		armor : 0,
 		movementSpeed : 1,
-		attackSpeed : 1
+		attackSpeed : 1,
+		attackRange : 50
 	};
+
+	if(!params)
+		params = {};
 
 	// Write configs if they havent specifed them
 	goog.object.forEach(defaultConfigs, function(prop, key) {
@@ -65,6 +69,18 @@ CloseContact.Components.Actor = function(params) {
 	 * @type {Number}
 	 */
 	this.attackSpeed = params.attackSpeed;
+
+	/**
+	 * The attack range of the actor
+	 * @type {Number}
+	 */
+	this.attackRange = params.attackRange;
+
+	/**
+	 * The last time this actor attacked
+	 * @type {Number}
+	 */
+	this.lastAttackTime = 0;
 
 
 	this.updates = {};
@@ -124,10 +140,31 @@ CloseContact.Components.Actor.prototype.getAttackSpeed = function() {
 };
 
 /**
+ * Gets the attack range for the Actor
+ * @return {Number} The attack range
+ */
+CloseContact.Components.Actor.prototype.getAttackRange = function() {
+	return this.attackRange;
+};
+
+CloseContact.Components.Actor.prototype.getLastAttackTime = function() {
+	return this.lastAttackTime;
+};
+
+CloseContact.Components.Actor.prototype.getNextAttackTime = function() {
+	var t = this.getLastAttackTime(),
+		attackDelta = 1000/this.getAttackSpeed();
+
+	t = t + attackDelta;
+
+	return t;
+};
+
+/**
  * Sets the health for the actor
  * @param {Number} health 
  */
-CloseContact.Component.Actor.prototype.setHealth = function(health) {
+CloseContact.Components.Actor.prototype.setHealth = function(health) {
 	if(this.health != health){
 		this.health = health;
 		this.updates.health = true;
@@ -136,10 +173,10 @@ CloseContact.Component.Actor.prototype.setHealth = function(health) {
 };
 
 /**
- * Sets the health for the actor
- * @param {Number} health 
+ * Sets the full health for the actor
+ * @param {Number} full health 
  */
-CloseContact.Component.Actor.prototype.setFullHealth = function(fullHealth) {
+CloseContact.Components.Actor.prototype.setFullHealth = function(fullHealth) {
 	if(this.fullHealth != fullHealth){
 		this.fullHealth = fullHealth;
 		this.updates.fullHealth = true;
@@ -148,10 +185,10 @@ CloseContact.Component.Actor.prototype.setFullHealth = function(fullHealth) {
 };
 
 /**
- * Sets the health for the actor
- * @param {Number} health 
+ * Sets the attack damage for the actor
+ * @param {Number} attack damage 
  */
-CloseContact.Component.Actor.prototype.setAttackDmg = function(attackDmg) {
+CloseContact.Components.Actor.prototype.setAttackDmg = function(attackDmg) {
 	if(this.attackDmg != attackDmg){
 		this.attackDmg = attackDmg;
 		this.updates.attackDmg = true;
@@ -160,10 +197,10 @@ CloseContact.Component.Actor.prototype.setAttackDmg = function(attackDmg) {
 };
 
 /**
- * Sets the health for the actor
- * @param {Number} health 
+ * Sets the armor for the actor
+ * @param {Number} armor 
  */
-CloseContact.Component.Actor.prototype.setArmor = function(armor) {
+CloseContact.Components.Actor.prototype.setArmor = function(armor) {
 	if(this.armor != armor){
 		this.armor = armor;
 		this.updates.armor = true;
@@ -172,10 +209,10 @@ CloseContact.Component.Actor.prototype.setArmor = function(armor) {
 };
 
 /**
- * Sets the health for the actor
- * @param {Number} health 
+ * Sets the movement speed for the actor
+ * @param {Number} movement speed 
  */
-CloseContact.Component.Actor.prototype.setMovementSpeed = function(movementSpeed) {
+CloseContact.Components.Actor.prototype.setMovementSpeed = function(movementSpeed) {
 	if(this.movementSpeed != movementSpeed){
 		this.movementSpeed = movementSpeed;
 		this.updates.movementSpeed = true;
@@ -184,10 +221,10 @@ CloseContact.Component.Actor.prototype.setMovementSpeed = function(movementSpeed
 };
 
 /**
- * Sets the health for the actor
- * @param {Number} health 
+ * Sets the attack speed for the actor
+ * @param {Number} attack speed 
  */
-CloseContact.Component.Actor.prototype.setAttackSpeed = function(attackSpeed) {
+CloseContact.Components.Actor.prototype.setAttackSpeed = function(attackSpeed) {
 	if(this.attackSpeed != attackSpeed){
 		this.attackSpeed = attackSpeed;
 		this.updates.attackSpeed = true;
@@ -196,10 +233,32 @@ CloseContact.Component.Actor.prototype.setAttackSpeed = function(attackSpeed) {
 };
 
 /**
+ * Sets the attack range for the actor
+ * @param {Number} attack range 
+ */
+CloseContact.Components.Actor.prototype.setAttackRange = function(attackRange) {
+	if(this.attackRange != attackRange){
+		this.attackRange = attackRange;
+		this.updates.attackRange = true;
+		this.hasBeenUpdated();
+	}
+};
+
+CloseContact.Components.Actor.prototype.setLastAttackTime = function(lastAttackTime) {
+	if(this.lastAttackTime != lastAttackTime){
+		this.lastAttackTime = lastAttackTime;
+		this.updates.lastAttackTime = true;
+		this.hasBeenUpdated();
+	}
+};
+
+
+
+/**
  * Gets the updates for the component
  * @return {Object} The updates
  */
-CrunchJS.Components.Viewport.prototype.getUpdates = function() {
+CloseContact.Components.Actor.prototype.getUpdates = function() {
 	var obj = {};
 
 	goog.object.forEach(this.updates, function(updated, key) {

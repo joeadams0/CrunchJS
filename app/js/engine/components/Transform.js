@@ -180,6 +180,25 @@ CrunchJS.Components.Transform.prototype.setIsMovable = function(isMovable) {
 	}
 };
 
+/** 
+ * Measures the distance between this transform and another transform
+ * @param  {CrunchJS.Components.Transform} trans The transform to measure the distance to
+ * @return {Number}       The distance
+ */
+CrunchJS.Components.Transform.prototype.distance = function(trans) {
+	var x = trans.getX(),
+		y = trans.getY(),
+		dist;
+
+	dist = Math.pow(x-this.getX(), 2);
+
+	dist += Math.pow(y-this.getY(), 2);
+
+	dist = Math.sqrt(dist);
+
+	return dist;
+};
+
 CrunchJS.Components.Transform.prototype.getUpdates = function() {
 	return goog.object.filter(this, function(obj, key) {
 		if(!goog.isFunction(obj))
