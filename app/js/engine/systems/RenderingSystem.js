@@ -137,7 +137,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       shapeRenC = scene.getComponent(eId, 'RenderShape'), // the RenderShape component for this entity (which it may not have)
       textRenC  = scene.getComponent(eId, 'RenderText'),  // the RenderText component for this entity (which it may not have)
       cameraC   = scene.getComponent(eId, 'Camera'),      // this entity's Camera component (which it may not have)
-      screenSize = {};
+      screenSize = {}, offX,offY;
   // is this THE camera?
   if (cameraC != null && cameraC.isActive) {
     this.setCam(cameraC, eId);
@@ -229,9 +229,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
             x: size.width,
             y: size.height
           };
-
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
+          // then access the offests
+          offX = imgRenC.offset.x;
+          offY = imgRenC.offset.y;
         } else if (shapeRenC != null) {   // it is a RenderShape PIXI.Graphics
           // first, deal with the sizing of the thing
           var size = this.getSize(eId, 'RenderShape');
@@ -239,12 +241,12 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
             x: size.width,
             y: size.height
           };
-
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
-
+          // then access the offests
+          offX = shapeRenC.offset.x;
+          offY = shapeRenC.offset.y;
           // check for changes
-
         } else {                          // it is a RenderText PIXI.Text
           // first, deal with the sizing of the thing
           var size = this.getSize(eId, 'RenderText');
@@ -252,9 +254,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
             x: size.width,
             y: size.height
           };
-
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
+          // then access the offests
+          offX = textRenC.offset.x;
+          offY = textRenC.offset.y;
           // check for changes
         }
         // after handling PIXI representations of entity
@@ -263,22 +267,22 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         // Do the actual visual updating //
         ///////////////////////////////////
         // offest the transform
-        transf.x = transf.x + 
-
-
+        temp = {};
+        temp.x = transf.x + offX;
+        temp.y = transf.y + offY;
         // translate the Transform position to the onscreen position
-        var transformX = this.translatePosition(transf, 'x'),
-            transformY = this.translatePosition(transf, 'y');
+        var transformX = this.translatePosition(temp, 'x'),
+            transformY = this.translatePosition(temp, 'y');
 
         // Get top left for rendering
-        var left = transformX - screenSize.width/2,
+        var left  = transformX - screenSize.width/2,
             right = transformY - screenSize.height/2;
 
         sprite.position.x = left;
         sprite.position.y = right;
 
         // translate the in-game object Size (Body or RenderImage) to the onscreen object size
-        sprite.width = screenSize.width;
+        sprite.width  = screenSize.width;
         sprite.height =  screenSize.height
       }
     } else {         // it should be an array
@@ -292,7 +296,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         for (var p = 0; p < 3; p++) {
           if(sprite[p] == undefined) {continue;}
           // first, deal with the sizing of the thing
-          var cName,offX,offY;
+          var cName;
           if(p==0){cName='RenderImage';offX=imgRenC.offset.x;offY=imgRenC.offset.y;}
           else if(p==1){cName='RenderShape';offX=shapeRenC.offset.x;offY=shapeRenC.offset.y;}
           else{cName='RenderText';offX=textRenC.offset.x;offY=textRenC.offset.y;}
@@ -305,10 +309,13 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.height = this.translateScale(bSize, 'y');  
           
           // actual visual updating
+          // offest the transform component
+          temp = {};
+          temp.x = transf.x + offX;
+          temp.y = transf.y + offY;
           // translate the Transform position to the onscreen position
-          
-          var transformX = this.translatePosition(transf, 'x'),
-              transformY = this.translatePosition(transf, 'y');
+          var transformX = this.translatePosition(temp, 'x'),
+              transformY = this.translatePosition(temp, 'y');
 
           // Get top left for rendering
           var left = transformX - screenSize.width/2,

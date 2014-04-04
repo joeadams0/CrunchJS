@@ -101,11 +101,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		var camEntity = this.createEntity();
 
-		/*this.addComponent(ent2, new CrunchJS.Components.Body({
-			width : 3,
-			height : 3
-		}));*/
-
 		var tiles = [
 			[11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13],
 			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
@@ -195,6 +190,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 	    	})
 		);
 
+    // handle instantiating all the tiles
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
 
@@ -251,6 +247,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		},this);
 
 
+    // handle the warrior
 		var ent2 = this.createEntity();
 
 		this.addComponents(ent2, 
@@ -266,10 +263,14 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 			new CrunchJS.Components.RenderShape({
         type: 'rectangle',
-        color: 0x00FFF6,
+        color: 0x00CC00,
         size: {
-          x: 5,
-          y: 5
+          x: 10,
+          y: 1.5
+        },
+        offset: {
+          x: 0,
+          y: -5.5
         }
 		  }),
 
@@ -321,28 +322,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    }),
 		    new CrunchJS.Components.Occupancy()
 		);
-
-  /* Testing Render Shape Section  */
-		var testEnt = this.createEntity();
-
-		this.addComponents(testEnt, 
-			new CrunchJS.Components.Transform({
-				x : xStart + 10,
-				y : yStart + 2,
-				layer : 0x00000001
-			}),
-
-			new CrunchJS.Components.RenderShape({
-        type: 'rectangle',
-        color: 0x00FFF6
-		  }),
-
-		  new CrunchJS.Components.Body({
-		  	width : 10,
-		    height : 2
-		  })
-		);
-// END TESTING RENDER SHAPE SECTION //
 	
 		var sys = new CrunchJS.Systems.RenderingSystem({
 			entityId : 1
