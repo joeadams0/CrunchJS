@@ -16,7 +16,7 @@ goog.require('box2d.Vec2');
 goog.require('box2d.PolyShape');
 goog.require('box2d.CircleDef');
 goog.require('box2d.BodyDef');
-
+goog.require('box2d.Shape');//Provides method for finding x coorid of body in World
 /**
  * Creates the Physics System
  * @extends {CrunchJS.System}
@@ -75,7 +75,8 @@ CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
 	worldAABB.maxVertex.Set(1000, 1000);
 	var gravity = new box2d.Vec2(0, 0);
 	var doSleep = true;
-	var world = new box2d.World(worldAABB, gravity, doSleep);	
+	var world = new box2d.World(worldAABB, gravity, doSleep);
+	this.addCircle(5, world);	
 	return world;
 
 	//This will be called from the scene not from the init() function
@@ -93,8 +94,8 @@ CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
  */
 //b is linked list of bodies in world
 CrunchJS.Systems.PhysicsSystem.prototype.collisionCollect = function (b){
-	var edge = b.box2d.GetContactList();
-	return edge;
+	//var edge = b.GetContactList();
+	//return edge;
 	//can iterate over edges to evaluate the collisions that happened
 };
 
@@ -109,8 +110,35 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var timeStep = 1.0/60;
 	var iteration = 1;
 	world.Step(timeStep, iteration);
-	var b = world.getBodyList;
-	var listCollisions = this.collisionCollect(b);
+	var node = world.getBodyList;
+	CrunchJS.world.log(' TESTUPDATE ' + world, CrunchJS.LogLevels.DEBUG);
+	//var listCollisions = this.collisionCollect(node);
+
+		while (node){
+			var b = node;
+			node = node.GetNext();
+
+			var shape = b.GetShapeList();
+			while (shape){ 
+				var shape1 = shape;
+				shape = shape.GetNext();
+
+				if (shape1 != null){
+
+					var shapeType = shape1.GetType();
+
+					CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
+
+				if (shapeType === box2d.ShapeDef.Type.circleShape){
+					var position = b.GetPosition();
+					CrunchJS.world.log(position + " test2", CrunchJS.LogLevels.DEBUG);
+				}
+
+				}
+			}
+		}
+
+
 };
 //TO DO: Have to adjust how vertexes are added to Box2D world
 /**

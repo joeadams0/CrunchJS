@@ -26,6 +26,8 @@ goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 goog.require('CrunchJS.Components.Viewport');
 
+
+goog.require('box2d.Shape');
 /**
  * The Game Scene
  * @constructor
@@ -87,12 +89,16 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(physSys);
 
 		var worldP = physSys.init();
-		physSys.addCircle(5, worldP);
+		physSys.addCircle(6, worldP);
 		//for (var x = 0; x>-1; x++){
-		CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
-		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		
+		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
 		//}
 
+		//calls update once every second
+		var repeatedUpdateCall = setInterval(function(){physSys.update(worldP)}, (1000));
+
+		
 	}
 
 	// If it is the main window
