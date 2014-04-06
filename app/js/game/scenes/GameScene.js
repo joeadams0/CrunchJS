@@ -15,10 +15,13 @@ goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
 goog.require('CloseContact.Systems.TowerSystem');
 goog.require('CloseContact.Systems.AttackSystem');
+goog.require('CloseContact.Systems.ActorSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
 goog.require('CrunchJS.Components.RenderImage');
+goog.require('CrunchJS.Components.RenderShape');
+goog.require('CrunchJS.Components.RenderText');
 goog.require('CrunchJS.Components.Camera');
 goog.require('CrunchJS.Components.OccupancyGrid');
 goog.require('CrunchJS.Components.Body');
@@ -62,6 +65,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.OccupancyGrid,
 		CrunchJS.Components.Occupancy,
 		CrunchJS.Components.RenderImage,
+		CrunchJS.Components.RenderShape,
+		CrunchJS.Components.RenderText,
 		CrunchJS.Components.Camera,
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
@@ -83,13 +88,15 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			pathSys = new CrunchJS.Systems.PathfindingSystem(),
 			pathMoveSys = new CrunchJS.Systems.PathMovementSystem(),
 			towerSystem = new CloseContact.Systems.TowerSystem(),
-			attackSystem = new CloseContact.Systems.AttackSystem();
+			attackSystem = new CloseContact.Systems.AttackSystem(),
+			actorSystem = new CloseContact.Systems.ActorSystem();
 
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
 		this.addSystem(pathMoveSys);
 		this.addSystem(towerSystem);
-		this.addSystem(attackSystem)
+		this.addSystem(attackSystem);
+		this.addSystem(actorSystem);
 
 	}
 
@@ -111,14 +118,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 
 		var camEntity = this.createEntity();
-
-		
-			
-
-		/*this.addComponent(ent2, new CrunchJS.Components.Body({
-			width : 3,
-			height : 3
-		}));*/
 
 		var tiles = [
 			[11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13],
@@ -160,21 +159,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			'assets/wall-bottom-right.png', // 18
 			'assets/tower.png' // 19
 
-		]
-		
-		// var tiles = [
-		// 	[0,0,0,0,0,0,0,0,0,0],
-		// 	[0,1,1,1,1,1,1,1,1,0],
-		// 	[0,1,1,1,1,0,0,0,1,0],
-		// 	[0,1,1,1,0,0,1,0,1,0],
-		// 	[0,1,1,0,0,1,1,0,1,0],
-		// 	[0,1,1,0,1,1,1,1,1,0],
-		// 	[0,1,1,0,1,1,1,0,1,0],
-		// 	[0,1,1,0,1,0,0,0,1,0],
-		// 	[0,1,1,1,1,1,1,1,1,0],
-		// 	[0,0,0,0,0,0,0,0,0,0]
-		// ];
-
+		];
 		
 		var xStart = -170,
 			yStart = -70;
@@ -184,6 +169,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		console.log(width);
 		console.log(height);
 
+    // add components to the occupancyGrid entity
 		this.addComponents(entity, 
 			new CrunchJS.Components.Transform({
 				layer : 0x00000001
@@ -196,6 +182,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			})
 		);
 
+    // add components to the camEntity
 		this.addComponents(camEntity, 
 			new CrunchJS.Components.Transform({
 				layer : 0x00000001
@@ -223,6 +210,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 	    	})
 		);
 
+    // handle instantiating all the tiles
 		goog.array.forEach(tiles, function(row, y) {
 			goog.array.forEach(row, function(tile,x) {
 
@@ -276,6 +264,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		},this);
 
 
+    // handle the warrior
 		var ent2 = this.createEntity();
 
 		this.addComponents(ent2, 
@@ -287,8 +276,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 			new CrunchJS.Components.RenderImage({
 		      image: 'warrior.png'
-		    }),
-
+		 	}),
 		    new CrunchJS.Components.Body({
 		    	width : 10,
 		    	height : 10
@@ -296,7 +284,19 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		    new CloseContact.Components.Actor({
 		    	team : 0
-		    })
+		    }),
+
+			new CrunchJS.Components.RenderText({
+		        text: "User1",
+		        style: {
+		          font: "5px",
+		          fill: "white"
+		        },
+		        offset: {
+		          x: 0,
+		          y: -8
+		        }
+			})
 		);
 
 		var tower1 = this.createEntity(),
@@ -354,21 +354,12 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		    new CloseContact.Components.Tower()
 		);
-
 	
 		var sys = new CrunchJS.Systems.RenderingSystem({
 			entityId : 1
 		});
 
 		this.addSystem(sys);
-
-
-
-
-
-
-
-
 
 
 		var self = this;
