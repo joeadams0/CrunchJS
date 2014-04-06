@@ -498,3 +498,29 @@ CrunchJS.Systems.RenderingSystem.prototype.onMouseMove = function(data) {
     });
   }
 };
+
+CrunchJS.Systems.RenderingSystem.prototype.entityDestroyed = function(eId) {
+  goog.base(this, 'entityDestroyed', eId);
+  if (Object.prototype.toString.call(this.sprites[eId]) == '[object Array]'){ // we're dealing with an array of PIXI objects
+    for(var q=0; q<3; q++){
+      if (this.sprites[eId][q] == undefined) continue;
+      this.stage.removeChild(this.sprites[eId][q]); // remove from PIXI
+    }
+  } else { // we've only got the one PIXI object to clear
+    this.stage.removeChild(this.sprites[eId]);
+  }
+  this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
+};
+
+CrunchJS.Systems.RenderingSystem.prototype.entityDisabled = function(eId) {
+  goog.base(this, 'entityDisabled', eId);
+  if (Object.prototype.toString.call(this.sprites[eId]) == '[object Array]'){ // we're dealing with an array of PIXI objects
+    for(var q=0; q<3; q++){
+      if (this.sprites[eId][q] == undefined) continue;
+      this.stage.removeChild(this.sprites[eId][q]); // remove from PIXI
+    }
+  } else { // we've only got the one PIXI object to clear
+    this.stage.removeChild(this.sprites[eId]);
+  }
+  this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
+};
