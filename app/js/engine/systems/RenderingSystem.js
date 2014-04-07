@@ -273,7 +273,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         // Do the actual visual updating //
         ///////////////////////////////////
         // offest the transform
-        temp = {};
+        var temp = {};
         temp.x = transf.x + offX;
         temp.y = transf.y + offY;
         // translate the Transform position to the onscreen position
@@ -304,7 +304,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           // first, deal with the sizing of the thing
           var cName;
           if(p==0){cName='RenderImage';offX=imgRenC.offset.x;offY=imgRenC.offset.y;}
-          else if(p==1){cName='RenderShape';offX=shapeRenC.offset.x;offY=shapeRenC.offset.y;}
+          else if(p==1){
+            cName='RenderShape';
+            offX=shapeRenC.offset.x;
+            offY=shapeRenC.offset.y;
+          }
           else{cName='RenderText';offX=textRenC.offset.x;offY=textRenC.offset.y;}
           var size = this.getSize(eId, cName);
           var bSize = {
@@ -330,9 +334,28 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite[p].position.x = left;
           sprite[p].position.y = right;
 
-          // translate the in-game object Size (Body or RenderImage) to the onscreen object size
-          sprite[p].width = screenSize.width;
-          sprite[p].height =  screenSize.height
+          if(cName == 'RenderShape'){
+            var redraw = sprite[p].width != screenSize.width || sprite[p].height != screenSize.height;
+
+            if(redraw){
+              sprite[p].width = screenSize.width;
+              sprite[p].height =  screenSize.height
+              sprite[p].clear();
+              if (shapeRenC.type.toLowerCase() == 'rectangle') {
+                if(shapeRenC.fill === true){
+                  sprite[p].beginFill(shapeRenC.color);
+                }
+                sprite[p].lineStyle(1, shapeRenC.color, 1);
+                sprite[p].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+              }
+            }
+          }
+          else{
+            // translate the in-game object Size (Body or RenderImage) to the onscreen object size
+            sprite[p].width = screenSize.width;
+            sprite[p].height =  screenSize.height
+          }
+
         }
       }
     }

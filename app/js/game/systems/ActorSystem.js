@@ -27,22 +27,23 @@ CloseContact.Systems.ActorSystem.prototype.processEntity = function(frame, entit
 
 	if(!renderShape){
 		
-		this.getScene().addComponent(entityId, new CrunchJS.Components.RenderShape({
-		        type: 'rectangle',
-		        color: '0xFF0000',
-		        size: {
-		          x: 10,
-		          y: 1.5
-		        },
-		        fill : true,
-		        offset: {
-		          x: 0,
-		          y: -6
-		        }
-			})
-		);
+
+		renderShape = new CrunchJS.Components.RenderShape({
+	        type: 'rectangle',
+	        color: '0xFF0000',
+	        size: {
+	          x: 10,
+	          y: 1.5
+	        },
+	        fill : true,
+	        offset: {
+	          x: 0,
+	          y: -6
+	        }
+		});
+
+		this.getScene().addComponent(entityId, renderShape);
 	}
-	else{
-		renderShape
-	}
+
+	renderShape.setSize(10*actor.getHealth()/actor.getMaxHealth(), renderShape.getSize().y);
 };

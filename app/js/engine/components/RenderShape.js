@@ -125,15 +125,35 @@ CrunchJS.Components.RenderShape.prototype.setOffset = function(x,y) {
 };
 
 CrunchJS.Components.RenderShape.prototype.getUpdates = function() {
-	return goog.object.filter(this, function(obj, key) {
-		if(!goog.isFunction(obj))
-      if(!goog.isObject(obj))
-			  return this.updates[key];
-      else
-        return true;
-	}, this);
+  var obj = {};
+	
+  if(this.updates.type){
+    obj.type = this.getType();
+  }
+  if(this.updates.size && (this.updates.size.x || this.updates.size.y)){
+    obj.size = this.getSize();
+  }
+  if(this.updates.color){
+    obj.color = this.getColor()
+  }
+  if(this.updates.fill){
+    obj.fill = this.getFill()
+  }
+  if(this.updates.offset && (this.updates.offset.y || this.updates.offset.x)){
+    obj.offset = this.getOffset()
+  }
+
+
+  return obj;
+};
+
+CrunchJS.Components.RenderShape.prototype.update = function(obj) {
+  goog.object.forEach(obj, function(el, key) {
+
+    this[key] = el;
+  }, this);
 };
 
 CrunchJS.Components.RenderShape.prototype.resetUpdates = function() {
-	this.updates = undefined;
+	this.updates = {};
 };

@@ -606,7 +606,7 @@ CrunchJS.Internal.ComponentManager.prototype.getUpdates = function() {
 				return this.hasComponent(id, name);
 			}, this), 
 			function(name) {
-				var comp = this.getComponent(id, name)
+				var comp = this.getComponent(id, name),
 					data = comp.getUpdates();
 
 				comp.resetUpdates();

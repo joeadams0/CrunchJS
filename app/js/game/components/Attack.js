@@ -9,8 +9,11 @@ goog.require('CrunchJS.Component');
 /** 
  * Creates a component to attack another entity	
  * @param {[type]} params [description]
+ * @constructor
+ * @class 
  */
 CloseContact.Components.Attack = function(params) {
+	goog.base(this, params);
 	this.entity = params.entity;
 };
 

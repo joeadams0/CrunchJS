@@ -10,9 +10,11 @@ goog.require('goog.object');
 /**
  * The Actor Component has the basic data about the state of the actor, ie health armor ect.
  * @param {[type]} params [description]
+ * @constructor
+ * @class 
  */
 CloseContact.Components.Actor = function(params) {
-	goog.base(this);
+	goog.base(this, params);
 
 	// The default actor
 	var defaultConfigs = {
