@@ -97,7 +97,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		//calls update once every second
 		var repeatedUpdateCall = setInterval(function(){physSys.update(worldP)}, (1000));
-
 		
 	}
 

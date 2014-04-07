@@ -110,8 +110,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var timeStep = 1.0/60;
 	var iteration = 1;
 	world.Step(timeStep, iteration);
-	var node = world.getBodyList;
-	CrunchJS.world.log(' TESTUPDATE ' + world, CrunchJS.LogLevels.DEBUG);
+	var node = world.GetBodyList();
+	CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
+	CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
 	//var listCollisions = this.collisionCollect(node);
 
 		while (node){
@@ -127,18 +128,22 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 
 					var shapeType = shape1.GetType();
 
-					CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
+					//CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
 
+				//ensures that the current shape is a circle object
 				if (shapeType === box2d.ShapeDef.Type.circleShape){
-					var position = b.GetPosition();
-					CrunchJS.world.log(position + " test2", CrunchJS.LogLevels.DEBUG);
+
+					//This gets the x and y cooridiniate of each circle object in the world
+					var position = shape1.GetPosition();
+					CrunchJS.world.log(position, CrunchJS.LogLevels.DEBUG);
+
 				}
 
 				}
 			}
 		}
 
-
+		this.addCircle(4, world);
 };
 //TO DO: Have to adjust how vertexes are added to Box2D world
 /**
@@ -174,6 +179,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (radius, world){
 	circleBd.AddShape(circleSd);
 	circleBd.position.Set(50,50);
 	var circleBody = world.CreateBody(circleBd);
+
+	//Add new physics component representing this circle in box2d world
+
 };
 
 /**
@@ -210,5 +218,5 @@ CrunchJS.Systems.PhysicsSystem.prototype.addImpulse = function (objectID, degree
  * @param  {int} intervalVariable global variable set by initial setInterval() call
  */
 CrunchJS.Systems.PhysicsSystem.prototype.cancelUpdate = function (intervalVariable){
-	window.clearInterval(intervalVariable);
+	clearInterval(intervalVariable);
 };
