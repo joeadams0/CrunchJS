@@ -392,7 +392,6 @@ CrunchJS.Scene.prototype.getSim = function() {
  * @param  {Object} data The new data
  */
 CrunchJS.Scene.prototype.onSync = function(data) {
-	CrunchJS.world.log('Syncing');
 
 	this._entityManager.sync(data.entityManager);
 	this._componentManager.sync(data.componentManager);
@@ -404,7 +403,8 @@ CrunchJS.Scene.prototype.onSync = function(data) {
  * Sends the current entities and components
  */
 CrunchJS.Scene.prototype.onSyncRequest = function() {
-	this.postEventToRemoteEngine(CrunchJS.EngineCommands.Sync, this.getSnapshot());
+	var data = this.getSnapshot();
+	this.postEventToRemoteEngine(CrunchJS.EngineCommands.Sync, data);
 };
 
 /**

@@ -61,6 +61,8 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * @type {Object.<number, Object>}
 	 */
 	 this.communicationEvents = {}
+
+	 this.player = 2;
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -100,6 +102,14 @@ CrunchJS.Internal.NetworkManager.prototype.everyCommunicationTurn = function() {
 CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
 	CrunchJS.world.log('COMMAND: ' + data.command);
 	this.getScene().fireEvent(data.command, data.data);
+
+	if(data.command==CrunchJS.EngineCommands.Sync){
+		this.getScene().onSyncRequest();
+	}
+
+	if(data.player){
+		this.getScene().fireEvent('set_player', data.player);
+	}
 };
 
 /**
@@ -351,13 +361,17 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 		if(this.peerId == "host"){
+			var player = this.player,
+				eId = this.getScene().createPlayerEntity(player, (player+1)%2);
+
 			conn.send({
 				type : 'command',
 				data : {
 					command : CrunchJS.EngineCommands.Sync,
-					data : this.getScene().getSnapshot()
+					data : this.getScene().getSnapshot(),
+					player : player
 				}
-			})
+			});
 		}
 	}.bind(this));
 	conn.on('close', function(){

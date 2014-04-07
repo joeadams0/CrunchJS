@@ -30,7 +30,7 @@ CloseContact.Systems.ActorSystem.prototype.processEntity = function(frame, entit
 
 		renderShape = new CrunchJS.Components.RenderShape({
 	        type: 'rectangle',
-	        color: '0xFF0000',
+	        color: actor.team == 0 ? '0xFF0000' : '0x0000FF',
 	        size: {
 	          x: 10,
 	          y: 1.5

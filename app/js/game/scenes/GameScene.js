@@ -32,6 +32,9 @@ goog.require('CrunchJS.Components.Viewport');
 goog.require('CloseContact.Components.Actor');
 goog.require('CloseContact.Components.Tower');
 goog.require('CloseContact.Components.Attack');
+goog.require('CloseContact.Components.GameMaster');
+goog.require('CloseContact.Components.Player');
+
 
 /**
  * The Game Scene
@@ -73,7 +76,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.Viewport,
 		CloseContact.Components.Actor,
 		CloseContact.Components.Tower,
-		CloseContact.Components.Attack
+		CloseContact.Components.Attack,
+		CloseContact.Components.GameMaster,
+		CloseContact.Components.Player
 	];
 
 	goog.array.forEach(comps, function(comp) {
@@ -115,6 +120,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		var entity = this.createEntity();
 
 		this.setEntityName('master', entity);
+
+		var gameMaster = new CloseContact.Components.GameMaster();
+		this.addComponent(entity, gameMaster);
 
 
 		var camEntity = this.createEntity();
@@ -164,8 +172,15 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		var xStart = -170,
 			yStart = -70;
 
+		this.xStart = xStart;
+		this.yStart = yStart;
+
 		var width = tiles[0].length,
 			height = tiles.length;
+
+		this.width = width;
+		this.height = height;
+
 		console.log(width);
 		console.log(height);
 
@@ -263,42 +278,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			}, this);
 		},this);
 
+		var player = this.createPlayerEntity(1, 0);
 
-    // handle the warrior
-		var ent2 = this.createEntity();
-
-		this.addComponents(ent2, 
-			new CrunchJS.Components.Transform({
-				x : xStart + 10,
-				y : yStart + 10,
-				layer : 0x00000001
-			}),
-
-			new CrunchJS.Components.RenderImage({
-		      image: 'warrior.png'
-		 	}),
-		    new CrunchJS.Components.Body({
-		    	width : 10,
-		    	height : 10
-		    }),
-
-		    new CloseContact.Components.Actor({
-		    	team : 0,
-		    	health : 100
-		    })/*,
-
-			new CrunchJS.Components.RenderText({
-		        text: "User1",
-		        style: {
-		          font: "5px",
-		          fill: "white"
-		        },
-		        offset: {
-		          x: 0,
-		          y: -10
-		        }
-			})*/
-		);
+		this.playerId = 1;
 
 		var tower1 = this.createEntity(),
 			tower2 = this.createEntity();
@@ -395,8 +377,16 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 				y : yOffset+top
 			};
 
+			var players = self.getComponentsByType('Player'),
+				eId;
+
+			goog.structs.forEach(players, function(player) {
+
+				if(player.getPId() == gameMaster.getPId())
+					eId = player.entityId;
+			});
 			var dater = {
-				id : ent2,
+				id : eId,
 				coords : end,
 				gridId : 1
 			};
@@ -414,7 +404,58 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addEventListener(CrunchJS.EngineCommands.Sync, function() {			
 			self.fireEvent('Resize');	
 		});
+
+		this.addEventListener('set_player', function(pId) {
+			gameMaster.setPId(pId);
+		});
+
+
 	}
+
+};
+
+CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team) {
+	var player = this.createEntity(),
+		trans = {
+			x : team === 0 ? this.xStart+10 : this.xStart + 10*this.width-20,
+			y : this.yStart+10,
+			layer : 0x00000001
+		};
+
+	this.addComponents(player, 
+		new CrunchJS.Components.Transform(trans),
+
+		new CrunchJS.Components.RenderImage({
+	      image: 'warrior.png'
+	 	}),
+	    new CrunchJS.Components.Body({
+	    	width : 10,
+	    	height : 10
+	    }),
+
+	    new CloseContact.Components.Actor({
+	    	team : team,
+	    	health : 100
+	    }),
+
+	    new CloseContact.Components.Player({
+	    	pId : pId
+	    })/*,
+
+		new CrunchJS.Components.RenderText({
+	        text: "User1",
+	        style: {
+	          font: "5px",
+	          fill: "white"
+	        },
+	        offset: {
+	          x: 0,
+	          y: -10
+	        }
+		})*/
+	);
+
+	return player;
 
 };
 
