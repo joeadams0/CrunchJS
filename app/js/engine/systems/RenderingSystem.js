@@ -212,6 +212,35 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list
     } else {  // already a PIXI representation (or array of them) exsists
       sprite = this.sprites[eId]; // access the sprite
+      if (parts > 1 && goog.isArray(sprite)){
+        if (sprite[0] == undefined && imgRenC != null) {
+          sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          this.stage.addChild(sprite[0]);  // add it to the stage
+        } else if (sprite[1] == undefined && shapeRenC != null) {
+            sprite[1] = new PIXI.Graphics();
+            // deal with the sizing of the thing
+            var size = this.getSize(eId, 'RenderShape');
+            var bSize = {
+              x: size.width,
+              y: size.height
+            };
+            screenSize.width = this.translateScale(bSize, 'x');
+            screenSize.height = this.translateScale(bSize, 'y');  
+            // PIXI code for drawing rectangles
+            if (shapeRenC.type.toLowerCase() == 'rectangle') {
+              if(shapeRenC.fill === true){
+                sprite[1].beginFill(shapeRenC.color);
+              }
+              sprite[1].lineStyle(1, shapeRenC.color, 1);
+              sprite[1].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
+            }
+            this.stage.addChild(sprite[1]);  // add it to the stage
+        } else if (sprite[2] == undefined && textRenC != null) {
+            sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
+            this.stage.addChild(sprite[2]);  // add it to the stage
+        }
+        this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list, because it might have changed
+      }
     }
     
     // aside from some array/object checking, here is where we start to actually process the entity

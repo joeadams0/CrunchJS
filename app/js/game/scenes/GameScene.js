@@ -285,7 +285,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    new CloseContact.Components.Actor({
 		    	team : 0,
 		    	health : 100
-		    })/*,
+		    }),
 
 			new CrunchJS.Components.RenderText({
 		        text: "User1",
@@ -297,7 +297,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		          x: 0,
 		          y: -10
 		        }
-			})*/
+			})
 		);
 
 		var tower1 = this.createEntity(),
