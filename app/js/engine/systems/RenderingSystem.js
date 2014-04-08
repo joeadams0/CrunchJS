@@ -252,7 +252,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         ///////////////////////////////////
         // Do the actual visual updating //
         ///////////////////////////////////
-        sprite = this.updateSprite(sprite, screenSize, offX, offY);
+        sprite = this.updateSprite(sprite, screenSize, offX, offY, transf);
       }
     } else {         // it should be an array
       if (Object.prototype.toString.call(sprite) != '[object Array]'){ // but it is not an array!!! oh noes!
@@ -296,14 +296,14 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
             }
           }
           // actual visual updating
-          sprite[p] = this.updateSprite(sprite[p], screenSize, offX, offY);
+          sprite[p] = this.updateSprite(sprite[p], screenSize, offX, offY, transf);
         }
       }
     }
   }
 };
 
-CrunchJS.Systems.RenderingSystem.prototype.updateSprite(sprite, screenSize, offX, offY){
+CrunchJS.Systems.RenderingSystem.prototype.updateSprite = function(sprite, screenSize, offX, offY, transf){
   // offest the transform
   var temp = {};
   temp.x = transf.x + offX;
@@ -321,13 +321,13 @@ CrunchJS.Systems.RenderingSystem.prototype.updateSprite(sprite, screenSize, offX
 
   // translate the in-game object Size (Body or RenderImage) to the onscreen object size
   sprite.width  = screenSize.width;
-  sprite.height =  screenSize.height
+  sprite.height =  screenSize.height;
 
   return sprite;
 };
 
 // helper method for processEntity();
-CrunchJS.Systems.RenderingSystem.prototype.makePIXIShape(shapeRenC, eId){
+CrunchJS.Systems.RenderingSystem.prototype.makePIXIShape = function(shapeRenC, eId){
   var temp = new PIXI.Graphics();
   // deal with the sizing of the thing
   var size = this.getSize(eId, 'RenderShape');
