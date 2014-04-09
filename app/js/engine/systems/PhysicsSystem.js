@@ -118,33 +118,6 @@ var node = world.GetBodyList();
 	}
 };
 
-/**
- *
-    var b2AABB = box2d.AABB;
-	var worldAABB = new b2AABB();
-	var b2Vec2 = box2d.Vec2;
-	worldAABB.minVertex.Set(-1000, -1000);
-	worldAABB.maxVertex.Set(1000, 1000);
-	var gravity = new b2Vec2(0, 0);
-	var doSleep = true;
-	var world = new box2d.World(worldAABB, gravity, doSleep); 
-	console.log(world);
- *
- *
- *
- * 
- */
-
-//var canvasw;
-// CrunchJS.Systems.PhysicsSystem.prototype = function setcanvaswidth(canvaswidth){
-// 	return canvasw = canvaswidth;
-// }
-
-// var canvash;
-// function setcanvaswidth(canvaswidth){
-// 	return canvash = canvaswidth;
-// }
-
 
 /**
  * Initializes world and objects.
@@ -199,7 +172,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
- CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (id, width, height, xPos, yPos, world){
+ CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (ent, world){
  	//create rectangle
 
 	var boxSd = new box2d.BoxDef();
