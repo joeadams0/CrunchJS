@@ -130,8 +130,8 @@ CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
  */
 //b is linked list of bodies in world
 CrunchJS.Systems.PhysicsSystem.prototype.collisionCollect = function (b){
-	//var edge = b.GetContactList();
-	//return edge;
+	var edge = b.GetContactList();
+	return edge;
 	//can iterate over edges to evaluate the collisions that happened
 };
 
@@ -191,7 +191,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-// CrunchJS.Systems.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight, world){
+// CrunchJS.Systems.PhysicsSystem.prototype = function addRectangle(ent, world){
 // 	//create rectangle
 // 	var canvaswidth = 100;
 // 	var canvasheight = 100;
@@ -207,7 +207,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 // };
 
 
-CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (radius, world){
+CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (ent, world){
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
 	circleSd.radius = radius;

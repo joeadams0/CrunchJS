@@ -25,9 +25,9 @@ goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 goog.require('CrunchJS.Components.Viewport');
+goog.require('CrunchJS.Components.Physics');
 
 
-goog.require('box2d.Shape');
 /**
  * The Game Scene
  * @constructor
@@ -87,16 +87,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
 		var physSys = new CrunchJS.Systems.PhysicsSystem({});
 		this.addSystem(physSys);
-
-		var worldP = physSys.init();
-		physSys.addCircle(6, worldP);
-		//for (var x = 0; x>-1; x++){
-		
-		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
-		//}
-
-		//calls update once every second
-		var repeatedUpdateCall = setInterval(function(){physSys.update(worldP)}, (1000));
 		
 	}
 
