@@ -89,7 +89,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(physSys);
 
 		var worldP = physSys.init();
-		physSys.addCircle(6, worldP);
+		physSys.addRectangle(6, 6, 5, 5, worldP);
 		//for (var x = 0; x>-1; x++){
 		
 		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);

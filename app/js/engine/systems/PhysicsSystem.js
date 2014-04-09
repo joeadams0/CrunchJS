@@ -112,14 +112,14 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var iteration = 1;
 	world.Step(timeStep, iteration);
 	var node = world.GetBodyList();
-	CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
-	CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
+	//CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
+	//CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
 	//var listCollisions = this.collisionCollect(node);
 
 		while (node){
 			var b = node;
 			node = node.GetNext();
-
+			CrunchJS.world.log('Break', CrunchJS.LogLevels.DEBUG);
 			var shape = b.GetShapeList();
 			while (shape){ 
 				var shape1 = shape;
@@ -129,16 +129,17 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 
 					var shapeType = shape1.GetType();
 
-					//CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
+					//CrunchJS.world.log(shapeType, CrunchJS.LogLevels.DEBUG);
 
 				//ensures that the current shape is a circle object
-				if (shapeType === box2d.ShapeDef.Type.circleShape){
+				//if (shapeType === box2d.ShapeDef.Type.boxShape){
 
 					//This gets the x and y cooridiniate of each circle object in the world
 					var position = shape1.GetPosition();
+					//CrunchJS.world.log('Test!!!!', CrunchJS.LogLevels.DEBUG);
 					CrunchJS.world.log(position, CrunchJS.LogLevels.DEBUG);
 
-				}
+				//}
 
 				}
 			}
