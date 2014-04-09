@@ -45,12 +45,16 @@ CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 
 		goog.structs.forEach(this.getActiveEntities(), function(ent) {
 				
-		//if physics component has a correspondinng body in box2d
+		//if physics component has a corresponding body in box2d
 
-		//update box2d objects to match component's values
-		physComp.updateBox2dBody(ent);
-		//else create a body in box2d to match new physics component
-		box2dWorld.addRectangle(ent);
+		if (checkEntExistsInPhys(ent, box2dWorld)){
+			//update box2d objects to match component's values
+			physComp.updateBox2dBody(ent);
+		}
+		else{
+			//else create a body in box2d to match new physics component
+			box2dWorld.addRectangle(ent);
+		}
 		}, this);
 
 	}, this);
@@ -118,6 +122,30 @@ var node = world.GetBodyList();
 	}
 };
 
+CrunchJS.Systems.PhysicsSystem.prototype.checkEntExistsInPhys = function(ent, world){
+	var returnBool = false;
+	var node = world.GetBodyList();
+	while (node){
+		var b = node;
+		node = node.GetNext();
+		
+		var shape = b.GetShapeList();
+		while (shape){ 
+			var shape1 = shape;
+			shape = shape.GetNext();
+			if (shape1 != null){
+
+				var shapeType = shape1.GetType();
+				if (node.GetUserData() === ent.objectId){
+						returnBool = true;
+				}
+					//This gets the x and y cooridiniate of each circle object in the world
+					//var position = shape1.GetPosition();	
+			}
+		}
+	}
+	return returnBool;
+}
 
 /**
  * Initializes world and objects.
