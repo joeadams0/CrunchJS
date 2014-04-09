@@ -199,20 +199,20 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-// CrunchJS.Systems.PhysicsSystem.prototype = function addRectangle(ent, world){
-// 	//create rectangle
-// 	var canvaswidth = 100;
-// 	var canvasheight = 100;
-// 	var bodyDef = new box2d.BodyDef();
-// 	bodyDef.type = box2d.b2Body.b2_dynamicBody;
-// 	var scale = 30;
-// 	
-////fixDef() doesnt exist in this version of box2D we are using
-//
-// 	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
-// 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
-// 	world.CreateBody(bodyDef).CreateFixture(fixDef);
-// };
+ CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (ent, world){
+ 	//create rectangle
+ 	var canvaswidth = 100;
+ 	var canvasheight = 100;
+ 	var bodyDef = new box2d.BodyDef();
+ 	bodyDef.type = box2d.b2Body.b2_dynamicBody;
+ 	var scale = 30;
+ 	
+//fixDef() doesnt exist in this version of box2D we are using
+
+ 	bodyDef.position.x = (canvaswidth - scale * 2) * Math.random() + scale * 2;
+ 	bodyDef.position.y = canvasheight - (scale * Math.random() + scale);
+ 	var rectangleBody = world.CreateBody(bodyDef);
+ };
 
 
 CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (ent, world){
