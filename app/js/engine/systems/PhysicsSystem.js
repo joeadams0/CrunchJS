@@ -15,6 +15,7 @@ goog.require('box2d.AABB');
 goog.require('box2d.Vec2');
 goog.require('box2d.PolyShape');
 goog.require('box2d.CircleDef');
+goog.require('box2d.BoxDef');
 goog.require('box2d.BodyDef');
 goog.require('box2d.Shape');//Provides method for finding x coorid of body in World
 /**
@@ -143,7 +144,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 			}
 		}
 
-		this.addCircle(4, world);
+		this.addRectangle(10, 50, 4, 4, world);
 };
 //TO DO: Have to adjust how vertexes are added to Box2D world
 /**
@@ -153,20 +154,19 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
-// CrunchJS.Systems.PhysicsSystem.prototype = function addRectangle(canvaswidth, canvasheight, world){
-// 	//create rectangle
-// 	var canvaswidth = 100;
-// 	var canvasheight = 100;
-// 	var bodyDef = new box2d.BodyDef();
-// 	bodyDef.type = box2d.b2Body.b2_dynamicBody;
-// 	var scale = 30;
-// 	
-////fixDef() doesnt exist in this version of box2D we are using
-//
-// 	bodyDef.position.x = (canvaswidth - scale*2)*Math.random()+scale*2;
-// 	bodyDef.position.y = canvasheight - (scale*Math.random() +scale);
-// 	world.CreateBody(bodyDef).CreateFixture(fixDef);
-// };
+ CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (xPos, yPos, width, height, world){
+ 	//create rectangle
+	var boxSd = new box2d.BoxDef();
+	boxSd.density = 1.0;
+
+	//boxSd.userData = id;
+
+	boxSd.extents.Set(width, height);
+	var boxBd = new box2d.BodyDef();
+	boxBd.AddShape(boxSd);
+	boxBd.position.Set(xPos,yPos);
+	world.CreateBody(boxBd)
+ };
 
 
 CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (radius, world){
