@@ -71,7 +71,52 @@ CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 		}, this);
 
 	}, this);
-}	
+}
+
+//helper method for process function
+//updates box2d objects to match component's values
+CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent) {
+
+}
+
+//helper method for process function
+//update physics component with updated values from box2d
+CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent) {
+
+var node = world.GetBodyList();
+	//CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
+	//CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
+	//var listCollisions = this.collisionCollect(node);
+
+	while (node){
+		var b = node;
+		node = node.GetNext();
+		
+		var shape = b.GetShapeList();
+		while (shape){ 
+			var shape1 = shape;
+			shape = shape.GetNext();
+			if (shape1 != null){
+
+				var shapeType = shape1.GetType();
+
+				//CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
+
+				//ensures that the current shape is a circle object
+				if (shapeType === box2d.ShapeDef.Type.circleShape){
+					CrunchJS.world.log(node.GetUserData(), CrunchJS.LogLevels.DEBUG);
+					//This gets the x and y cooridiniate of each circle object in the world
+					var position = shape1.GetPosition();
+
+					//if this position value differs from the corresponding components then update component
+
+					//CrunchJS.world.log(position, CrunchJS.LogLevels.DEBUG);
+					//Update the physics components with the updated positions
+				}
+			}
+		}
+	}
+};
 
 /**
  *
@@ -142,46 +187,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.collisionCollect = function (b){
  * edits the transform component once an object moves after a step()
  */
 CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
-
 	var timeStep = 1.0/60;
 	var iteration = 1;
 	world.Step(timeStep, iteration);
-	var node = world.GetBodyList();
-	CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
-	CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
-	//var listCollisions = this.collisionCollect(node);
-
-		while (node){
-			var b = node;
-			node = node.GetNext();
-			
-			var shape = b.GetShapeList();
-
-			while (shape){ 
-				var shape1 = shape;
-				shape = shape.GetNext();
-
-				if (shape1 != null){
-
-					var shapeType = shape1.GetType();
-
-					//CrunchJS.world.log(shapeType + " test1", CrunchJS.LogLevels.DEBUG);
-
-				//ensures that the current shape is a circle object
-				if (shapeType === box2d.ShapeDef.Type.circleShape){
-					CrunchJS.world.log(node.GetUserData(), CrunchJS.LogLevels.DEBUG);
-					//This gets the x and y cooridiniate of each circle object in the world
-					var position = shape1.GetPosition();
-					CrunchJS.world.log(position, CrunchJS.LogLevels.DEBUG);
-					//Update the physics components with the updated positions
-
-				}
-
-				}
-			}
-		}
-
-		this.addCircle(4, world);
 };
 //TO DO: Have to adjust how vertexes are added to Box2D world
 /**
