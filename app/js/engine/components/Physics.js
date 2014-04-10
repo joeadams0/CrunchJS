@@ -60,6 +60,12 @@ CrunchJS.Components.Physics = function(params) {
 	 */
 	this.forceY = forceY.params;
 
+
+	this.radius = radius.params;
+
+	this.recWidth = recWidth.params;
+
+	this.recHeight = recHeight.params;
 	/**
 	 * Mass of the entity
 	 * Can be calculated using Box2D
@@ -72,18 +78,6 @@ CrunchJS.Components.Physics = function(params) {
 	 * @type {number}
 	 */
 	this.rotation = rotation.params;
-
-	/**
-	 * Is sleep allowed for the entity?
-	 * @type {Boolean}
-	 */
-	//this.allowSleep = allowSleep.params;
-
-	/**
-	 * Is the entity sleeping?
-	 * @type {Boolean}
-	 */
-	//this.isSleeping = isSleeping.params;
 
 	/**
 	 * Is the entity allowed to rotate?
@@ -100,7 +94,7 @@ CrunchJS.Components.Physics.prototype.getObjectId = function() {
 return this.objectId;
 }
 
-CrunchJS.Components.Physics.prototype.getObjectId = function(objectId) {
+CrunchJS.Components.Physics.prototype.setObjectId = function(objectId) {
 	if(objectId === this.objectId){
 		this.objectId = objectId;
 	}
@@ -130,7 +124,6 @@ CrunchJS.Components.Physics.prototype.getPositionY = function() {
 CrunchJS.Components.Physics.prototype.setPositionX = function(positionX) {
 	if(positionX != this.positionX){
 		this.positionX = positionX;
-		// insert method to call physics system method to set position in Box2D world
 	}
 };
 
@@ -141,9 +134,53 @@ CrunchJS.Components.Physics.prototype.setPositionX = function(positionX) {
 CrunchJS.Components.Physics.prototype.setPositionY = function(positionY) {
 	if(positionY != this.positionY){
 		this.positionY = positionY;
-		// insert method to call physics system method to set position in Box2D world
 	}
 };
+
+
+
+CrunchJS.Components.Physics.prototype.getRadius = function() {
+	return this.radius;
+};
+
+/**
+ * Sets the x-cooridinate
+ * @param {Number} positionX The x-cooridinate
+ */
+CrunchJS.Components.Physics.prototype.setRadius = function(radius) {
+	if(radius != this.radius){
+		this.radius = radius;
+	}
+};
+
+CrunchJS.Components.Physics.prototype.getRecWidth = function() {
+	return this.recWidth;
+};
+
+/**
+ * Sets the x-cooridinate
+ * @param {Number} positionX The x-cooridinate
+ */
+CrunchJS.Components.Physics.prototype.setRecWidth = function(recWidth) {
+	if(recWidth != this.recWidth){
+		this.recWidth = recWidth;
+	}
+};
+
+CrunchJS.Components.Physics.prototype.getRecHeight = function() {
+	return this.recHeight;
+};
+
+/**
+ * Sets the x-cooridinate
+ * @param {Number} positionX The x-cooridinate
+ */
+CrunchJS.Components.Physics.prototype.setRecHeight = function(recHeight) {
+	if(recHeight != this.recHeight){
+		this.recHeight = recHeight;
+	}
+};
+
 
 
 /**
@@ -170,7 +207,6 @@ CrunchJS.Components.Physics.prototype.getVelocityY = function() {
 CrunchJS.Components.Physics.prototype.setVelocityX = function(velocityX) {
 	if(velocityX != this.velocityX){
 		this.velocityX = velocityX;
-		// insert method to call physics system method to set velocity in Box2D world
 	}
 };
 
@@ -181,7 +217,6 @@ CrunchJS.Components.Physics.prototype.setVelocityX = function(velocityX) {
 CrunchJS.Components.Physics.prototype.setVelocityY = function(velocityY) {
 	if(velocityY != this.velocityY){
 		this.velocityY = velocityY;
-		// insert method to call physics system method to set velocity in Box2D world
 	}
 };
 
@@ -211,7 +246,6 @@ CrunchJS.Components.Physics.prototype.getForceY = function() {
 CrunchJS.Components.Physics.prototype.setforceX = function(forceX) {
 	if(forceX != this.forceX){
 		this.forceX = forceX;
-		// insert method to call physics system method to set force in Box2D world
 	}
 };
 
@@ -222,7 +256,6 @@ CrunchJS.Components.Physics.prototype.setforceX = function(forceX) {
 CrunchJS.Components.Physics.prototype.setForceY = function(forceY) {
 	if(forceY != this.forceY){
 		this.forceY = forceY;
-		// insert method to call physics system method to set force in Box2D world
 	}
 };
 
@@ -242,7 +275,6 @@ CrunchJS.Components.Physics.prototype.getMass = function() {
 CrunchJS.Components.Physics.prototype.setMass = function(mass) {
 	if(mass != this.mass){
 		this.mass = mass;
-		// insert method to call physics system method to set mass in Box2D world
 	}
 };
 
@@ -261,30 +293,8 @@ CrunchJS.Components.Rotation.prototype.getRotation = function() {
 CrunchJS.Components.Physics.prototype.setRotation = function(rotation) {
 	if(rotation != this.rotation){
 		this.rotation = rotation;
-		// insert method to call physics system method to set mass in Box2D world
 	}
 };
-
-//Decided these methods were unnecessary
-//at least at this stage of the project
-// /**
-//  * Returns if sleeping is allowed for the component
-//  * @return {Boolean} rotation
-//  */
-// CrunchJS.Components.Rotation.prototype.getAllowSleep = function() {
-// 	return this.allowSleep;
-// };
-
-// *
-//  * Sets whether the component is allowed to sleep
-//  * @param {Boolean} rotation The rotation
- 
-// CrunchJS.Components.Physics.prototype.setAllowSleep = function(allowSleep) {
-// 	if(allowSleep != this.allowSleep){
-// 		this.allowSleep = allowSleep;
-// 		// insert method to call physics system method to set allowSleep in Box2D world
-// 	}
-// };
 
 
 /**
@@ -302,6 +312,5 @@ CrunchJS.Components.Rotation.prototype.getPreventRotation = function() {
 CrunchJS.Components.Physics.prototype.setRotation = function(preventRotation) {
 	if(preventRotation != this.preventRotation){
 		this.preventRotation = preventRotation;
-		// insert method to call physics system method to set preventRotation in Box2D world
 	}
 };

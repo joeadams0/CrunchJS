@@ -206,12 +206,13 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var boxSd = new box2d.BoxDef();
 	boxSd.density = 1.0;
 
-	boxSd.userData = id;
+	//boxSd.userData = id;
 
-	boxSd.extents.Set(width, height);
+	boxSd.extents.Set(ent.getRecWidth(), ent.getRecHeight());
 	var boxBd = new box2d.BodyDef();
 	boxBd.AddShape(boxSd);
-	boxBd.position.Set(xPos,yPos);
+	boxBd.position.Set(ent.getPositionX(),ent.getPositionY());
+	boxBd.userData = ent.getObjectId();
 	world.CreateBody(boxBd)
  };
 
@@ -219,13 +220,13 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (ent, world){
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
-	circleSd.radius = radius;
+	circleSd.radius = ent.getRadius();
 	circleSd.restitution = 1.0;
-	circleSd.friction = 0;
+	circleSd.friction = 1.0;
 	var circleBd = new box2d.BodyDef();
 	circleBd.AddShape(circleSd);
-	circleBd.position.Set(50,50);
-	circleBd.userData = 1;
+	circleBd.position.Set(ent.getPositionX(), ent.getPositionY());
+	circleBd.userData = ent.getObjectId();
 	var circleBody = world.CreateBody(circleBd);
 
 	//Add new physics component representing this circle in box2d world
