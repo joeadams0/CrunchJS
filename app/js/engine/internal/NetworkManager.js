@@ -89,7 +89,7 @@ CrunchJS.Internal.NetworkManager.prototype.everyCommunicationTurn = function() {
 	if (typeof currentEvents !== 'undefined') {
 		for (var i=0;i<currentEvents.length;i++)
 		{ 
-			this.log("Event on current communication turn: " + this.communicationTurn);
+			this.log('Event on current communication turn: ' + this.communicationTurn);
 			this.log(currentEvents[i], CrunchJS.LogLevels.DEBUG);
 			//Fire event to pass data
 			this.fireEventLogic(currentEvents[i]);
@@ -145,7 +145,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 	var peer = null;
 	if(createHost)
 	{
-		peer = new Peer("host", {key: this.apiKey});
+		peer = new Peer('host', {key: this.apiKey});
 	}
 	else
 	{
@@ -167,7 +167,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 CrunchJS.Internal.NetworkManager.prototype.peerOnOpen = function(id) {
 	//record the generated ID
 	this.peerId = id;
-	this.log("PeerJS ID: " + this.peerId, CrunchJS.LogLevels.DEBUG);
+	this.log('PeerJS ID: ' + this.peerId, CrunchJS.LogLevels.DEBUG);
 	this.probeHost();
 };
 
@@ -215,8 +215,6 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		}
 		else if(data['type'] == 'command')
 		{
-			//FIRE EVENTS TO PASS DATA
-			//this.log("Data from " + conn.peer + " received on comm. turn: " + this.communicationTurn, CrunchJS.LogLevels.DEBUG);
 			//Place data in communication turn queue with delay
 			var insertEvent = this.communicationTurn + 2;
 			if (typeof this.communicationEvents[insertEvent] === 'undefined') {
@@ -231,15 +229,15 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			var n = d.getTime();
 			this.pingTimes[otherPeer] = n - this.pingTimes[otherPeer];
 			
-			this.log("Ping RTT: " + otherPeer,CrunchJS.LogLevels.DEBUG);
+			this.log('Ping RTT: ' + otherPeer,CrunchJS.LogLevels.DEBUG);
 			this.log(this.pingTimes[otherPeer], CrunchJS.LogLevels.DEBUG);
 		}
 	}.bind(this));
 };
 
 /**
- * Helper for the logic for a "connect" message
- * @param {Object} data JSON object identified as a "connect" message
+ * Helper for the logic for a 'connect' message
+ * @param {Object} data JSON object identified as a 'connect' message
  */
 CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 {
@@ -276,8 +274,8 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 };
 
 /**
- * Helper for the logic for a "should_connect" message
- * @param {Object} data JSON object identified as a "should_connect" message
+ * Helper for the logic for a 'should_connect' message
+ * @param {Object} data JSON object identified as a 'should_connect' message
  */
 CrunchJS.Internal.NetworkManager.prototype.shouldConnectMessageLogic = function(data)
 {
@@ -302,8 +300,8 @@ CrunchJS.Internal.NetworkManager.prototype.sendMessageToAllPeers = function(mess
 };
 
 /**
- * Returns JSON for a "connect" message
- * @return {Object} JSON object for a "connect" message
+ * Returns JSON for a 'connect' message
+ * @return {Object} JSON object for a 'connect' message
  */
 CrunchJS.Internal.NetworkManager.prototype.createConnectMessage = function()
 {
@@ -311,9 +309,9 @@ CrunchJS.Internal.NetworkManager.prototype.createConnectMessage = function()
 };
 
 /**
- * Returns JSON for a "should_connect" message.
+ * Returns JSON for a 'should_connect' message.
  * @param {string} otherPeerId peer ID to populate the message with
- * @return {Object} JSON object for a "should_connect" message
+ * @return {Object} JSON object for a 'should_connect' message
  */
 CrunchJS.Internal.NetworkManager.prototype.createShouldConnectMessage = function(otherPeerId)
 {
@@ -321,8 +319,8 @@ CrunchJS.Internal.NetworkManager.prototype.createShouldConnectMessage = function
 };
 
 /**
- * Returns JSON for a "ping" message meant for the host.
- * @return {Object} JSON object for a "ping" message
+ * Returns JSON for a 'ping' message meant for the host.
+ * @return {Object} JSON object for a 'ping' message
  */
 CrunchJS.Internal.NetworkManager.prototype.createPingMessage = function()
 {
@@ -341,7 +339,7 @@ CrunchJS.Internal.NetworkManager.prototype.isHost = function(h)
 		h = this.peerId;
 	}
 	
-	if(h == "host")
+	if(h == 'host')
 	{
 		return true;
 	}
@@ -395,9 +393,9 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		//Save the connection.
 		this.connectedPeers.push(pId);
 		this.connections.push(conn);
-		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
+		this.log('PeerJS Connections: ', CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
-		if(this.peerId == "host"){
+		if(this.peerId == 'host'){
 			conn.send({
 				type : 'command',
 				data : {
@@ -411,7 +409,7 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		var position = this.connectedPeers.indexOf(pId);
 		this.connectedPeers.splice(position, 1);
 		this.connections.splice(position, 1);
-		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
+		this.log('PeerJS Connections: ', CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
 };
