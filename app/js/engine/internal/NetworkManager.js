@@ -60,7 +60,13 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * Communication events hash table
 	 * @type {Object.<number, Object>}
 	 */
-	 this.communicationEvents = {}
+	 this.communicationEvents = {};
+	 
+	 /**
+	  * This hash contains starting times for pings and then ping times after they are calculated
+	  * @type {Object.<string, number>}
+	  */
+	 this.pingTimes = {};
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -218,6 +224,16 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			}
 			this.communicationEvents[insertEvent].push(data['data']);
 		}
+		else if(data['type'] == 'ping')
+		{
+			var otherPeer = data['data'];
+			var d = new Date();
+			var n = d.getTime();
+			this.pingTimes[otherPeer] = n - this.pingTimes[otherPeer];
+			
+			this.log("Ping RTT: " + otherPeer,CrunchJS.LogLevels.DEBUG);
+			this.log(this.pingTimes[otherPeer], CrunchJS.LogLevels.DEBUG);
+		}
 	}.bind(this));
 };
 
@@ -230,7 +246,7 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 	var otherPeer = data['data'];
 			
 	//If I am the host, I should tell everybody to connect to this person
-	if(this.peerId == 'host')
+	if(this.isHost())
 	{
 		var message = this.createShouldConnectMessage(otherPeer);
 		this.sendMessageToAllPeers(message);
@@ -240,6 +256,22 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 	if(this.connectedPeers.indexOf(otherPeer) == -1)
 	{
 		this.connect(otherPeer);
+		
+		//If I am the host, I should measure ping to this person
+		if(this.isHost())
+		{
+			var d = new Date();
+			var n = d.getTime();
+			this.pingTimes[otherPeer] = n;
+			this.log(n, CrunchJS.LogLevels.DEBUG);
+		}
+	}
+	
+	//If the host is connecting to me, ping him back
+	if(this.isHost(otherPeer))
+	{
+		var pos = this.connectedPeers.indexOf(otherPeer);
+		this.connections[pos].send(this.createPingMessage());
 	}
 };
 
@@ -287,14 +319,29 @@ CrunchJS.Internal.NetworkManager.prototype.createShouldConnectMessage = function
 {
 	return {'type': 'should_connect', 'data': otherPeerId};
 };
+
+/**
+ * Returns JSON for a "ping" message meant for the host.
+ * @return {Object} JSON object for a "ping" message
+ */
+CrunchJS.Internal.NetworkManager.prototype.createPingMessage = function()
+{
+	return {'type': 'ping', 'data': this.peerId};
+};
  
 /**
  * Checks the peer ID to see if this is the host
+ * @param {string|undefined} Optional parameter for checking a peer ID of a different peer
  * @return {boolean} Whether this is the host or not
  */
-CrunchJS.Internal.NetworkManager.prototype.isHost = function()
+CrunchJS.Internal.NetworkManager.prototype.isHost = function(h)
 {
-	if(this.peerId == "host")
+	if(typeof(h) === 'undefined')
+	{
+		h = this.peerId;
+	}
+	
+	if(h == "host")
 	{
 		return true;
 	}
