@@ -38,42 +38,42 @@ CrunchJS.Systems.PhysicsSystem.prototype.activate = function() {
 	goog.base(this, 'activate');
 	this.physComp = this.getScene().createEntityComposition().all('PhysicsComponent');	
 	this.setEntityComposition(this.getScene().createEntityComposition().one('Transform', 'Body', 'Physics'));//.exclude('ExampleComp')
-	var box2dWorld = this.init();
+	this.box2dWorld = this.init();
 };
 
 CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 	goog.structs.forEach(this.phys, function(physId) {
-		var physComp = this.getScene().getComponent(physID, 'PhysicsComponent');
+		var physComp = this.getScene().getComponent(this.physID, 'PhysicsComponent');
 
 		goog.structs.forEach(this.getActiveEntities(), function(ent) {
 				
 		//if physics component has a corresponding body in box2d
-
-		if (checkEntExistsInPhys(ent, box2dWorld)){
+		if (this.checkEntExistsInPhys(ent, this.box2dWorld) == true){
 			//update box2d objects to match component's values
-			physComp.updateBox2dBody(ent);
+			physComp.updateBox2dBody(ent, this.box2dWorld);
 		}
 		else{
 			//else create a body in box2d to match new physics component
-			box2dWorld.addRectangle(ent);
+			if (ent.getRadius == 0)
+				this.addRectangle(ent, this.box2dWorld);
+			if (ent.getRadius > 0)
+				this.addCircle(ent, this.box2dWorld)
 		}
 		}, this);
 
 	}, this);
 
 	//step physics world
-	this.update(box2dWorld);
+	this.update(this.box2dWorld);
 
 	//update physics component with updated values from box2d
 	goog.structs.forEach(this.phys, function(physId) {
-		var physComp = this.getScene().getComponent(physID, 'PhysicsComponent');
-
+		var physComp = this.getScene().getComponent(this.physID, 'PhysicsComponent');
 		goog.structs.forEach(this.getActiveEntities(), function(ent) {
-				
+	
 		//if physics component has different value then corresponding box2d body
-
 		//update physics component to match box2d's values
-		var updatePhys = physComp.updatePhysComponent(ent);
+		var updatePhys = physComp.updatePhysComponent(ent, this.box2dWorld);
 		if (updatePhys == false){
 			CrunchJS.world.log('error in calling updatePhysComponent() on ', CrunchJS.LogLevels.DEBUG);
 			CrunchJS.world.log(ent, CrunchJS.LogLevels.DEBUG);
@@ -85,35 +85,45 @@ CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 
 //helper method for process function
 //updates box2d objects to match component's values
-CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent) {
-
-}
-
-//helper method for process function
-//update physics component with updated values from box2d
-CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, world) {
-
-var node = world.GetBodyList();
-	//CrunchJS.world.log(world, CrunchJS.LogLevels.DEBUG);
-	//CrunchJS.world.log(node, CrunchJS.LogLevels.DEBUG);
-	//var listCollisions = this.collisionCollect(node);
-
+CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent, world) {
+	var node = world.GetBodyList();
 	while (node){
 		var b = node;
 		node = node.GetNext();
-		
 		var shape = b.GetShapeList();
 		while (shape){ 
 			var shape1 = shape;
 			shape = shape.GetNext();
 			if (shape1 != null){
+				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
+				if (b.GetUserData() === ent.getObjectId){
+					shape1.setPositionX(ent.getPositionX());
+					shape1.setPositionY(ent.getPositionY());
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+};
 
-					//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
-					if (b.GetUserData() === ent.getObjectId){
+//helper method for process function
+//update physics component with updated values from box2d
+CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, world) {
+	var node = world.GetBodyList();
+	while (node){
+		var b = node;
+		node = node.GetNext();
+		var shape = b.GetShapeList();
+		while (shape){ 
+			var shape1 = shape;
+			shape = shape.GetNext();
+			if (shape1 != null){
+				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
+				if (b.GetUserData() === ent.getObjectId){
 					ent.setPositionX(shape1.GetPosition().x);
 					ent.setPositionY(shape1.GetPosition().y);
 					return true;
-					}
 				}
 			}
 		}
@@ -127,24 +137,12 @@ CrunchJS.Systems.PhysicsSystem.prototype.checkEntExistsInPhys = function(ent, wo
 	while (node){
 		var b = node;
 		node = node.GetNext();
-		
-		var shape = b.GetShapeList();
-		while (shape){ 
-			var shape1 = shape;
-			shape = shape.GetNext();
-			if (shape1 != null){
-
-				var shapeType = shape1.GetType();
-				if (node.GetUserData() === ent.objectId){
-						returnBool = true;
-				}
-					//This gets the x and y cooridiniate of each circle object in the world
-					//var position = shape1.GetPosition();	
-			}
+		if (b.GetUserData() === ent.objectId){
+			returnBool = true;
 		}
 	}
 	return returnBool;
-}
+};
 
 /**
  * Initializes world and objects.
@@ -159,13 +157,6 @@ CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
 	var world = new box2d.World(worldAABB, gravity, doSleep);
 	this.addCircle(5, world);	
 	return world;
-
-	//This will be called from the scene not from the init() function
-	/**
-	 * Calls update() method repeatedly at the rate indiciated by the int passed into the method
-	 * @type {int}
-	 */
-	//window.setInterval(update(world), (1000/50));
 };
 
 

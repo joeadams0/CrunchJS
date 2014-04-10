@@ -19,71 +19,71 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.Physics = function(params) {
-
+	goog.base(this, params);
 	
 
-	this.objectId = objectId.params; 
+	this.objectId = params.objectId; 
 	/**
 	 * Position of the entity in x direction
 	 * @type {int}
 	 */
-	this.positionX = positionX.params;
+	this.positionX = params.positionX;
 
 	/**
 	 * Position of the entity in y direction
 	 * @type {int}
 	 */
-	this.positionY = positionY.params;
+	this.positionY = params.positionY;
 	
 
 	/**
 	 * The velocity of the entity x
 	 * @type {Object}
 	 */
-	this.velocityX = velocityX.params;
+	this.velocityX = params.velocityX;
 
 	/**
 	 * The Velocity of the entity in the y
 	 * @type {Object}
 	 */
-	this.velocityY = velocityY.params;
+	this.velocityY = params.velocityY;
 
 	/**
 	 * The force on the entity x
 	 * @type {Object}
 	 */
-	this.forceX = forceX.params;
+	this.forceX = params.forceX;
 
 	/**
 	 * The force on the entity y
 	 * @type {Object}
 	 */
-	this.forceY = forceY.params;
+	this.forceY = params.forceY;
 
 
-	this.radius = radius.params;
+	this.radius = params.radius;
 
-	this.recWidth = recWidth.params;
+	this.recWidth = params.recWidth;
 
-	this.recHeight = recHeight.params;
+	this.recHeight = params.recHeight;
 	/**
 	 * Mass of the entity
 	 * Can be calculated using Box2D
 	 * @type {number}
 	 */
-	this.mass = mass.params;
+	this.mass = params.mass;
 
 	/**
 	 * Rotation of the entity
 	 * @type {number}
 	 */
-	this.rotation = rotation.params;
+	this.rotation = params.rotation;
 
 	/**
 	 * Is the entity allowed to rotate?
 	 * @type {Boolean}
 	 */
-	this.preventRotation = preventRotation.params;
+	this.preventRotation = params.preventRotation;
 };
 
 goog.inherits(CrunchJS.Components.Physics, CrunchJS.Component);
@@ -282,7 +282,7 @@ CrunchJS.Components.Physics.prototype.setMass = function(mass) {
  * Gets the rotation of component
  * @return {Number} rotation
  */
-CrunchJS.Components.Rotation.prototype.getRotation = function() {
+CrunchJS.Components.Physics.prototype.getRotation = function() {
 	return this.rotation;
 };
 
@@ -301,7 +301,7 @@ CrunchJS.Components.Physics.prototype.setRotation = function(rotation) {
  * Gets if the component is allowed to rotate
  * @return {Boolean} preventRotation
  */
-CrunchJS.Components.Rotation.prototype.getPreventRotation = function() {
+CrunchJS.Components.Physics.prototype.getPreventRotation = function() {
 	return this.preventRotation;
 };
 
