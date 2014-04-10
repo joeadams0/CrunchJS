@@ -218,7 +218,7 @@ CrunchJS.Components.OccupancyGrid.prototype.setTile = function(x, y, id, layer) 
 	}
 };
 
-CrunchJS.Components.OccupancyGrid.prototype.unsetTile = function(x, y, id) {
+CrunchJS.Components.OccupancyGrid.prototype.unsetTile = function(x, y, id) {	
 	this.getTile(x, y).entities.remove(id);
 	this.refreshTile(x, y);
 

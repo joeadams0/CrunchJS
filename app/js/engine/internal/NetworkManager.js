@@ -18,7 +18,7 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * API key for PeerJS-Server
 	 * @type {string}
 	 */
-	this.apiKey = 'x41mtbnpaagzxgvi';
+	this.apiKey = 'nhc2blm0184zpvi';
 	
 	/**
 	 * The string ID of this peer

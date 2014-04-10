@@ -4,6 +4,7 @@
 goog.provide('CloseContact.Core');
 goog.provide('CloseContact.Scenes');
 goog.provide('CloseContact.Components');
+goog.provide('CloseContact.Systems');
 
 goog.require('CrunchJS');
 goog.require('CloseContact.Scenes.MainMenuScene');
