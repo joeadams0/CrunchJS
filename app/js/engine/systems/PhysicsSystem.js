@@ -36,56 +36,50 @@ CrunchJS.Systems.PhysicsSystem.prototype.name = 'PhysicsSystem';
 
 CrunchJS.Systems.PhysicsSystem.prototype.activate = function() {
 	goog.base(this, 'activate');
-	this.physComp = this.getScene().createEntityComposition().all('PhysicsComponent');	
-	this.setEntityComposition(this.getScene().createEntityComposition().one('Transform', 'Body', 'Physics'));//.exclude('ExampleComp')
+	this.setEntityComposition(this.getScene().createEntityComposition().all('Transform', 'Body', 'Physics'));//.exclude('ExampleComp')
 	this.box2dWorld = this.init();
 };
 
 CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
-	goog.structs.forEach(this.phys, function(physId) {
-		var physComp = this.getScene().getComponent(this.physID, 'PhysicsComponent');
+	goog.structs.forEach(this.getActiveEntities(), function(ent) {
+		
+		var phys = this.getScene().getComponent(ent, 'Physics');
 
-		goog.structs.forEach(this.getActiveEntities(), function(ent) {
-				
 		//if physics component has a corresponding body in box2d
-		if (this.checkEntExistsInPhys(ent, this.box2dWorld) == true){
+		if (this.checkEntExistsInPhys(phys, this.box2dWorld) == true){
 			//update box2d objects to match component's values
-			physComp.updateBox2dBody(ent, this.box2dWorld);
+			this.updateBox2dBody(phys, this.box2dWorld);
 		}
 		else{
 			//else create a body in box2d to match new physics component
-			if (ent.getRadius == 0)
-				this.addRectangle(ent, this.box2dWorld);
-			if (ent.getRadius > 0)
-				this.addCircle(ent, this.box2dWorld)
+			if (phys.getRadius == 0)
+				this.addRectangle(phys, this.box2dWorld);
+			if (phys.getRadius > 0)
+				this.addCircle(phys, this.box2dWorld)
 		}
-		}, this);
-
 	}, this);
+
 
 	//step physics world
 	this.update(this.box2dWorld);
 
-	//update physics component with updated values from box2d
-	goog.structs.forEach(this.phys, function(physId) {
-		var physComp = this.getScene().getComponent(this.physID, 'PhysicsComponent');
-		goog.structs.forEach(this.getActiveEntities(), function(ent) {
-	
+	goog.structs.forEach(this.getActiveEntities(), function(ent) {
+
 		//if physics component has different value then corresponding box2d body
 		//update physics component to match box2d's values
-		var updatePhys = physComp.updatePhysComponent(ent, this.box2dWorld);
+		var phys = this.getScene().getComponent(ent, 'Physics'),
+			updatePhys = this.updatePhysComponent(phys, this.box2dWorld);
+
 		if (updatePhys == false){
 			CrunchJS.world.log('error in calling updatePhysComponent() on ', CrunchJS.LogLevels.DEBUG);
 			CrunchJS.world.log(ent, CrunchJS.LogLevels.DEBUG);
 		}
-		}, this);
-
 	}, this);
 }
 
 //helper method for process function
 //updates box2d objects to match component's values
-CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent, world) {
+CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(phys, world) {
 	var node = world.GetBodyList();
 	while (node){
 		var b = node;
@@ -96,9 +90,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent, world) 
 			shape = shape.GetNext();
 			if (shape1 != null){
 				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
-				if (b.GetUserData() === ent.getObjectId){
-					shape1.setPositionX(ent.getPositionX());
-					shape1.setPositionY(ent.getPositionY());
+				if (b.GetUserData() === phys.getObjectId){
+					shape1.setPositionX(phys.getPositionX());
+					shape1.setPositionY(phys.getPositionY());
 					return true;
 				}
 			}
@@ -109,8 +103,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(ent, world) 
 
 //helper method for process function
 //update physics component with updated values from box2d
-CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, world) {
-	var node = world.GetBodyList();
+CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(phys, world) {
+	var node = world.GetBodyList(),
+		trans = this.getScene().getComponent(phys.entityId, 'Transform');
 	while (node){
 		var b = node;
 		node = node.GetNext();
@@ -120,9 +115,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, wor
 			shape = shape.GetNext();
 			if (shape1 != null){
 				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
-				if (b.GetUserData() === ent.getObjectId){
-					ent.setPositionX(shape1.GetPosition().x);
-					ent.setPositionY(shape1.GetPosition().y);
+				if (b.GetUserData() === phys.getObjectId){
+					trans.setX(shape1.GetPosition().x);
+					trans.setY(shape1.GetPosition().y);
 					return true;
 				}
 			}
@@ -131,13 +126,13 @@ CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, wor
 	return false;
 };
 
-CrunchJS.Systems.PhysicsSystem.prototype.checkEntExistsInPhys = function(ent, world){
+CrunchJS.Systems.PhysicsSystem.prototype.checkEntExistsInPhys = function(phys, world){
 	var returnBool = false;
 	var node = world.GetBodyList();
 	while (node){
 		var b = node;
 		node = node.GetNext();
-		if (b.GetUserData() === ent.objectId){
+		if (b.GetUserData() === phys.objectId){
 			returnBool = true;
 		}
 	}
@@ -155,7 +150,6 @@ CrunchJS.Systems.PhysicsSystem.prototype.init = function (){
 	var gravity = new box2d.Vec2(0, 0);
 	var doSleep = true;
 	var world = new box2d.World(worldAABB, gravity, doSleep);
-	this.addCircle(5, world);	
 	return world;
 };
 
@@ -180,7 +174,7 @@ CrunchJS.Systems.PhysicsSystem.prototype.collisionCollect = function (b){
 CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var timeStep = 1.0/60;
 	var iteration = 1;
-	world.Step(timeStep, iteration);
+	this.box2dWorld.Step(timeStep, iteration);
 };
 //TO DO: Have to adjust how vertexes are added to Box2D world
 /**
@@ -190,7 +184,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
  * @param {int} canvaswidth
  * @param {int} canvasheight
  */
- CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (ent, world){
+ CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (phys, world){
+ 	var trans = this.getScene().getComponent(phys.entityId, 'Transform');
+
  	//create rectangle
 
 	var boxSd = new box2d.BoxDef();
@@ -198,27 +194,29 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 
 	//boxSd.userData = id;
 
-	boxSd.extents.Set(ent.getRecWidth(), ent.getRecHeight());
+	boxSd.extents.Set(phys.getRecWidth(), phys.getRecHeight());
 	var boxBd = new box2d.BodyDef();
 	boxBd.AddShape(boxSd);
-	boxBd.position.Set(ent.getPositionX(),ent.getPositionY());
-	boxBd.userData = ent.getObjectId();
+	boxBd.position.Set(trans.getX(),trans.getY());
+	boxBd.userData = phys.getObjectId();
 
 	//Add new physics component representing this rectangle in box2d world
 	world.CreateBody(boxBd)
  };
 
 
-CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (ent, world){
+CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (phys, world){
+ 	var trans = this.getScene().getComponent(phys.entityId, 'Transform');
+
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
-	circleSd.radius = ent.getRadius();
+	circleSd.radius = phys.getRadius();
 	circleSd.restitution = 1.0;
 	circleSd.friction = 1.0;
 	var circleBd = new box2d.BodyDef();
 	circleBd.AddShape(circleSd);
-	circleBd.position.Set(ent.getPositionX(), ent.getPositionY());
-	circleBd.userData = ent.getObjectId();
+	circleBd.position.Set(trans.getX(), trans.getY());
+	circleBd.userData = phys.getObjectId();
 	
 	//Add new physics component representing this circle in box2d world
 	var circleBody = world.CreateBody(circleBd);

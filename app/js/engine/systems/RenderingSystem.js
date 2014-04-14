@@ -9,6 +9,8 @@ goog.require('CrunchJS.System');
 goog.require('CrunchJS.Components.Viewport');
 
 goog.require('goog.object');
+goog.require('goog.array');
+goog.require('goog.structs')
 
 /**
  * Creates the Rendering System. If you're making a game, you probably need one of these.
@@ -46,7 +48,7 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
       canvasData[key] = el;
   });
 
-  if(!canvasData.entityId)
+  if(!canvasData.entityId && this.getScene())
     canvasData.entityId = this.getScene().createEntity();
 
   /**
@@ -105,6 +107,8 @@ goog.inherits(CrunchJS.Systems.RenderingSystem, CrunchJS.System);
 CrunchJS.Systems.RenderingSystem.prototype.name = 'RenderingSystem';
 
 /**
+ * 
+ *
   responsible for defining what entites go in the system.
   also handles the viewport magic
 */
@@ -564,17 +568,26 @@ CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
     }
     // zero if 'first' equals 'last'
     if (transf1 != null && transf2 != null && transf1.getLayer() == transf2.getLayer()){
-      return 0;
+      return 1;
     }
     // positive if 'first' is greater than 'last'
     return 1;
   };
 
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
-    goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn);
+    console.log('Inserted: ', goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn));
 		//this.getActiveEntities().add(entityId);
 	} else{
     goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn);
 		//var success = this.getActiveEntities().remove(entityId);
 	}
+};
+
+CrunchJS.Systems.RenderingSystem.prototype.refreshData = function() {
+
+  var activeEntities = this.getScene().findEntities(this._entityComposition);
+
+  goog.structs.forEach(activeEntities, function(entityId) {
+    this.checkEntity(entityId);
+  }, this);
 };

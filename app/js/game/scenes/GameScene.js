@@ -78,6 +78,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
 		CrunchJS.Components.Viewport,
+		CrunchJS.Components.Physics,
 		CloseContact.Components.Actor,
 		CloseContact.Components.Tower,
 		CloseContact.Components.Attack,
@@ -355,7 +356,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			entityId : 1
 		});
 
+		console.log(sys);
 		this.addSystem(sys);
+		console.log(sys);
 
 
 		var self = this;

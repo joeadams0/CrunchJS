@@ -23,18 +23,6 @@ CrunchJS.Components.Physics = function(params) {
 	
 
 	this.objectId = params.objectId; 
-	/**
-	 * Position of the entity in x direction
-	 * @type {int}
-	 */
-	this.positionX = params.positionX;
-
-	/**
-	 * Position of the entity in y direction
-	 * @type {int}
-	 */
-	this.positionY = params.positionY;
-	
 
 	/**
 	 * The velocity of the entity x
@@ -84,6 +72,8 @@ CrunchJS.Components.Physics = function(params) {
 	 * @type {Boolean}
 	 */
 	this.preventRotation = params.preventRotation;
+
+	this.updates = {};
 };
 
 goog.inherits(CrunchJS.Components.Physics, CrunchJS.Component);
@@ -97,47 +87,10 @@ return this.objectId;
 CrunchJS.Components.Physics.prototype.setObjectId = function(objectId) {
 	if(objectId === this.objectId){
 		this.objectId = objectId;
+		this.updates.objectId = true;
+		this.hasBeenUpdated();
 	}
 }
-
-/**
- * Gets x-cooridinate of component
- * @return {Number} x-cooridinate
- */
-CrunchJS.Components.Physics.prototype.getPositionX = function() {
-	return this.positionX;
-};
-
-
-/**
- * Gets the y-cooridinate of component
- * @return {Number} y-cooridinate
- */
-CrunchJS.Components.Physics.prototype.getPositionY = function() {
-	return this.positionY;
-};
-
-/**
- * Sets the x-cooridinate
- * @param {Number} positionX The x-cooridinate
- */
-CrunchJS.Components.Physics.prototype.setPositionX = function(positionX) {
-	if(positionX != this.positionX){
-		this.positionX = positionX;
-	}
-};
-
-/**
- * Sets the y-cooridinate
- * @param {Number} positionY The y-cooridinate
- */
-CrunchJS.Components.Physics.prototype.setPositionY = function(positionY) {
-	if(positionY != this.positionY){
-		this.positionY = positionY;
-	}
-};
-
-
 
 CrunchJS.Components.Physics.prototype.getRadius = function() {
 	return this.radius;
@@ -150,6 +103,8 @@ CrunchJS.Components.Physics.prototype.getRadius = function() {
 CrunchJS.Components.Physics.prototype.setRadius = function(radius) {
 	if(radius != this.radius){
 		this.radius = radius;
+		this.updates.radius = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -164,6 +119,8 @@ CrunchJS.Components.Physics.prototype.getRecWidth = function() {
 CrunchJS.Components.Physics.prototype.setRecWidth = function(recWidth) {
 	if(recWidth != this.recWidth){
 		this.recWidth = recWidth;
+		this.updates.recWidth = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -178,6 +135,8 @@ CrunchJS.Components.Physics.prototype.getRecHeight = function() {
 CrunchJS.Components.Physics.prototype.setRecHeight = function(recHeight) {
 	if(recHeight != this.recHeight){
 		this.recHeight = recHeight;
+		this.updates.recHeight = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -207,6 +166,8 @@ CrunchJS.Components.Physics.prototype.getVelocityY = function() {
 CrunchJS.Components.Physics.prototype.setVelocityX = function(velocityX) {
 	if(velocityX != this.velocityX){
 		this.velocityX = velocityX;
+		this.updates.velocityX = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -217,6 +178,8 @@ CrunchJS.Components.Physics.prototype.setVelocityX = function(velocityX) {
 CrunchJS.Components.Physics.prototype.setVelocityY = function(velocityY) {
 	if(velocityY != this.velocityY){
 		this.velocityY = velocityY;
+		this.updates.velocityY = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -246,6 +209,8 @@ CrunchJS.Components.Physics.prototype.getForceY = function() {
 CrunchJS.Components.Physics.prototype.setforceX = function(forceX) {
 	if(forceX != this.forceX){
 		this.forceX = forceX;
+		this.updates.forceX = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -256,6 +221,8 @@ CrunchJS.Components.Physics.prototype.setforceX = function(forceX) {
 CrunchJS.Components.Physics.prototype.setForceY = function(forceY) {
 	if(forceY != this.forceY){
 		this.forceY = forceY;
+		this.updates.forceY = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -275,6 +242,8 @@ CrunchJS.Components.Physics.prototype.getMass = function() {
 CrunchJS.Components.Physics.prototype.setMass = function(mass) {
 	if(mass != this.mass){
 		this.mass = mass;
+		this.updates.mass = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -293,6 +262,8 @@ CrunchJS.Components.Physics.prototype.getRotation = function() {
 CrunchJS.Components.Physics.prototype.setRotation = function(rotation) {
 	if(rotation != this.rotation){
 		this.rotation = rotation;
+		this.updates.rotation = true;
+		this.hasBeenUpdated();
 	}
 };
 
@@ -309,8 +280,21 @@ CrunchJS.Components.Physics.prototype.getPreventRotation = function() {
  * Sets whether the component can rotate
  * @param {Boolean} preventRotation The rotation
  */
-CrunchJS.Components.Physics.prototype.setRotation = function(preventRotation) {
+CrunchJS.Components.Physics.prototype.setPreventRotation = function(preventRotation) {
 	if(preventRotation != this.preventRotation){
 		this.preventRotation = preventRotation;
+		this.updates.preventRotation = true;
+		this.hasBeenUpdated();
 	}
+};
+
+CrunchJS.Components.Physics.prototype.getUpdates = function() {
+	var obj = {};
+
+	goog.object.forEach(this.updates, function(updated, key) {
+		if(updated)
+			obj[key] = this[key];
+	}, this);
+
+	return obj;
 };
