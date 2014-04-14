@@ -572,12 +572,27 @@ CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
     // positive if 'first' is greater than 'last'
     return 1;
   };
+  // same function as above, but with zero for equals, in order to make binaryRemove work
+  var compareFn2 = function(first, last){
+    var transf1 = me.getScene().getComponent(first, 'Transform');   // the transform component for first
+    var transf2 = me.getScene().getComponent(last, 'Transform');    // the transform component for last
+    // negative if 'first' is less than 'last'
+    if(transf1 != null && transf2 != null && transf1.getLayer() > transf2.getLayer()){
+      return -1;
+    }
+    // zero if 'first' equals 'last'
+    if (transf1 != null && transf2 != null && transf1.getLayer() == transf2.getLayer()){
+      return 0;
+    }
+    // positive if 'first' is greater than 'last'
+    return 1;
+  };
 
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
     goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn);
 		//this.getActiveEntities().add(entityId);
 	} else{
-    goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn);
+    goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn2);
 		//var success = this.getActiveEntities().remove(entityId);
 	}
 };
