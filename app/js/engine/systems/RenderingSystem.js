@@ -516,8 +516,7 @@ CrunchJS.Systems.RenderingSystem.prototype.onResize = function() {
     }
 };
 
-CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {   
-  console.log("STAGE WAS CLICKED", data); 
+CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {     
   this.getScene().fireEvent('click', data);
 };
 
@@ -575,7 +574,7 @@ CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
   };
 
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
-    console.log('Inserted: ', goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn));
+    goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn);
 		//this.getActiveEntities().add(entityId);
 	} else{
     goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn);

@@ -18,6 +18,7 @@ goog.require('CloseContact.Systems.TowerSystem');
 goog.require('CloseContact.Systems.AttackSystem');
 goog.require('CloseContact.Systems.ActorSystem');
 goog.require('CloseContact.Systems.PlayerSystem');
+goog.require('CloseContact.Systems.PhysicsPathMovementSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -96,11 +97,12 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		
 		var occSys = new CrunchJS.Systems.OccupancyGridSystem(),
 			pathSys = new CrunchJS.Systems.PathfindingSystem(),
-			pathMoveSys = new CrunchJS.Systems.PathMovementSystem(),
+			pathMoveSys = new CloseContact.Systems.PhysicsPathMovementSystem(),
 			towerSystem = new CloseContact.Systems.TowerSystem(),
 			attackSystem = new CloseContact.Systems.AttackSystem(),
 			actorSystem = new CloseContact.Systems.ActorSystem(),
-			playerSystem = new CloseContact.Systems.PlayerSystem();
+			playerSystem = new CloseContact.Systems.PlayerSystem(),
+			physSys = new CrunchJS.Systems.PhysicsSystem({});
 
 
 
@@ -111,10 +113,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(attackSystem);
 		this.addSystem(actorSystem);
 		this.addSystem(playerSystem);
-
-
-		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
-		var physSys = new CrunchJS.Systems.PhysicsSystem({});
 		this.addSystem(physSys);
 		
 	}
@@ -356,9 +354,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			entityId : 1
 		});
 
-		console.log(sys);
 		this.addSystem(sys);
-		console.log(sys);
 
 
 		var self = this;
@@ -511,11 +507,16 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 
 	    new CloseContact.Components.Actor({
 	    	team : team,
-	    	health : 100
+	    	health : 100,
+	    	movementSpeed : 20
 	    }),
 
 	    new CloseContact.Components.Player({
 	    	pId : pId
+	    }),
+
+	    new CrunchJS.Components.Physics({
+	    	objectId : player
 	    })
 	);
 

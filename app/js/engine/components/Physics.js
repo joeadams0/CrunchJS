@@ -6,6 +6,8 @@ goog.provide('CrunchJS.Components.Physics');
 
 goog.require('CrunchJS.Component');
 
+goog.require('goog.object');
+
 /**
  * [Physics description]
  * @param {Object}  positionX        Position of the entity
@@ -21,7 +23,28 @@ goog.require('CrunchJS.Component');
 CrunchJS.Components.Physics = function(params) {
 	goog.base(this, params);
 	
+	var defaults = {
+		velocityX : 0,
+		velocityY : 0,
+		forceX : 0,
+		forceY : 0,
+		radius : 0,
+		recWidth : 5,
+		recHeight : 5,
+		mass : 1,
+		rotation : 0,
+		preventRotation : true
 
+	}
+
+
+	if(!params)
+		params = {};
+
+	goog.object.forEach(defaults, function(val, key) {
+		if(!params[key])
+			params[key] = val;
+	});
 	this.objectId = params.objectId; 
 
 	/**

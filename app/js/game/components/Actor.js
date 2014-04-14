@@ -21,7 +21,7 @@ CloseContact.Components.Actor = function(params) {
 		maxHealth : 100,
 		attackDmg : 10,
 		armor : 0,
-		movementSpeed : 1,
+		movementSpeed : 0,
 		attackSpeed : 1,
 		attackRange : 50,
 		team : 0

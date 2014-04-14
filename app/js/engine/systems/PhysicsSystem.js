@@ -52,9 +52,9 @@ CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 		}
 		else{
 			//else create a body in box2d to match new physics component
-			if (phys.getRadius == 0)
+			if (phys.getRadius() == 0)
 				this.addRectangle(phys, this.box2dWorld);
-			if (phys.getRadius > 0)
+			if (phys.getRadius() > 0)
 				this.addCircle(phys, this.box2dWorld)
 		}
 	}, this);
@@ -80,23 +80,15 @@ CrunchJS.Systems.PhysicsSystem.prototype.process = function(frame) {
 //helper method for process function
 //updates box2d objects to match component's values
 CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(phys, world) {
-	var node = world.GetBodyList();
+	var node = world.GetBodyList(),
+		trans = this.getScene().getComponent(phys.entityId, 'Transform');;
 	while (node){
-		var b = node;
-		node = node.GetNext();
-		var shape = b.GetShapeList();
-		while (shape){ 
-			var shape1 = shape;
-			shape = shape.GetNext();
-			if (shape1 != null){
-				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
-				if (b.GetUserData() === phys.getObjectId){
-					shape1.setPositionX(phys.getPositionX());
-					shape1.setPositionY(phys.getPositionY());
-					return true;
-				}
-			}
+		if(node.GetUserData() === phys.objectId){
+			node.m_position.Set(trans.getX(),trans.getY());
+			node.SetLinearVelocity(new box2d.Vec2(phys.getVelocityX(), phys.getVelocityY()));
+			return true;
 		}
+		node = node.GetNext();
 	}
 	return false;
 };
@@ -104,24 +96,17 @@ CrunchJS.Systems.PhysicsSystem.prototype.updateBox2dBody = function(phys, world)
 //helper method for process function
 //update physics component with updated values from box2d
 CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(phys, world) {
-	var node = world.GetBodyList(),
+	var node = world.m_bodyList,
 		trans = this.getScene().getComponent(phys.entityId, 'Transform');
 	while (node){
-		var b = node;
-		node = node.GetNext();
-		var shape = b.GetShapeList();
-		while (shape){ 
-			var shape1 = shape;
-			shape = shape.GetNext();
-			if (shape1 != null){
-				//This sets the component's x-coorid and y-coorid to be equal to the values in box2d'w world
-				if (b.GetUserData() === phys.getObjectId){
-					trans.setX(shape1.GetPosition().x);
-					trans.setY(shape1.GetPosition().y);
-					return true;
-				}
-			}
+		if(node.GetUserData() === phys.objectId){
+			trans.setX(node.m_position.x);
+			trans.setY(node.m_position.y);
+			phys.setVelocityX(node.m_linearVelocity.x);
+			phys.setVelocityY(node.m_linearVelocity.y);
+			return true;
 		}
+		node = node.GetNext();
 	}
 	return false;
 };
@@ -198,7 +183,12 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var boxBd = new box2d.BodyDef();
 	boxBd.AddShape(boxSd);
 	boxBd.position.Set(trans.getX(),trans.getY());
+	boxBd.rotation = phys.getRotation();
+	boxBd.linearVelocity = new box2d.Vec2(phys.getVelocityX(), phys.getVelocityY());
+	boxBd.preventRotation = phys.getPreventRotation();
 	boxBd.userData = phys.getObjectId();
+	boxBd.allowSleep = false;
+
 
 	//Add new physics component representing this rectangle in box2d world
 	world.CreateBody(boxBd)
