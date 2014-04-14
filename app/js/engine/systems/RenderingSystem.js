@@ -19,6 +19,8 @@ goog.require('goog.object');
 CrunchJS.Systems.RenderingSystem = function(canvasData){
   goog.base(this);
 
+  this._activeEntities = [];
+
   var self = this;
 
   if(!canvasData){
@@ -119,10 +121,12 @@ CrunchJS.Systems.RenderingSystem.prototype.activate = function() {
 };
 
 CrunchJS.Systems.RenderingSystem.prototype.process = function(f){
-  goog.base(this, 'process');
+  var me = this;                    // explicit reference
+  goog.array.forEach(this.getActiveEntities(), function(e,i,a){
+    me.processEntity(f, e);
+  });
   
   // the code that actually tries to re-draw to the Canvas
-  var me = this;                    // explicit reference
   window['requestAnimFrame']( function(){     // this is from JavaScript and prevents exceeding framerate
     me.renderer.render(me.stage);   // PIXI call to render the stage
   });
@@ -333,7 +337,7 @@ CrunchJS.Systems.RenderingSystem.prototype.updateSprite = function(sprite, scree
 
   // translate the in-game object Size (Body or RenderImage) to the onscreen object size
   sprite.width  = screenSize.width;
-  sprite.height =  screenSize.height
+  sprite.height =  screenSize.height;
 
   return sprite;
 };
@@ -546,4 +550,31 @@ CrunchJS.Systems.RenderingSystem.prototype.entityDisabled = function(eId) {
     this.stage.removeChild(this.sprites[eId]);
   }
   this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
+};
+
+CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
+  var me = this;
+  // the function which sorts the entites by layer in the Transform
+  var compareFn = function(first, last){
+    var transf1 = me.getScene().getComponent(first, 'Transform');   // the transform component for first
+    var transf2 = me.getScene().getComponent(last, 'Transform');    // the transform component for last
+    // negative if 'first' is less than 'last'
+    if(transf1 != null && transf2 != null && transf1.getLayer() > transf2.getLayer()){
+      return -1;
+    }
+    // zero if 'first' equals 'last'
+    if (transf1 != null && transf2 != null && transf1.getLayer() == transf2.getLayer()){
+      return 0;
+    }
+    // positive if 'first' is greater than 'last'
+    return 1;
+  };
+
+	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
+    goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn);
+		//this.getActiveEntities().add(entityId);
+	} else{
+    goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn);
+		//var success = this.getActiveEntities().remove(entityId);
+	}
 };

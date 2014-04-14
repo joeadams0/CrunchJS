@@ -13,6 +13,7 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
+goog.require('CrunchJS.Systems.PhysicsSystem');
 goog.require('CloseContact.Systems.TowerSystem');
 goog.require('CloseContact.Systems.AttackSystem');
 goog.require('CloseContact.Systems.ActorSystem');
@@ -30,6 +31,8 @@ goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 goog.require('CrunchJS.Components.Viewport');
+goog.require('CrunchJS.Components.Physics');
+
 goog.require('CloseContact.Components.Actor');
 goog.require('CloseContact.Components.Tower');
 goog.require('CloseContact.Components.Attack');
@@ -98,6 +101,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			actorSystem = new CloseContact.Systems.ActorSystem(),
 			playerSystem = new CloseContact.Systems.PlayerSystem();
 
+
+
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
 		this.addSystem(pathMoveSys);
@@ -106,11 +111,18 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(actorSystem);
 		this.addSystem(playerSystem);
 
+
+		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
+		var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		this.addSystem(physSys);
+		
 	}
 
 	// If it is the main window
 	else{
 		var sim;
+		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		//Console.log("TESTESTEST");
 		if(COMPILED){
 			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/game.js');
 		}
