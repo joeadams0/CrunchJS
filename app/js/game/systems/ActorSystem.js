@@ -7,8 +7,12 @@ goog.provide('CloseContact.Systems.ActorSystem');
 goog.require('CrunchJS.System');
 goog.require('CrunchJS.Components.RenderShape')
 
+/**
+ * @constructor
+ * @class
+ */
 CloseContact.Systems.ActorSystem = function() {
-
+	goog.base(this);
 };
 
 goog.inherits(CloseContact.Systems.ActorSystem, CrunchJS.System);

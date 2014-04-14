@@ -16,6 +16,7 @@ goog.require('CrunchJS.Systems.PathMovementSystem');
 goog.require('CloseContact.Systems.TowerSystem');
 goog.require('CloseContact.Systems.AttackSystem');
 goog.require('CloseContact.Systems.ActorSystem');
+goog.require('CloseContact.Systems.PlayerSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -94,7 +95,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			pathMoveSys = new CrunchJS.Systems.PathMovementSystem(),
 			towerSystem = new CloseContact.Systems.TowerSystem(),
 			attackSystem = new CloseContact.Systems.AttackSystem(),
-			actorSystem = new CloseContact.Systems.ActorSystem();
+			actorSystem = new CloseContact.Systems.ActorSystem(),
+			playerSystem = new CloseContact.Systems.PlayerSystem();
 
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
@@ -102,6 +104,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(towerSystem);
 		this.addSystem(attackSystem);
 		this.addSystem(actorSystem);
+		this.addSystem(playerSystem);
 
 	}
 
@@ -280,8 +283,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		var player = this.createPlayerEntity(1, 0);
 
-		this.playerId = 1;
-
 		var tower1 = this.createEntity(),
 			tower2 = this.createEntity();
 
@@ -350,6 +351,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addEventListener(CrunchJS.Events.Move, function(data) {
 			var transform = self.getComponent(data.id, 'Transform');
 
+			self.removeComponent(data.id, 'Attack');
+
 			self.addComponent(data.id, new CrunchJS.Components.PathQuery({
 				start : {
 					x : transform.x,
@@ -360,45 +363,61 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			}));
 		});
 
-		this.addEventListener('click', function() {	
-			var viewport = self.getComponent(1, 'Viewport'),
-        		transform = self.getComponent(2, 'Transform'),
-        		camera = self.getComponent(2, 'Camera');
+		this.addEventListener('click', function(data) {
+			var target = data.target._entityId;
+			if(target){
+				var player = self.getComponent(data.target._entityId, 'Player');
 
-			var width = viewport.getWidth(),
-				height = viewport.getHeight(),
-				xOffset = (viewport.getMousePosition().x/width)*camera.lensSize.width,
-				yOffset = (viewport.getMousePosition().y/height)*camera.lensSize.height,
-				left = (transform.x-camera.lensSize.width/2),
-				top = (transform.y-camera.lensSize.height/2);
+				if(player && player.getPId() != gameMaster.getPId()){
+					var d = {
+						source : gameMaster.getPId(),
+						target : player.getPId()
+					}
+					self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
+						command : 'ATTACK',
+						data : d
+					});
+					setTimeout(function() {
+						self.fireEvent('ATTACK', d);
+					}, 200);
 
-			var end = {
-				x : xOffset+left,
-				y : yOffset+top
-			};
+				}
+				else
+					target = false;
+			}
+			if(!target){
+				var viewport = self.getComponent(1, 'Viewport'),
+	        		transform = self.getComponent(2, 'Transform'),
+	        		camera = self.getComponent(2, 'Camera');
 
-			var players = self.getComponentsByType('Player'),
-				eId;
+				var width = viewport.getWidth(),
+					height = viewport.getHeight(),
+					xOffset = (viewport.getMousePosition().x/width)*camera.lensSize.width,
+					yOffset = (viewport.getMousePosition().y/height)*camera.lensSize.height,
+					left = (transform.x-camera.lensSize.width/2),
+					top = (transform.y-camera.lensSize.height/2);
 
-			goog.structs.forEach(players, function(player) {
+				var end = {
+					x : xOffset+left,
+					y : yOffset+top
+				};
 
-				if(player.getPId() == gameMaster.getPId())
-					eId = player.entityId;
-			});
-			var dater = {
-				id : eId,
-				coords : end,
-				gridId : 1
-			};
+				var eId = self.getEIdFromPId(gameMaster.getPId());
+				var dater = {
+					id : eId,
+					coords : end,
+					gridId : 1
+				};
 
-			setTimeout(function() {
-				self.fireEvent(CrunchJS.Events.Move, dater);
-			}, 200);
+				setTimeout(function() {
+					self.fireEvent(CrunchJS.Events.Move, dater);
+				}, 200);
 
-			self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
-				command : CrunchJS.Events.Move,
-				data : dater
-			});
+				self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
+					command : CrunchJS.Events.Move,
+					data : dater
+				});
+			}
 		});
 
 		this.addEventListener(CrunchJS.EngineCommands.Sync, function() {			
@@ -409,9 +428,51 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			gameMaster.setPId(pId);
 		});
 
+		this.addEventListener('create_user', function(pId) {
+			CrunchJS.world.log('CREATING USER:'+pId);
+			self.createPlayerEntity(pId, (pId+1)%2);
+		});
+
+		this.addEventListener('destroy_user', function(pId) {
+			CrunchJS.world.log('DESTOYING USER:'+pId);
+
+			var players = self.getComponentsByType('Player');
+
+			goog.structs.forEach(players, function(player) {
+				if(pId == player.getPId())
+					self.destroyEntity(player.entityId);
+			});
+
+		});
+
+		this.addEventListener('ATTACK', function(data) {
+			var target = self.getEIdFromPId(data.target),
+				source = self.getEIdFromPId(data.source);
+
+			var attack = new CloseContact.Components.Attack({
+				entity : target
+			});
+
+			self.addComponent(source, attack);
+
+		});
+
 
 	}
 
+};
+
+CloseContact.Scenes.GameScene.prototype.getEIdFromPId = function(pId) {
+	var players = this.getComponentsByType('Player'),
+		eId;
+
+	goog.structs.forEach(players, function(player) {
+
+		if(player.getPId() == pId)
+			eId = player.entityId;
+	}, this);
+
+	return eId;
 };
 
 CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team) {
@@ -426,8 +487,8 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 		new CrunchJS.Components.Transform(trans),
 
 		new CrunchJS.Components.RenderImage({
-	      image: 'warrior.png'
-	 	}),
+	      image: 'warrior.png'	 
+	  	}),
 	    new CrunchJS.Components.Body({
 	    	width : 10,
 	    	height : 10
@@ -440,19 +501,7 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 
 	    new CloseContact.Components.Player({
 	    	pId : pId
-	    })/*,
-
-		new CrunchJS.Components.RenderText({
-	        text: "User1",
-	        style: {
-	          font: "5px",
-	          fill: "white"
-	        },
-	        offset: {
-	          x: 0,
-	          y: -10
-	        }
-		})*/
+	    })
 	);
 
 	return player;

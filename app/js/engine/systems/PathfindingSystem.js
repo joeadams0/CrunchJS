@@ -43,7 +43,6 @@ CrunchJS.Systems.PathfindingSystem.prototype.processEntity = function(frame, ent
 	this.getScene().removeComponent(ent, 'PathQuery');
 
 	steps = this.astar(occGrid, query.start, query.end, false);
-	CrunchJS.world.log(steps);
 
 	this.getScene().addComponent(ent, new CrunchJS.Components.Path({
 		steps : steps,
@@ -62,7 +61,6 @@ CrunchJS.Systems.PathfindingSystem.prototype.astar = function(occGrid, start, en
 		}),
 		currentNode, neighbors, steps, success = false;
 
-	CrunchJS.world.log(endTile);
 
 	openList.push(this.createSearchNode(startTile,0,endTile));
 

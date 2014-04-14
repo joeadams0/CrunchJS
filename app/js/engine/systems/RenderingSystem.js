@@ -51,7 +51,7 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
    * The Pixi Stage
    * @type {PIXI.Stage}
    */
-  this.stage = new PIXI.Stage(0x000000);
+  this.stage = new PIXI.Stage(0x000000, true);
 
   /**
    * The Pixi renderer
@@ -90,7 +90,7 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
   this.sprites = []; // an array of Entities that are in the stage
   this.cam = null;
 
-  this.stage.click = goog.bind(this.onStageClick, this);
+  // this.stage.click = goog.bind(this.onStageClick, this);
 
 
 
@@ -156,24 +156,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       if (parts == 1){ // only need to make the one sprite
         if (imgRenC != null) {
           sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          sprite._entityId = eId;
+          sprite.setInteractive(true);
+          sprite.click = goog.bind(this.onStageClick, this);
         } else if (shapeRenC != null){  // shapeRendering requires more complex painting right now.
-          sprite = new PIXI.Graphics();
-          // deal with the sizing of the thing
-          var size = this.getSize(eId, 'RenderShape');
-          var bSize = {
-            x: size.width,
-            y: size.height
-          };
-          screenSize.width = this.translateScale(bSize, 'x');
-          screenSize.height = this.translateScale(bSize, 'y');  
-          // PIXI code for drawing rectangles
-          if (shapeRenC.type.toLowerCase() == 'rectangle') {
-            if(shapeRenC.fill === true){
-              sprite.beginFill(shapeRenC.color);
-            }
-            sprite.lineStyle(1, shapeRenC.color, 1);
-            sprite.drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
-          }
+          sprite = this.makePIXIShape(shapeRenC, eId);
         } else {
           sprite = new PIXI.Text(textRenC.text, textRenC.style);
         }
@@ -182,27 +169,13 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         sprite = [];
         if (imgRenC != null) { // make the imageRendering sprite
           sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
-          this.stage.addChild(sprite[0]);  // add it to the stage
+          this.stage.addChild(sprite[0]);  // add it to the stage          
+          sprite[0]._entityId = eId;
+          sprite[0].setInteractive(true);
+          sprite[0].click = goog.bind(this.onStageClick, this);
         }
         if (shapeRenC != null) {
-          sprite[1] = new PIXI.Graphics();
-          // deal with the sizing of the thing
-          var size = this.getSize(eId, 'RenderShape');
-          var bSize = {
-            x: size.width,
-            y: size.height
-          };
-          screenSize.width = this.translateScale(bSize, 'x');
-          screenSize.height = this.translateScale(bSize, 'y');  
-          // PIXI code for drawing rectangles
-          if (shapeRenC.type.toLowerCase() == 'rectangle') {
-            if(shapeRenC.fill === true){
-              sprite[1].beginFill(shapeRenC.color);
-            }
-            sprite[1].lineStyle(1, shapeRenC.color, 1);
-            sprite[1].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
-          }
-          this.stage.addChild(sprite[1]);  // add it to the stage
+          sprite[1] = this.makePIXIShape(shapeRenC, eId);
         }
         if (textRenC != null) {
           sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
@@ -212,6 +185,24 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list
     } else {  // already a PIXI representation (or array of them) exsists
       sprite = this.sprites[eId]; // access the sprite
+      // if the PIXI representation is an array, and the entity has more than 1 part needed to render
+      if (parts > 1 && goog.isArray(sprite)){
+        // if the image component is on this entity, but the PIXI representation of it is not.
+        // similar checks for the other 2 renderComponents
+        if (sprite[0] == undefined && imgRenC != null) {
+          sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          sprite[0]._entityId = eId;
+          sprite[0].setInteractive(true);
+          sprite[0].click = goog.bind(this.onStageClick, this);
+          this.stage.addChild(sprite[0]);  // add it to the stage
+        } else if (sprite[1] == undefined && shapeRenC != null) {
+          sprite[1] = this.makePIXIShape(shapeRenC, eId);
+        } else if (sprite[2] == undefined && textRenC != null) {
+          sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
+          this.stage.addChild(sprite[2]);  // add it to the stage
+        }
+        this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list, because it might have changed
+      }
     }
     
     // aside from some array/object checking, here is where we start to actually process the entity
@@ -227,6 +218,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         this.sprites[eId] = undefined;
         return;
       } else {        // and we found out that the sprite is what its supposed to be
+        var xRenC;
         // handle the single renderable
         if (imgRenC != null) {            // it is a RenderImage PIXI.Sprite
           // first, deal with the sizing of the thing
@@ -237,9 +229,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           };
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
-          // then access the offests
-          offX = imgRenC.offset.x;
-          offY = imgRenC.offset.y;
+          xRenC = imgRenC;
         } else if (shapeRenC != null) {   // it is a RenderShape PIXI.Graphics
           // first, deal with the sizing of the thing
           var size = this.getSize(eId, 'RenderShape');
@@ -249,9 +239,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           };
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
-          // then access the offests
-          offX = shapeRenC.offset.x;
-          offY = shapeRenC.offset.y;
+          xRenC = shapeRenC;
           // check for changes
         } else {                          // it is a RenderText PIXI.Text
           // first, deal with the sizing of the thing
@@ -262,34 +250,18 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           };
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
-          // then access the offests
-          offX = textRenC.offset.x;
-          offY = textRenC.offset.y;
+          xRenC = textRenC;
           // check for changes
         }
+        // then access the offests
+        offX = xRenC.offset.x;
+        offY = xRenC.offset.y;
         // after handling PIXI representations of entity
         // (sprite => entity)
         ///////////////////////////////////
         // Do the actual visual updating //
         ///////////////////////////////////
-        // offest the transform
-        var temp = {};
-        temp.x = transf.x + offX;
-        temp.y = transf.y + offY;
-        // translate the Transform position to the onscreen position
-        var transformX = this.translatePosition(temp, 'x'),
-            transformY = this.translatePosition(temp, 'y');
-
-        // Get top left for rendering
-        var left  = transformX - screenSize.width/2,
-            right = transformY - screenSize.height/2;
-
-        sprite.position.x = left;
-        sprite.position.y = right;
-
-        // translate the in-game object Size (Body or RenderImage) to the onscreen object size
-        sprite.width  = screenSize.width;
-        sprite.height =  screenSize.height
+        sprite = this.updateSprite(sprite, screenSize, offX, offY, transf);
       }
     } else {         // it should be an array
       if (Object.prototype.toString.call(sprite) != '[object Array]'){ // but it is not an array!!! oh noes!
@@ -304,12 +276,9 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           // first, deal with the sizing of the thing
           var cName;
           if(p==0){cName='RenderImage';offX=imgRenC.offset.x;offY=imgRenC.offset.y;}
-          else if(p==1){
-            cName='RenderShape';
-            offX=shapeRenC.offset.x;
-            offY=shapeRenC.offset.y;
-          }
+          else if(p==1){cName='RenderShape';offX=shapeRenC.offset.x;offY=shapeRenC.offset.y;}
           else{cName='RenderText';offX=textRenC.offset.x;offY=textRenC.offset.y;}
+
           var size = this.getSize(eId, cName);
           var bSize = {
             x: size.width,
@@ -318,22 +287,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
           
-          // actual visual updating
-          // offest the transform component
-          temp = {};
-          temp.x = transf.x + offX;
-          temp.y = transf.y + offY;
-          // translate the Transform position to the onscreen position
-          var transformX = this.translatePosition(temp, 'x'),
-              transformY = this.translatePosition(temp, 'y');
-
-          // Get top left for rendering
-          var left = transformX - screenSize.width/2,
-              right = transformY - screenSize.height/2;
-
-          sprite[p].position.x = left;
-          sprite[p].position.y = right;
-
+          // check to handle size-change in renderShape
           if(cName == 'RenderShape'){
             var redraw = sprite[p].width != screenSize.width || sprite[p].height != screenSize.height;
 
@@ -350,16 +304,61 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
               }
             }
           }
-          else{
-            // translate the in-game object Size (Body or RenderImage) to the onscreen object size
-            sprite[p].width = screenSize.width;
-            sprite[p].height =  screenSize.height
+          if(cName == 'RenderText'){
+            sprite[p].setText(textRenC.getText());
           }
-
+          // actual visual updating
+          sprite[p] = this.updateSprite(sprite[p], screenSize, offX, offY, transf);
         }
       }
     }
   }
+};
+
+CrunchJS.Systems.RenderingSystem.prototype.updateSprite = function(sprite, screenSize, offX, offY, transf){
+  // offest the transform
+  var temp = {};
+  temp.x = transf.x + offX;
+  temp.y = transf.y + offY;
+  // translate the Transform position to the onscreen position
+  var transformX = this.translatePosition(temp, 'x'),
+      transformY = this.translatePosition(temp, 'y');
+
+  // Get top left for rendering
+  var left  = transformX - screenSize.width/2,
+      right = transformY - screenSize.height/2;
+
+  sprite.position.x = left;
+  sprite.position.y = right;
+
+  // translate the in-game object Size (Body or RenderImage) to the onscreen object size
+  sprite.width  = screenSize.width;
+  sprite.height =  screenSize.height
+
+  return sprite;
+};
+
+// helper method for processEntity();
+CrunchJS.Systems.RenderingSystem.prototype.makePIXIShape = function(shapeRenC, eId){
+  var temp = new PIXI.Graphics();
+  // deal with the sizing of the thing
+  var size = this.getSize(eId, 'RenderShape');
+  var bSize = {
+    x: size.width,
+    y: size.height
+  };
+  var useWidth = this.translateScale(bSize, 'x');
+  var useHeight = this.translateScale(bSize, 'y');  
+  // PIXI code for drawing rectangles
+  if (shapeRenC.type.toLowerCase() == 'rectangle') {
+    if(shapeRenC.fill === true){
+      temp.beginFill(shapeRenC.color);
+    }
+    temp.lineStyle(1, shapeRenC.color, 1);
+    temp.drawRect(0,0, useWidth,useHeight);//fill all the available space
+  }
+  this.stage.addChild(temp);  // add it to the stage
+  return temp;
 };
 
 /**
@@ -509,8 +508,9 @@ CrunchJS.Systems.RenderingSystem.prototype.onResize = function() {
     }
 };
 
-CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {    
-  this.getScene().fireEvent('click');
+CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {   
+  console.log("STAGE WAS CLICKED", data); 
+  this.getScene().fireEvent('click', data);
 };
 
 CrunchJS.Systems.RenderingSystem.prototype.onMouseMove = function(data) {

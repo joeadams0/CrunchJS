@@ -91,7 +91,6 @@ CloseContact.Components.Actor = function(params) {
 	 */
 	this.lastAttackTime = 0;
 
-
 	this.updates = {};
 
 };
@@ -175,6 +174,10 @@ CloseContact.Components.Actor.prototype.getNextAttackTime = function() {
 	t = t + attackDelta;
 
 	return t;
+};
+
+CloseContact.Components.Actor.prototype.getAction = function() {
+	return this.action;
 };
 
 /**
@@ -273,6 +276,14 @@ CloseContact.Components.Actor.prototype.setLastAttackTime = function(lastAttackT
 	if(this.lastAttackTime != lastAttackTime){
 		this.lastAttackTime = lastAttackTime;
 		this.updates.lastAttackTime = true;
+		this.hasBeenUpdated();
+	}
+};
+
+CloseContact.Components.Actor.prototype.setAction = function(action) {
+	if(this.action != action){
+		this.action = action;
+		this.updates.action = true;
 		this.hasBeenUpdated();
 	}
 };

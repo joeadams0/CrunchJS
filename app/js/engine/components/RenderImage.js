@@ -13,7 +13,7 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.RenderImage = function(obj) {
-  goog.base(this);
+  goog.base(this, obj);
 
   /**
    * The image name/path

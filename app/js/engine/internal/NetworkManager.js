@@ -355,14 +355,10 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		//Tell the peer that you want to connect with him.
 		var message = this.createConnectMessage();
 		conn.send(message);
-		//Save the connection.
-		this.connectedPeers.push(pId);
-		this.connections.push(conn);
-		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
-		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 		if(this.peerId == "host"){
-			var player = this.player,
-				eId = this.getScene().createPlayerEntity(player, (player+1)%2);
+			var player = this.player;
+
+			this.getScene().fireEvent('create_user', player);
 
 			conn.send({
 				type : 'command',
@@ -372,7 +368,26 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 					player : player
 				}
 			});
+			this.player++;
+
+			var mssg = {
+				type : 'command',
+				data : {
+					command : 'create_user',
+					data : player
+				}
+			}
+
+			this.sendMessageToAllPeers(mssg);
+			conn.player = player;
 		}
+
+
+		//Save the connection.
+		this.connectedPeers.push(pId);
+		this.connections.push(conn);
+		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
+		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
 	conn.on('close', function(){
 		var position = this.connectedPeers.indexOf(pId);
@@ -380,5 +395,17 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.connections.splice(position, 1);
 		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
+
+		this.getScene().fireEvent('destroy_user', conn.player);
+		var mssg = {
+			type : 'command',
+			data : {
+				command : 'destroy_user',
+				data : conn.player
+			}
+		}
+
+		this.sendMessageToAllPeers(mssg);
+
 	}.bind(this));
 };
