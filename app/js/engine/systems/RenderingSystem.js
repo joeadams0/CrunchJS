@@ -21,7 +21,7 @@ goog.require('goog.structs')
 CrunchJS.Systems.RenderingSystem = function(canvasData){
   goog.base(this);
 
-  this._activeEntities = [];
+  this._activeEntities = [];  // changed from Set to Array
 
   var self = this;
 
@@ -126,7 +126,7 @@ CrunchJS.Systems.RenderingSystem.prototype.activate = function() {
 
 CrunchJS.Systems.RenderingSystem.prototype.process = function(f){
   var me = this;                    // explicit reference
-  goog.array.forEach(this.getActiveEntities(), function(e,i,a){
+  goog.array.forEach(this._activeEntities, function(e,i,a){
     me.processEntity(f, e);
   });
   
@@ -555,6 +555,11 @@ CrunchJS.Systems.RenderingSystem.prototype.entityDisabled = function(eId) {
   this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
 };
 
+// me is 'this' in reference to the renderingSysyem object
+
+CrunchJS.Systems.RenderingSystem.prototype.removeEntity = function(eId) {
+  goog.array.remove(this._activeEntities, eId);
+};
 CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
   var me = this;
   // the function which sorts the entites by layer in the Transform
@@ -572,28 +577,14 @@ CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
     // positive if 'first' is greater than 'last'
     return 1;
   };
-  // same function as above, but with zero for equals, in order to make binaryRemove work
-  var compareFn2 = function(first, last){
-    var transf1 = me.getScene().getComponent(first, 'Transform');   // the transform component for first
-    var transf2 = me.getScene().getComponent(last, 'Transform');    // the transform component for last
-    // negative if 'first' is less than 'last'
-    if(transf1 != null && transf2 != null && transf1.getLayer() > transf2.getLayer()){
-      return -1;
-    }
-    // zero if 'first' equals 'last'
-    if (transf1 != null && transf2 != null && transf1.getLayer() == transf2.getLayer()){
-      return 0;
-    }
-    // positive if 'first' is greater than 'last'
-    return 1;
-  };
 
 	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
-    goog.array.binaryInsert(this.getActiveEntities(), eId, compareFn);
-		//this.getActiveEntities().add(entityId);
+    goog.array.binaryInsert(this._activeEntities, eId, compareFn);
+		//this._activeEntities.add(entityId);
 	} else{
-    goog.array.binaryRemove(this.getActiveEntities(), eId, compareFn2);
-		//var success = this.getActiveEntities().remove(entityId);
+    //goog.array.binaryRemove(this._activeEntities, eId, compareFn);
+    goog.array.remove(this._activeEntities, eId);
+		//var success = this._activeEntities.remove(entityId);
 	}
 };
 
