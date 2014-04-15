@@ -45,7 +45,7 @@ CrunchJS.Components.Transform = function(params) {
 	 * The layer variable is just a bit flag number. You can have up to 32 layers.
 	 * @type {number}
 	 */
-	this.layer = params.layer | 0x00000001;
+	this.layer = params.layer || 0x00000001;
 
 	/**
 	 * The rotation of the entity

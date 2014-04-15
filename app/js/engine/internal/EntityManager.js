@@ -167,7 +167,7 @@ CrunchJS.Internal.EntityManager.prototype._createEntity = function(id) {
 			return false;
 		}
 		else{
-			goog.array.remove(id);
+			goog.array.remove(this._entityPool, id);
 			this.activateEntity(id);
 			return true;
 		}

@@ -176,6 +176,8 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 
 	var boxSd = new box2d.BoxDef();
 	boxSd.density = 1.0;
+	boxSd.categoryBits = trans.getLayer();
+	boxSd.maskBits = 0;
 
 	//boxSd.userData = id;
 

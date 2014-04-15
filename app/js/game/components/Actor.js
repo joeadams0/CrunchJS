@@ -294,8 +294,7 @@ CloseContact.Components.Actor.prototype.takeAttackDmg = function(dmg) {
 	this.takeTrueDmg(dmg);
 };
 
-CloseContact.Components.Actor.prototype.takeTrueDmg = function(dmg) {
-	CrunchJS.world.log(this.getHealth());
+CloseContact.Components.Actor.prototype.takeTrueDmg = function(dmg) {	
 	this.setHealth(Math.max(this.getHealth()-dmg, 0));
 };
 

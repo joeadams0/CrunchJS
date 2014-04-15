@@ -19,6 +19,7 @@ goog.require('CloseContact.Systems.AttackSystem');
 goog.require('CloseContact.Systems.ActorSystem');
 goog.require('CloseContact.Systems.PlayerSystem');
 goog.require('CloseContact.Systems.PhysicsPathMovementSystem');
+goog.require('CloseContact.Systems.ProjectileSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -39,7 +40,7 @@ goog.require('CloseContact.Components.Tower');
 goog.require('CloseContact.Components.Attack');
 goog.require('CloseContact.Components.GameMaster');
 goog.require('CloseContact.Components.Player');
-
+goog.require('CloseContact.Components.Projectile')
 
 /**
  * The Game Scene
@@ -84,7 +85,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CloseContact.Components.Tower,
 		CloseContact.Components.Attack,
 		CloseContact.Components.GameMaster,
-		CloseContact.Components.Player
+		CloseContact.Components.Player,
+		CloseContact.Components.Projectile
 	];
 
 	goog.array.forEach(comps, function(comp) {
@@ -102,6 +104,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			attackSystem = new CloseContact.Systems.AttackSystem(),
 			actorSystem = new CloseContact.Systems.ActorSystem(),
 			playerSystem = new CloseContact.Systems.PlayerSystem(),
+			projectileSystem = new CloseContact.Systems.ProjectileSystem(),
 			physSys = new CrunchJS.Systems.PhysicsSystem({});
 
 
@@ -113,6 +116,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(attackSystem);
 		this.addSystem(actorSystem);
 		this.addSystem(playerSystem);
+		this.addSystem(projectileSystem);
 		this.addSystem(physSys);
 		
 	}
@@ -362,16 +366,18 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addEventListener(CrunchJS.Events.Move, function(data) {
 			var transform = self.getComponent(data.id, 'Transform');
 
-			self.removeComponent(data.id, 'Attack');
+			if(transform){
+				self.removeComponent(data.id, 'Attack');
 
-			self.addComponent(data.id, new CrunchJS.Components.PathQuery({
-				start : {
-					x : transform.x,
-					y : transform.y
-				},
-				end : data.coords,
-				gridId : data.gridId
-			}));
+				self.addComponent(data.id, new CrunchJS.Components.PathQuery({
+					start : {
+						x : transform.x,
+						y : transform.y
+					},
+					end : data.coords,
+					gridId : data.gridId
+				}));
+			}
 		});
 
 		this.addEventListener('click', function(data) {
@@ -508,7 +514,7 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 	    new CloseContact.Components.Actor({
 	    	team : team,
 	    	health : 100,
-	    	movementSpeed : 20
+	    	movementSpeed : 25
 	    }),
 
 	    new CloseContact.Components.Player({
