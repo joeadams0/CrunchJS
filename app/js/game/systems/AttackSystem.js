@@ -132,7 +132,7 @@ CloseContact.Systems.AttackSystem.prototype.processEntity = function(frame, enti
 
 			}
 			// Add the path
-			else {
+			else if(attackerTrans.getIsMoveable()){
 				this.getScene().addComponent(entity, new CrunchJS.Components.PathQuery({
 					start : {
 						x : attackerTrans.getX(),

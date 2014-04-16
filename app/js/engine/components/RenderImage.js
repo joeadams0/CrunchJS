@@ -31,6 +31,8 @@ CrunchJS.Components.RenderImage = function(obj) {
   this.offset.x = this.offset.x ? this.offset.x : 0;
   this.offset.y = this.offset.y ? this.offset.y : 0;
 
+  this.tint = goog.isNumber(obj.tint) ? obj.tint : 0xFFFFFF;
+
   this.updates = {};
 };
 
@@ -93,6 +95,18 @@ CrunchJS.Components.RenderImage.prototype.setOffset = function(x,y) {
     this.hasBeenUpdated();
     this.updates.offset = this.updates.offset ? this.updates.offset : {};
     this.updates.offset.y=true;
+  }
+};
+
+CrunchJS.Components.RenderImage.prototype.getTint = function() {
+  return this.tint;
+};
+
+CrunchJS.Components.RenderImage.prototype.setTint = function(tint) {
+  if(this.getTint() != tint){
+    this.tint = tint;
+    this.updates.tint = true;
+    this.hasBeenUpdated();
   }
 };
 

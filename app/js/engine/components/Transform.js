@@ -11,7 +11,7 @@ goog.require('CrunchJS.Component');
  * @param {number=}  params.x    The x position
  * @param {number=}  params.y     The y position
  * @param {number} params.layer The layer of the entity
- * @param {Boolean} params.isMovable Should this object be allowed to be moved
+ * @param {Boolean} params.isMoveable Should this object be allowed to be moved
  * @param {Number=} params.rotation The rotation of the entity
  * @constructor
  * @class 
@@ -36,7 +36,7 @@ CrunchJS.Components.Transform = function(params) {
 	 * Is this object moveable
 	 * @type {Boolean}
 	 */
-	this.isMovable = params.isMovable ? params.isMovable : true;
+	this.isMoveable = goog.isDefAndNotNull(params.isMoveable) ? params.isMoveable : true;
 
 
 	/**
@@ -57,7 +57,7 @@ CrunchJS.Components.Transform = function(params) {
 	this.updates = {
 		x : false,
 		y : false,
-		isMovable : false,
+		isMoveable : false,
 		layer : false,
 		rotation : false
 	}
@@ -163,18 +163,18 @@ CrunchJS.Components.Transform.prototype.setRotation = function(rotation) {
  * Checks if it is movable
  * @return {Boolean} True if is moveable
  */
-CrunchJS.Components.Transform.prototype.isMovable = function() {
-	return this.isMovable;
+CrunchJS.Components.Transform.prototype.getIsMoveable = function() {
+	return this.isMoveable;
 };
 
 /**
  * Sets if the entity is moveable
- * @param {Boolean} isMovable 
+ * @param {Boolean} isMoveable 
  */
-CrunchJS.Components.Transform.prototype.setIsMovable = function(isMovable) {
-	if(this.isMovable != isMovable){
-		this.isMovable = isMovable;
-		this.updates.isMovable = true;
+CrunchJS.Components.Transform.prototype.setIsMoveable = function(isMoveable) {
+	if(this.isMoveable != isMoveable){
+		this.isMoveable = isMoveable;
+		this.updates.isMoveable = true;
 
 		this.hasBeenUpdated();
 	}

@@ -151,13 +151,94 @@ CrunchJS.Systems.PathfindingSystem.prototype.reconstructPath = function(node, oc
 	var steps = [], step;
 
 	while(node){
-		step = occGrid.tileToCoord(node.x, node.y);
+		step = {
+			x : node.x,
+			y : node.y
+		}
 
 		steps.push(step);
 
 		node = node.parent;
+
 	}
 
-	return steps.reverse();
+	steps = this.lineOfSightPath(steps.reverse(), occGrid);
+
+	for(var i = 0; i < steps.length; i++){
+		steps[i] = occGrid.tileToCoord(steps[i].x, steps[i].y);
+	}
+
+	return steps;
+};
+
+CrunchJS.Systems.PathfindingSystem.prototype.lineOfSightPath = function(steps, occGrid) {
+	var newSteps = [],
+		currentLoc = steps[0];
+
+	for(var i = 1; i < steps.length; i++){
+		if(!this.canSee(currentLoc.x, currentLoc.y, steps[i].x, steps[i].y, occGrid)){
+			currentLoc = steps[i-1];
+			newSteps.push(currentLoc);
+			i--;
+		}
+		else if(i == steps.length-1){
+			newSteps.push(steps[i]);
+		}
+	}
+
+	return newSteps;
+};
+
+// Algorithm : http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+CrunchJS.Systems.PathfindingSystem.prototype.canSee = function(x0, y0, x1, y1, occGrid) {
+	var dx = Math.abs(x1-x0),
+		dy = Math.abs(y1-y0),
+		x = x0,
+		y = y0,
+		n = 1 + dx + dy,
+		x_inc = (x1>x0) ? 1 : -1,
+		y_inc = (y1>y0) ? 1 : -1,
+		error = dx-dy;
+
+	dx *= 2;
+	dy *= 2;
+
+	var startN = n;
+
+	while(n>0){
+
+		if(occGrid.isOccupied({
+			x : x,
+			y : y
+		})){
+			return false;
+		}
+		if(error>0){
+			x += x_inc;
+			error -= dy;
+		}
+		else if(error == 0){
+			if(occGrid.isOccupied({
+				x : x,
+				y : y+y_inc
+			}) || occGrid.isOccupied({
+				x : x+x_inc,
+				y : y
+			})){
+				return false;
+			}
+
+			x += x_inc;
+			error -= dy;
+		}
+		else{
+			y += y_inc;
+			error += dx;
+		}
+
+		n--;
+	}
+
+	return true;
 };
 

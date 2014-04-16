@@ -167,6 +167,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite._entityId = eId;
           sprite.setInteractive(true);
           sprite.click = goog.bind(this.onStageClick, this);
+          sprite.tint = imgRenC.tint;
         } else if (shapeRenC != null){  // shapeRendering requires more complex painting right now.
           sprite = this.makePIXIShape(shapeRenC, eId);
         } else {
@@ -181,6 +182,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite[0]._entityId = eId;
           sprite[0].setInteractive(true);
           sprite[0].click = goog.bind(this.onStageClick, this);
+          sprite[0].tint = imgRenC.tint;
         }
         if (shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);
@@ -202,6 +204,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite[0]._entityId = eId;
           sprite[0].setInteractive(true);
           sprite[0].click = goog.bind(this.onStageClick, this);
+          sprite[0].tint = imgRenC.tint;
           this.stage.addChild(sprite[0]);  // add it to the stage
         } else if (sprite[1] == undefined && shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);

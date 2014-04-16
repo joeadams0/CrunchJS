@@ -24,7 +24,8 @@ CloseContact.Components.Actor = function(params) {
 		movementSpeed : 0,
 		attackSpeed : 1,
 		attackRange : 50,
-		team : 0
+		team : 0,
+		visionRange : 70
 	};
 
 	if(!params)
@@ -90,6 +91,8 @@ CloseContact.Components.Actor = function(params) {
 	 * @type {Number}
 	 */
 	this.lastAttackTime = 0;
+
+	this.visionRange = params.visionRange;
 
 	this.updates = {};
 
@@ -176,9 +179,10 @@ CloseContact.Components.Actor.prototype.getNextAttackTime = function() {
 	return t;
 };
 
-CloseContact.Components.Actor.prototype.getAction = function() {
-	return this.action;
+CloseContact.Components.Actor.prototype.getVisionRange = function() {
+	return this.visionRange;
 };
+
 
 /**
  * Sets the health for the actor
@@ -280,10 +284,10 @@ CloseContact.Components.Actor.prototype.setLastAttackTime = function(lastAttackT
 	}
 };
 
-CloseContact.Components.Actor.prototype.setAction = function(action) {
-	if(this.action != action){
-		this.action = action;
-		this.updates.action = true;
+CloseContact.Components.Actor.prototype.setVisionRange = function(range) {
+	if(this.visionRange != range){
+		this.visionRange = range;
+		this.updates.visionRange = true;
 		this.hasBeenUpdated();
 	}
 };

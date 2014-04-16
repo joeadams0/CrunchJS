@@ -20,6 +20,7 @@ goog.require('CloseContact.Systems.ActorSystem');
 goog.require('CloseContact.Systems.PlayerSystem');
 goog.require('CloseContact.Systems.PhysicsPathMovementSystem');
 goog.require('CloseContact.Systems.ProjectileSystem');
+goog.require('CloseContact.Systems.FogOfWarSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -40,7 +41,7 @@ goog.require('CloseContact.Components.Tower');
 goog.require('CloseContact.Components.Attack');
 goog.require('CloseContact.Components.GameMaster');
 goog.require('CloseContact.Components.Player');
-goog.require('CloseContact.Components.Projectile')
+goog.require('CloseContact.Components.Projectile');
 
 /**
  * The Game Scene
@@ -105,6 +106,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			actorSystem = new CloseContact.Systems.ActorSystem(),
 			playerSystem = new CloseContact.Systems.PlayerSystem(),
 			projectileSystem = new CloseContact.Systems.ProjectileSystem(),
+			// fogOfWarSystem = new CloseContact.Systems.FogOfWarSystem(),
 			physSys = new CrunchJS.Systems.PhysicsSystem({});
 
 
@@ -117,6 +119,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(actorSystem);
 		this.addSystem(playerSystem);
 		this.addSystem(projectileSystem);
+		// this.addSystem(fogOfWarSystem);
 		this.addSystem(physSys);
 		
 	}
@@ -147,33 +150,32 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		var tiles = [
 			[11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,1,1,1,15],
-			[14,1,1,1,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,1,1,1,15],
-			[14,1,1,1,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,10,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1 ,1 ,1 ,1 ,20,1 ,20,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,20,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,20,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,2 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,4 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,5 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,7 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,8 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,10,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,20,1 ,1 ,20,20,20,20,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,1 ,15],
 			[16,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,18]
 		];
 
-		var tileSet = [
-			'assets/tree.png', // 0
-			'assets/grass.png', // 1
+		var tileSet = [ '',
+			'assets/grass.png', // 1 
 			'assets/path-top-left.png', // 2
-			'assets/path-top-middle.png', // 3
+			'assets/path-top-middle.png', // 3 
 			'assets/path-top-right.png', // 4
 			'assets/path-middle-left.png', // 5
-			'assets/path-middle-middle.png', // 6
+			'assets/path-middle-middle.png', // 6 
 			'assets/path-middle-right.png', // 7
 			'assets/path-bottom-left.png', // 8
-			'assets/path-bottom-middle.png', // 9
+			'assets/path-bottom-middle.png', // 9 
 			'assets/path-bottom-right.png', // 10
 			'assets/wall-top-left.png', // 11
 			'assets/wall-top-middle.png', // 12
@@ -183,7 +185,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			'assets/wall-bottom-left.png', // 16
 			'assets/wall-bottom-middle.png', // 17
 			'assets/wall-bottom-right.png', // 18
-			'assets/tower.png' // 19
+			'assets/tower.png',// 19
+			'assets/tree.png' // 20
 
 		];
 		
@@ -259,7 +262,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					};
 
 				if(tile){
-
+					this.setEntityName('tile-'+x+'-'+y, id);
 					this.addComponents(id, 
 						new CrunchJS.Components.Transform({
 							x : xStart+x*10,
@@ -272,10 +275,11 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 						}),
 
 						new CrunchJS.Components.RenderImage({
-							image : 'assets/grass.png'
+							image : 'assets/grass.png',
+							//tint : 0x585858 
 						})
 					);					
-					if(tile>1){
+					if(tile>1 ){
 						id = this.createEntity();
 
 						this.addComponents(id, 
@@ -283,7 +287,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 							new CrunchJS.Components.Body(body),
 
 							new CrunchJS.Components.RenderImage({
-								image : tileSet[tile]
+								image : tileSet[tile],
+								//tint : 0x585858   
 							})
 						);
 					}
@@ -296,7 +301,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			}, this);
 		},this);
 
-		var player = this.createPlayerEntity(1, 0);
+		var player = this.createPlayerEntity(1 , 0);
 
 		var tower1 = this.createEntity(),
 			tower2 = this.createEntity();
@@ -305,7 +310,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.Transform({
 				x : xStart+25,
 				y : yStart+height/2*10-17,
-				layer : 0x00000001
+				layer : 0x00000001,
+				isMoveable : false
 			}),
 			new CrunchJS.Components.RenderImage({
 		      image: 'assets/tower.png',
@@ -331,7 +337,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.Transform({
 				x : xStart+width*10-35,
 				y : yStart+height/2*10-17,
-				layer : 0x00000001
+				layer : 0x00000001,
+				isMoveable : false
 			}),
 			new CrunchJS.Components.RenderImage({
 		      image: 'assets/tower.png',
@@ -348,14 +355,14 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		    new CloseContact.Components.Actor({
 		    	attackDmg : 20,
-		    	team : 1
+		    	team : 1 
 		    }),
 
 		    new CloseContact.Components.Tower()
 		);
 	
 		var sys = new CrunchJS.Systems.RenderingSystem({
-			entityId : 1
+			entityId : 1 
 		});
 
 		this.addSystem(sys);
@@ -403,7 +410,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					target = false;
 			}
 			if(!target){
-				var viewport = self.getComponent(1, 'Viewport'),
+				var viewport = self.getComponent(1 , 'Viewport'),
 	        		transform = self.getComponent(2, 'Transform'),
 	        		camera = self.getComponent(2, 'Camera');
 
@@ -423,7 +430,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 				var dater = {
 					id : eId,
 					coords : end,
-					gridId : 1
+					gridId : 1 
 				};
 
 				setTimeout(function() {
@@ -447,7 +454,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		this.addEventListener('create_user', function(pId) {
 			CrunchJS.world.log('CREATING USER:'+pId);
-			self.createPlayerEntity(pId, (pId+1)%2);
+			self.createPlayerEntity(pId, (pId+1 )%2);
 		});
 
 		this.addEventListener('destroy_user', function(pId) {
@@ -504,7 +511,7 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 		new CrunchJS.Components.Transform(trans),
 
 		new CrunchJS.Components.RenderImage({
-	      image: 'warrior.png'	 
+	      image: 'assets/warrior.png'	 
 	  	}),
 	    new CrunchJS.Components.Body({
 	    	width : 10,
@@ -534,7 +541,7 @@ CloseContact.Scenes.GameScene.prototype.process = function(frame) {
 	goog.base(this, 'process', frame);
 
 	if(!CrunchJS.world.isSim()){
-		var viewport = this.getComponent(1, 'Viewport'),
+		var viewport = this.getComponent(1 , 'Viewport'),
 	        transform = this.getComponent(2, 'Transform'),
 	        camera = this.getComponent(2, 'Camera');
 
@@ -544,36 +551,36 @@ CloseContact.Scenes.GameScene.prototype.process = function(frame) {
 
 	    if(pt.x <= width*.05){
 	    	// Move outside left contstraints 
-	    	if(camera.constraints.topLeft.x > transform.x-1-camera.lensSize.width/2){
+	    	if(camera.constraints.topLeft.x > transform.x-1 -camera.lensSize.width/2){
 	    		transform.x = camera.constraints.topLeft.x + camera.lensSize.width/2;
 	    	}
 	    	else{
-	      		transform.x = transform.x - 1;
+	      		transform.x = transform.x - 1 ;
 	      	}
 	    }
 	    else if(pt.x >= width*.95){
-	    	if(camera.constraints.bottomRight.x < transform.x+1+camera.lensSize.width/2){
+	    	if(camera.constraints.bottomRight.x < transform.x+1 +camera.lensSize.width/2){
 	    		transform.x = camera.constraints.bottomRight.x - camera.lensSize.width/2;
 	    	}
 	    	else{
-	      		transform.x = transform.x + 1;
+	      		transform.x = transform.x + 1 ;
 	      	}
 	    }
 
 	    if(pt.y <= height*.05){
-	    	if(camera.constraints.topLeft.y > transform.y-1-camera.lensSize.height/2){
+	    	if(camera.constraints.topLeft.y > transform.y-1 -camera.lensSize.height/2){
 	    		transform.y = camera.constraints.topLeft.y + camera.lensSize.height/2;
 	    	}
 	    	else{
-	      		transform.y = transform.y - 1;
+	      		transform.y = transform.y - 1 ;
 	      	}
 	    }
 	    else if(pt.y >= height*.95){
-	    	if(camera.constraints.bottomRight.y < transform.y+1+camera.lensSize.height/2){
+	    	if(camera.constraints.bottomRight.y < transform.y+1 +camera.lensSize.height/2){
 	    		transform.y = camera.constraints.bottomRight.y - camera.lensSize.height/2;
 	    	}
 	    	else{
-	      		transform.y = transform.y + 1;
+	      		transform.y = transform.y + 1 ;
 	      	}
 	    }
 	}

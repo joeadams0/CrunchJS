@@ -18,7 +18,7 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * API key for PeerJS-Server
 	 * @type {string}
 	 */
-	this.apiKey = 'nhc2blm0184zpvi';
+	this.apiKey = 'x41mtbnpaagzxgvi';
 	
 	/**
 	 * The string ID of this peer
@@ -117,7 +117,7 @@ CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
  * @param {Object} data The event data
  */
 CrunchJS.Internal.NetworkManager.prototype.sendNetworkCommand = function(data) {
-	this.sendMessageToAllPeers({'type':'command', 'data':data});
+	this.sendMessageToAllPeers({type:'command', data:data});
 };
 
 /**
