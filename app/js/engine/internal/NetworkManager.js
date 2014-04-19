@@ -48,7 +48,7 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * Communication turn length
 	 * @type {number}
 	 */
-	 this.communicationTurnLength = 100;
+	 this.communicationTurnLength = 500;
 	
 	/**
 	 * Current communication turn number
@@ -63,10 +63,16 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 this.communicationEvents = {};
 	 
 	 /**
-	  * This hash contains starting times for pings and then ping times after they are calculated
+	  * This hash contains starting times for pings
 	  * @type {Object.<string, number>}
 	  */
-	 this.pingTimes = {};
+	 this.pingStarts = {};
+
+	 /**
+	  * This list contains ping times after they are calculated
+	  * @type {Array}
+	  */
+	 this.pingTimes = [];
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -157,8 +163,18 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 	peer.on('error', this.peerOnError.bind(this));
 	this.peer = peer;
 	this.getScene().addEventListener(CrunchJS.Events.SendNetworkCommand, goog.bind(this.sendNetworkCommand, this));
-	setInterval(goog.bind(this.everyCommunicationTurn, this), this.communicationTurnLength);
+	setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
 };
+
+/**
+ * Logic for running communication turns at variable turn lengths
+ */
+CrunchJS.Internal.NetworkManager.prototype.setTimeoutTurnLogic = function()
+{
+	goog.bind(this.everyCommunicationTurn, this);
+	this.log('test',CrunchJS.LogLevels.DEBUG);
+	setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
+}
 
 /**
  * Function for when a peer opens a connection
@@ -227,12 +243,42 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			var otherPeer = data['data'];
 			var d = new Date();
 			var n = d.getTime();
-			this.pingTimes[otherPeer] = n - this.pingTimes[otherPeer];
+			this.pingTimes.push(n - this.pingStarts[otherPeer]);
 			
+			//Tell other peers to change turn length
+			var turnlength = this.calculateTurnLength();
+			var message = this.createTurnLengthMessage(turnlength);
+			this.sendMessageToAllPeers(message);
+
+			setTimeout(function()
+			{
+				this.communicationTurnLength = turnlength;
+				this.log('Turn length set to: ' + turnlength, CrunchJS.LogLevels.DEBUG);
+			}.bind(this), this.communicationTurnLength * 2);
 			this.log('Ping RTT: ' + otherPeer,CrunchJS.LogLevels.DEBUG);
-			this.log(this.pingTimes[otherPeer], CrunchJS.LogLevels.DEBUG);
+			this.log(n - this.pingStarts[otherPeer], CrunchJS.LogLevels.DEBUG);
+		}
+		else if(data['type'] == 'turn_length')
+		{
+			this.communicationTurnLength = data['data'];
+			this.log('Turn length set to: ' + data['data'], CrunchJS.LogLevels.DEBUG);
 		}
 	}.bind(this));
+};
+
+/*
+ * Helper for computing the average turn length based on ping times
+ * @return {float} Average turn length
+ */
+CrunchJS.Internal.NetworkManager.prototype.calculateTurnLength = function()
+{
+	var total = 0;
+	this.pingTimes.forEach(function(i)
+	{
+		total += i/2;
+	});
+	return total/this.pingTimes.length;
+
 };
 
 /**
@@ -260,7 +306,7 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 		{
 			var d = new Date();
 			var n = d.getTime();
-			this.pingTimes[otherPeer] = n;
+			this.pingStarts[otherPeer] = n;
 			this.log(n, CrunchJS.LogLevels.DEBUG);
 		}
 	}
@@ -325,6 +371,15 @@ CrunchJS.Internal.NetworkManager.prototype.createShouldConnectMessage = function
 CrunchJS.Internal.NetworkManager.prototype.createPingMessage = function()
 {
 	return {'type': 'ping', 'data': this.peerId};
+};
+
+/**
+ * Returns JSON for a 'turn_length' message
+ * @return {Object} JSON object for a 'turn_length' message
+ */
+CrunchJS.Internal.NetworkManager.prototype.createTurnLengthMessage = function (length)
+{
+	return {'type': 'turn_length', 'data': length};
 };
  
 /**
