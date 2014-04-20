@@ -275,7 +275,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 						}),
 
 						new CrunchJS.Components.RenderImage({
-							image : 'assets/grass.png',
+							image : 'assets/grass.png'
 							//tint : 0x585858 
 						})
 					);					
@@ -287,7 +287,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 							new CrunchJS.Components.Body(body),
 
 							new CrunchJS.Components.RenderImage({
-								image : tileSet[tile],
+								image : tileSet[tile]
 								//tint : 0x585858   
 							})
 						);
