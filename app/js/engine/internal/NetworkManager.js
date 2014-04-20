@@ -137,7 +137,7 @@ CrunchJS.Internal.NetworkManager.prototype.sendNetworkCommand = function(data) {
  */
 CrunchJS.Internal.NetworkManager.prototype.activate = function() {
 	goog.base(this, 'activate');
-	this.initialize(false);
+	this.initialize(false, true);
 };
 
 /**
@@ -150,9 +150,10 @@ CrunchJS.Internal.NetworkManager.prototype.deactivate = function() {
 /**
  * Initializes background tasks for the Network Manager.
  * @param {boolean} createHost A boolean to determine if the host should be created
+ * @param {boolean} startTurns Flag determining if communication turns should start
  */
-CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
-{
+CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost, startTurns)
+{	
 	//only run Network Manager in main window
 	if(CrunchJS.world.isSim())
 	{
@@ -173,7 +174,11 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 	peer.on('error', this.peerOnError.bind(this));
 	this.peer = peer;
 	this.getScene().addEventListener(CrunchJS.Events.SendNetworkCommand, goog.bind(this.sendNetworkCommand, this));
-	setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
+
+	if(startTurns)
+	{
+		setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength * 3);
+	}
 };
 
 /**
@@ -182,7 +187,6 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost)
 CrunchJS.Internal.NetworkManager.prototype.setTimeoutTurnLogic = function()
 {
 	goog.bind(this.everyCommunicationTurn, this);
-	this.log('test',CrunchJS.LogLevels.DEBUG);
 	setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
 }
 
@@ -207,7 +211,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
 		//this may occur if a peer tries to become the host but a race condition prevents it
 		if(this.peerId == null)
 		{
-			this.initialize(false);
+			this.initialize(false, false);
 		}
 	}
 	else if(err['message'] == 'Could not connect to peer host')
@@ -218,7 +222,7 @@ CrunchJS.Internal.NetworkManager.prototype.peerOnError = function(err) {
 		this.peer = null;
 		this.connectedPeers = [];
 		this.connections = [];
-		this.initialize(true);
+		this.initialize(true, false);
 	}
 	this.log(err, CrunchJS.LogLevels.DEBUG);
 };
@@ -483,7 +487,7 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		//Save the connection.
 		this.connectedPeers.push(pId);
 		this.connections.push(conn);
-		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
+		this.log('PeerJS Connections: ', CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
 	conn.on('close', function(){
