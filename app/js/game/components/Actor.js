@@ -21,10 +21,11 @@ CloseContact.Components.Actor = function(params) {
 		maxHealth : 100,
 		attackDmg : 10,
 		armor : 0,
-		movementSpeed : 1,
+		movementSpeed : 0,
 		attackSpeed : 1,
 		attackRange : 50,
-		team : 0
+		team : 0,
+		visionRange : 70
 	};
 
 	if(!params)
@@ -91,6 +92,7 @@ CloseContact.Components.Actor = function(params) {
 	 */
 	this.lastAttackTime = 0;
 
+	this.visionRange = params.visionRange;
 
 	this.updates = {};
 
@@ -176,6 +178,11 @@ CloseContact.Components.Actor.prototype.getNextAttackTime = function() {
 
 	return t;
 };
+
+CloseContact.Components.Actor.prototype.getVisionRange = function() {
+	return this.visionRange;
+};
+
 
 /**
  * Sets the health for the actor
@@ -277,14 +284,21 @@ CloseContact.Components.Actor.prototype.setLastAttackTime = function(lastAttackT
 	}
 };
 
+CloseContact.Components.Actor.prototype.setVisionRange = function(range) {
+	if(this.visionRange != range){
+		this.visionRange = range;
+		this.updates.visionRange = true;
+		this.hasBeenUpdated();
+	}
+};
+
 
 CloseContact.Components.Actor.prototype.takeAttackDmg = function(dmg) {
 	dmg = dmg - this.getArmor();
 	this.takeTrueDmg(dmg);
 };
 
-CloseContact.Components.Actor.prototype.takeTrueDmg = function(dmg) {
-	CrunchJS.world.log(this.getHealth());
+CloseContact.Components.Actor.prototype.takeTrueDmg = function(dmg) {	
 	this.setHealth(Math.max(this.getHealth()-dmg, 0));
 };
 

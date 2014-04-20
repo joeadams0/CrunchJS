@@ -7,8 +7,12 @@ goog.provide('CloseContact.Systems.ActorSystem');
 goog.require('CrunchJS.System');
 goog.require('CrunchJS.Components.RenderShape')
 
+/**
+ * @constructor
+ * @class
+ */
 CloseContact.Systems.ActorSystem = function() {
-
+	goog.base(this);
 };
 
 goog.inherits(CloseContact.Systems.ActorSystem, CrunchJS.System);
@@ -30,7 +34,7 @@ CloseContact.Systems.ActorSystem.prototype.processEntity = function(frame, entit
 
 		renderShape = new CrunchJS.Components.RenderShape({
 	        type: 'rectangle',
-	        color: '0xFF0000',
+	        color: actor.team == 0 ? '0xFF0000' : '0x0000FF',
 	        size: {
 	          x: 10,
 	          y: 1.5

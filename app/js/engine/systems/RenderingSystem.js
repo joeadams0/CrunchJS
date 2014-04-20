@@ -9,6 +9,8 @@ goog.require('CrunchJS.System');
 goog.require('CrunchJS.Components.Viewport');
 
 goog.require('goog.object');
+goog.require('goog.array');
+goog.require('goog.structs')
 
 /**
  * Creates the Rendering System. If you're making a game, you probably need one of these.
@@ -18,6 +20,8 @@ goog.require('goog.object');
  */
 CrunchJS.Systems.RenderingSystem = function(canvasData){
   goog.base(this);
+
+  this._activeEntities = [];  // changed from Set to Array
 
   var self = this;
 
@@ -44,14 +48,14 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
       canvasData[key] = el;
   });
 
-  if(!canvasData.entityId)
+  if(!canvasData.entityId && this.getScene())
     canvasData.entityId = this.getScene().createEntity();
 
   /**
    * The Pixi Stage
    * @type {PIXI.Stage}
    */
-  this.stage = new PIXI.Stage(0x000000);
+  this.stage = new PIXI.Stage(0x000000, true);
 
   /**
    * The Pixi renderer
@@ -90,7 +94,7 @@ CrunchJS.Systems.RenderingSystem = function(canvasData){
   this.sprites = []; // an array of Entities that are in the stage
   this.cam = null;
 
-  this.stage.click = goog.bind(this.onStageClick, this);
+  // this.stage.click = goog.bind(this.onStageClick, this);
 
 
 
@@ -103,6 +107,8 @@ goog.inherits(CrunchJS.Systems.RenderingSystem, CrunchJS.System);
 CrunchJS.Systems.RenderingSystem.prototype.name = 'RenderingSystem';
 
 /**
+ * 
+ *
   responsible for defining what entites go in the system.
   also handles the viewport magic
 */
@@ -119,10 +125,12 @@ CrunchJS.Systems.RenderingSystem.prototype.activate = function() {
 };
 
 CrunchJS.Systems.RenderingSystem.prototype.process = function(f){
-  goog.base(this, 'process');
+  var me = this;                    // explicit reference
+  goog.array.forEach(this._activeEntities, function(e,i,a){
+    me.processEntity(f, e);
+  });
   
   // the code that actually tries to re-draw to the Canvas
-  var me = this;                    // explicit reference
   window['requestAnimFrame']( function(){     // this is from JavaScript and prevents exceeding framerate
     me.renderer.render(me.stage);   // PIXI call to render the stage
   });
@@ -156,6 +164,10 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
       if (parts == 1){ // only need to make the one sprite
         if (imgRenC != null) {
           sprite = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          sprite._entityId = eId;
+          sprite.setInteractive(true);
+          sprite.click = goog.bind(this.onStageClick, this);
+          sprite.tint = imgRenC.tint;
         } else if (shapeRenC != null){  // shapeRendering requires more complex painting right now.
           sprite = this.makePIXIShape(shapeRenC, eId);
         } else {
@@ -166,7 +178,11 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         sprite = [];
         if (imgRenC != null) { // make the imageRendering sprite
           sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
-          this.stage.addChild(sprite[0]);  // add it to the stage
+          this.stage.addChild(sprite[0]);  // add it to the stage          
+          sprite[0]._entityId = eId;
+          sprite[0].setInteractive(true);
+          sprite[0].click = goog.bind(this.onStageClick, this);
+          sprite[0].tint = imgRenC.tint;
         }
         if (shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);
@@ -185,6 +201,10 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         // similar checks for the other 2 renderComponents
         if (sprite[0] == undefined && imgRenC != null) {
           sprite[0] = new PIXI.Sprite( PIXI.Texture.fromImage(imgRenC.image) );
+          sprite[0]._entityId = eId;
+          sprite[0].setInteractive(true);
+          sprite[0].click = goog.bind(this.onStageClick, this);
+          sprite[0].tint = imgRenC.tint;
           this.stage.addChild(sprite[0]);  // add it to the stage
         } else if (sprite[1] == undefined && shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);
@@ -294,6 +314,9 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
                 sprite[p].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
               }
             }
+          }
+          if(cName == 'RenderText'){
+            sprite[p].setText(textRenC.getText());
           }
           // actual visual updating
           sprite[p] = this.updateSprite(sprite[p], screenSize, offX, offY, transf);
@@ -496,8 +519,8 @@ CrunchJS.Systems.RenderingSystem.prototype.onResize = function() {
     }
 };
 
-CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {    
-  this.getScene().fireEvent('click');
+CrunchJS.Systems.RenderingSystem.prototype.onStageClick = function(data) {     
+  this.getScene().fireEvent('click', data);
 };
 
 CrunchJS.Systems.RenderingSystem.prototype.onMouseMove = function(data) {
@@ -533,4 +556,46 @@ CrunchJS.Systems.RenderingSystem.prototype.entityDisabled = function(eId) {
     this.stage.removeChild(this.sprites[eId]);
   }
   this.sprites[eId] = undefined; // clear the RenderingSystem version of the entity
+};
+
+// me is 'this' in reference to the renderingSysyem object
+
+CrunchJS.Systems.RenderingSystem.prototype.removeEntity = function(eId) {
+  goog.array.remove(this._activeEntities, eId);
+};
+CrunchJS.Systems.RenderingSystem.prototype.checkEntity = function(eId) {
+  var me = this;
+  // the function which sorts the entites by layer in the Transform
+  var compareFn = function(first, last){
+    var transf1 = me.getScene().getComponent(first, 'Transform');   // the transform component for first
+    var transf2 = me.getScene().getComponent(last, 'Transform');    // the transform component for last
+    // negative if 'first' is less than 'last'
+    if(transf1 != null && transf2 != null && transf1.getLayer() > transf2.getLayer()){
+      return -1;
+    }
+    // zero if 'first' equals 'last'
+    if (transf1 != null && transf2 != null && transf1.getLayer() == transf2.getLayer()){
+      return 1;
+    }
+    // positive if 'first' is greater than 'last'
+    return 1;
+  };
+
+	if(this.getEntityComposition() != null && this.getScene().matchesComposition(eId, this.getEntityComposition())){
+    goog.array.binaryInsert(this._activeEntities, eId, compareFn);
+		//this._activeEntities.add(entityId);
+	} else{
+    //goog.array.binaryRemove(this._activeEntities, eId, compareFn);
+    goog.array.remove(this._activeEntities, eId);
+		//var success = this._activeEntities.remove(entityId);
+	}
+};
+
+CrunchJS.Systems.RenderingSystem.prototype.refreshData = function() {
+
+  var activeEntities = this.getScene().findEntities(this._entityComposition);
+
+  goog.structs.forEach(activeEntities, function(entityId) {
+    this.checkEntity(entityId);
+  }, this);
 };

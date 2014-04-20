@@ -51,6 +51,16 @@ box2d.Shape = function(def, body) {
   this.m_groupIndex = def.groupIndex;
 };
 
+//Justin's Method
+box2d.Shape.prototype.setPositionX = function(x){
+  this.m_position.x = x;
+}
+
+//Justin's Method
+box2d.Shape.prototype.setPositionY = function(y){
+  this.m_position.y = y;
+}
+
 box2d.Shape.prototype.TestPoint = function(p) {
   return false;
 };

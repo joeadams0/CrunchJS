@@ -14,7 +14,7 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.RenderShape = function(obj) {
-  goog.base(this);
+  goog.base(this, obj);
 
   /**
    * The code-name of the kind of shape to draw (Rectangle, Triangle...)

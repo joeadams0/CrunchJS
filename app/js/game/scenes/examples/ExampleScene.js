@@ -89,14 +89,13 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 		this.addSystem(pathMoveSys);
 
 		//Method to initialize a box2D world through calling methods from PhysicsSystem.js
-		//Not used in the demo for Project Report 2
-		//var physSys = new CrunchJS.Systems.PhysicsSystem({});
-		//this.addSystem(physSys);
+		var physSys = new CrunchJS.Systems.PhysicsSystem({});
+		this.addSystem(physSys);
 
-		//var worldP = physSys.init();
-		//physSys.addCircle(5, worldP);
-		//CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
-		//CrunchJS.world.log('TESTETS', CrunchJS.LogLevels.DEBUG);
+		var worldP = physSys.init();
+		physSys.addCircle(5, worldP);
+		CrunchJS.world.log(worldP, CrunchJS.LogLevels.DEBUG);
+		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
 
 			
 	}
@@ -144,6 +143,8 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 			height : 3
 		}));*/
 
+		CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		
 		var tiles = [
 			[0,0,0,0,0,0,0,0,0,0],
 			[0,1,1,1,1,1,1,1,1,0],
@@ -232,14 +233,6 @@ CloseContact.Scenes.ExampleScene.prototype.activate = function(data) {
 		});
 
 		this.addSystem(sys);
-
-
-
-
-
-
-
-
 
 
 		var self = this;

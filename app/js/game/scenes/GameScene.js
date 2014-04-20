@@ -13,9 +13,14 @@ goog.require('CrunchJS.Systems.RenderingSystem');
 goog.require('CrunchJS.Systems.OccupancyGridSystem');
 goog.require('CrunchJS.Systems.PathfindingSystem');
 goog.require('CrunchJS.Systems.PathMovementSystem');
+goog.require('CrunchJS.Systems.PhysicsSystem');
 goog.require('CloseContact.Systems.TowerSystem');
 goog.require('CloseContact.Systems.AttackSystem');
 goog.require('CloseContact.Systems.ActorSystem');
+goog.require('CloseContact.Systems.PlayerSystem');
+goog.require('CloseContact.Systems.PhysicsPathMovementSystem');
+goog.require('CloseContact.Systems.ProjectileSystem');
+goog.require('CloseContact.Systems.FogOfWarSystem');
 
 // Comps
 goog.require('CrunchJS.Components.Transform');
@@ -29,9 +34,14 @@ goog.require('CrunchJS.Components.Occupancy');
 goog.require('CrunchJS.Components.PathQuery');
 goog.require('CrunchJS.Components.Path');
 goog.require('CrunchJS.Components.Viewport');
+goog.require('CrunchJS.Components.Physics');
+
 goog.require('CloseContact.Components.Actor');
 goog.require('CloseContact.Components.Tower');
 goog.require('CloseContact.Components.Attack');
+goog.require('CloseContact.Components.GameMaster');
+goog.require('CloseContact.Components.Player');
+goog.require('CloseContact.Components.Projectile');
 
 /**
  * The Game Scene
@@ -71,9 +81,13 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CrunchJS.Components.PathQuery,
 		CrunchJS.Components.Path,
 		CrunchJS.Components.Viewport,
+		CrunchJS.Components.Physics,
 		CloseContact.Components.Actor,
 		CloseContact.Components.Tower,
-		CloseContact.Components.Attack
+		CloseContact.Components.Attack,
+		CloseContact.Components.GameMaster,
+		CloseContact.Components.Player,
+		CloseContact.Components.Projectile
 	];
 
 	goog.array.forEach(comps, function(comp) {
@@ -86,10 +100,16 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		
 		var occSys = new CrunchJS.Systems.OccupancyGridSystem(),
 			pathSys = new CrunchJS.Systems.PathfindingSystem(),
-			pathMoveSys = new CrunchJS.Systems.PathMovementSystem(),
+			pathMoveSys = new CloseContact.Systems.PhysicsPathMovementSystem(),
 			towerSystem = new CloseContact.Systems.TowerSystem(),
 			attackSystem = new CloseContact.Systems.AttackSystem(),
-			actorSystem = new CloseContact.Systems.ActorSystem();
+			actorSystem = new CloseContact.Systems.ActorSystem(),
+			playerSystem = new CloseContact.Systems.PlayerSystem(),
+			projectileSystem = new CloseContact.Systems.ProjectileSystem(),
+			// fogOfWarSystem = new CloseContact.Systems.FogOfWarSystem(),
+			physSys = new CrunchJS.Systems.PhysicsSystem({});
+
+
 
 		this.addSystem(occSys);
 		this.addSystem(pathSys);
@@ -97,12 +117,18 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(towerSystem);
 		this.addSystem(attackSystem);
 		this.addSystem(actorSystem);
-
+		this.addSystem(playerSystem);
+		this.addSystem(projectileSystem);
+		// this.addSystem(fogOfWarSystem);
+		this.addSystem(physSys);
+		
 	}
 
 	// If it is the main window
 	else{
 		var sim;
+		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
+		//Console.log("TESTESTEST");
 		if(COMPILED){
 			sim = new CrunchJS.Network.RemoteEngine.WWRemoteEngine('/jsc/game.js');
 		}
@@ -116,38 +142,40 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		this.setEntityName('master', entity);
 
+		var gameMaster = new CloseContact.Components.GameMaster();
+		this.addComponent(entity, gameMaster);
+
 
 		var camEntity = this.createEntity();
 
 		var tiles = [
 			[11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,1,1,1,15],
-			[14,1,1,1,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,1,1,1,15],
-			[14,1,1,1,8,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,10,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
-			[14,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15],
+			[14,1 ,1 ,1 ,1 ,20,1 ,20,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,20,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,20,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,2 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,3 ,4 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,5 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,6 ,7 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,8 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,10,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,20,20,20,20,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,20,20,1 ,1 ,20,20,20,20,20,20,1 ,1 ,20,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,15],
+			[14,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,20,20,1 ,1 ,1 ,1 ,20,1 ,1 ,20,1 ,1 ,1 ,1 ,15],
 			[16,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,18]
 		];
 
-		var tileSet = [
-			'assets/tree.png', // 0
-			'assets/grass.png', // 1
+		var tileSet = [ '',
+			'assets/grass.png', // 1 
 			'assets/path-top-left.png', // 2
-			'assets/path-top-middle.png', // 3
+			'assets/path-top-middle.png', // 3 
 			'assets/path-top-right.png', // 4
 			'assets/path-middle-left.png', // 5
-			'assets/path-middle-middle.png', // 6
+			'assets/path-middle-middle.png', // 6 
 			'assets/path-middle-right.png', // 7
 			'assets/path-bottom-left.png', // 8
-			'assets/path-bottom-middle.png', // 9
+			'assets/path-bottom-middle.png', // 9 
 			'assets/path-bottom-right.png', // 10
 			'assets/wall-top-left.png', // 11
 			'assets/wall-top-middle.png', // 12
@@ -157,15 +185,23 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			'assets/wall-bottom-left.png', // 16
 			'assets/wall-bottom-middle.png', // 17
 			'assets/wall-bottom-right.png', // 18
-			'assets/tower.png' // 19
+			'assets/tower.png',// 19
+			'assets/tree.png' // 20
 
 		];
 		
 		var xStart = -170,
 			yStart = -70;
 
+		this.xStart = xStart;
+		this.yStart = yStart;
+
 		var width = tiles[0].length,
 			height = tiles.length;
+
+		this.width = width;
+		this.height = height;
+
 		console.log(width);
 		console.log(height);
 
@@ -226,7 +262,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					};
 
 				if(tile){
-
+					this.setEntityName('tile-'+x+'-'+y, id);
 					this.addComponents(id, 
 						new CrunchJS.Components.Transform({
 							x : xStart+x*10,
@@ -240,9 +276,10 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 						new CrunchJS.Components.RenderImage({
 							image : 'assets/grass.png'
+							//tint : 0x585858 
 						})
 					);					
-					if(tile>1){
+					if(tile>1 ){
 						id = this.createEntity();
 
 						this.addComponents(id, 
@@ -251,6 +288,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 							new CrunchJS.Components.RenderImage({
 								image : tileSet[tile]
+								//tint : 0x585858   
 							})
 						);
 					}
@@ -263,42 +301,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			}, this);
 		},this);
 
-
-    // handle the warrior
-		var ent2 = this.createEntity();
-
-		this.addComponents(ent2, 
-			new CrunchJS.Components.Transform({
-				x : xStart + 10,
-				y : yStart + 10,
-				layer : 0x00000001
-			}),
-
-			new CrunchJS.Components.RenderImage({
-		      image: 'warrior.png'
-		 	}),
-		    new CrunchJS.Components.Body({
-		    	width : 10,
-		    	height : 10
-		    }),
-
-		    new CloseContact.Components.Actor({
-		    	team : 0,
-		    	health : 100
-		    }),
-
-			new CrunchJS.Components.RenderText({
-		        text: "User1",
-		        style: {
-		          font: "5px",
-		          fill: "white"
-		        },
-		        offset: {
-		          x: 0,
-		          y: -10
-		        }
-			})
-		);
+		var player = this.createPlayerEntity(1 , 0);
 
 		var tower1 = this.createEntity(),
 			tower2 = this.createEntity();
@@ -307,7 +310,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.Transform({
 				x : xStart+25,
 				y : yStart+height/2*10-17,
-				layer : 0x00000001
+				layer : 0x00000001,
+				isMoveable : false
 			}),
 			new CrunchJS.Components.RenderImage({
 		      image: 'assets/tower.png',
@@ -333,7 +337,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			new CrunchJS.Components.Transform({
 				x : xStart+width*10-35,
 				y : yStart+height/2*10-17,
-				layer : 0x00000001
+				layer : 0x00000001,
+				isMoveable : false
 			}),
 			new CrunchJS.Components.RenderImage({
 		      image: 'assets/tower.png',
@@ -350,14 +355,14 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		    new CloseContact.Components.Actor({
 		    	attackDmg : 20,
-		    	team : 1
+		    	team : 1 
 		    }),
 
 		    new CloseContact.Components.Tower()
 		);
 	
 		var sys = new CrunchJS.Systems.RenderingSystem({
-			entityId : 1
+			entityId : 1 
 		});
 
 		this.addSystem(sys);
@@ -368,53 +373,167 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addEventListener(CrunchJS.Events.Move, function(data) {
 			var transform = self.getComponent(data.id, 'Transform');
 
-			self.addComponent(data.id, new CrunchJS.Components.PathQuery({
-				start : {
-					x : transform.x,
-					y : transform.y
-				},
-				end : data.coords,
-				gridId : data.gridId
-			}));
+			if(transform){
+				self.removeComponent(data.id, 'Attack');
+
+				self.addComponent(data.id, new CrunchJS.Components.PathQuery({
+					start : {
+						x : transform.x,
+						y : transform.y
+					},
+					end : data.coords,
+					gridId : data.gridId
+				}));
+			}
 		});
 
-		this.addEventListener('click', function() {	
-			var viewport = self.getComponent(1, 'Viewport'),
-        		transform = self.getComponent(2, 'Transform'),
-        		camera = self.getComponent(2, 'Camera');
+		this.addEventListener('click', function(data) {
+			var target = data.target._entityId;
+			if(target){
+				var player = self.getComponent(data.target._entityId, 'Player');
 
-			var width = viewport.getWidth(),
-				height = viewport.getHeight(),
-				xOffset = (viewport.getMousePosition().x/width)*camera.lensSize.width,
-				yOffset = (viewport.getMousePosition().y/height)*camera.lensSize.height,
-				left = (transform.x-camera.lensSize.width/2),
-				top = (transform.y-camera.lensSize.height/2);
+				if(player && player.getPId() != gameMaster.getPId()){
+					var d = {
+						source : gameMaster.getPId(),
+						target : player.getPId()
+					}
+					self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
+						command : 'ATTACK',
+						data : d
+					});
+					setTimeout(function() {
+						self.fireEvent('ATTACK', d);
+					}, 200);
 
-			var end = {
-				x : xOffset+left,
-				y : yOffset+top
-			};
+				}
+				else
+					target = false;
+			}
+			if(!target){
+				var viewport = self.getComponent(1 , 'Viewport'),
+	        		transform = self.getComponent(2, 'Transform'),
+	        		camera = self.getComponent(2, 'Camera');
 
-			var dater = {
-				id : ent2,
-				coords : end,
-				gridId : 1
-			};
+				var width = viewport.getWidth(),
+					height = viewport.getHeight(),
+					xOffset = (viewport.getMousePosition().x/width)*camera.lensSize.width,
+					yOffset = (viewport.getMousePosition().y/height)*camera.lensSize.height,
+					left = (transform.x-camera.lensSize.width/2),
+					top = (transform.y-camera.lensSize.height/2);
 
-			setTimeout(function() {
-				self.fireEvent(CrunchJS.Events.Move, dater);
-			}, 200);
+				var end = {
+					x : xOffset+left,
+					y : yOffset+top
+				};
 
-			self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
-				command : CrunchJS.Events.Move,
-				data : dater
-			});
+				var eId = self.getEIdFromPId(gameMaster.getPId());
+				var dater = {
+					id : eId,
+					coords : end,
+					gridId : 1 
+				};
+
+				setTimeout(function() {
+					self.fireEvent(CrunchJS.Events.Move, dater);
+				}, 200);
+
+				self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
+					command : CrunchJS.Events.Move,
+					data : dater
+				});
+			}
 		});
 
 		this.addEventListener(CrunchJS.EngineCommands.Sync, function() {			
 			self.fireEvent('Resize');	
 		});
+
+		this.addEventListener('set_player', function(pId) {
+			gameMaster.setPId(pId);
+		});
+
+		this.addEventListener('create_user', function(pId) {
+			CrunchJS.world.log('CREATING USER:'+pId);
+			self.createPlayerEntity(pId, (pId+1 )%2);
+		});
+
+		this.addEventListener('destroy_user', function(pId) {
+			CrunchJS.world.log('DESTOYING USER:'+pId);
+
+			var players = self.getComponentsByType('Player');
+
+			goog.structs.forEach(players, function(player) {
+				if(pId == player.getPId())
+					self.destroyEntity(player.entityId);
+			});
+
+		});
+
+		this.addEventListener('ATTACK', function(data) {
+			var target = self.getEIdFromPId(data.target),
+				source = self.getEIdFromPId(data.source);
+
+			var attack = new CloseContact.Components.Attack({
+				entity : target
+			});
+
+			self.addComponent(source, attack);
+
+		});
+
+
 	}
+
+};
+
+CloseContact.Scenes.GameScene.prototype.getEIdFromPId = function(pId) {
+	var players = this.getComponentsByType('Player'),
+		eId;
+
+	goog.structs.forEach(players, function(player) {
+
+		if(player.getPId() == pId)
+			eId = player.entityId;
+	}, this);
+
+	return eId;
+};
+
+CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team) {
+	var player = this.createEntity(),
+		trans = {
+			x : team === 0 ? this.xStart+10 : this.xStart + 10*this.width-20,
+			y : this.yStart+10,
+			layer : 0x00000001
+		};
+
+	this.addComponents(player, 
+		new CrunchJS.Components.Transform(trans),
+
+		new CrunchJS.Components.RenderImage({
+	      image: 'assets/warrior.png'	 
+	  	}),
+	    new CrunchJS.Components.Body({
+	    	width : 10,
+	    	height : 10
+	    }),
+
+	    new CloseContact.Components.Actor({
+	    	team : team,
+	    	health : 100,
+	    	movementSpeed : 25
+	    }),
+
+	    new CloseContact.Components.Player({
+	    	pId : pId
+	    }),
+
+	    new CrunchJS.Components.Physics({
+	    	objectId : player
+	    })
+	);
+
+	return player;
 
 };
 
@@ -422,7 +541,7 @@ CloseContact.Scenes.GameScene.prototype.process = function(frame) {
 	goog.base(this, 'process', frame);
 
 	if(!CrunchJS.world.isSim()){
-		var viewport = this.getComponent(1, 'Viewport'),
+		var viewport = this.getComponent(1 , 'Viewport'),
 	        transform = this.getComponent(2, 'Transform'),
 	        camera = this.getComponent(2, 'Camera');
 
@@ -432,36 +551,36 @@ CloseContact.Scenes.GameScene.prototype.process = function(frame) {
 
 	    if(pt.x <= width*.05){
 	    	// Move outside left contstraints 
-	    	if(camera.constraints.topLeft.x > transform.x-1-camera.lensSize.width/2){
+	    	if(camera.constraints.topLeft.x > transform.x-1 -camera.lensSize.width/2){
 	    		transform.x = camera.constraints.topLeft.x + camera.lensSize.width/2;
 	    	}
 	    	else{
-	      		transform.x = transform.x - 1;
+	      		transform.x = transform.x - 1 ;
 	      	}
 	    }
 	    else if(pt.x >= width*.95){
-	    	if(camera.constraints.bottomRight.x < transform.x+1+camera.lensSize.width/2){
+	    	if(camera.constraints.bottomRight.x < transform.x+1 +camera.lensSize.width/2){
 	    		transform.x = camera.constraints.bottomRight.x - camera.lensSize.width/2;
 	    	}
 	    	else{
-	      		transform.x = transform.x + 1;
+	      		transform.x = transform.x + 1 ;
 	      	}
 	    }
 
 	    if(pt.y <= height*.05){
-	    	if(camera.constraints.topLeft.y > transform.y-1-camera.lensSize.height/2){
+	    	if(camera.constraints.topLeft.y > transform.y-1 -camera.lensSize.height/2){
 	    		transform.y = camera.constraints.topLeft.y + camera.lensSize.height/2;
 	    	}
 	    	else{
-	      		transform.y = transform.y - 1;
+	      		transform.y = transform.y - 1 ;
 	      	}
 	    }
 	    else if(pt.y >= height*.95){
-	    	if(camera.constraints.bottomRight.y < transform.y+1+camera.lensSize.height/2){
+	    	if(camera.constraints.bottomRight.y < transform.y+1 +camera.lensSize.height/2){
 	    		transform.y = camera.constraints.bottomRight.y - camera.lensSize.height/2;
 	    	}
 	    	else{
-	      		transform.y = transform.y + 1;
+	      		transform.y = transform.y + 1 ;
 	      	}
 	    }
 	}

@@ -529,7 +529,11 @@ CrunchJS.Internal.ComponentManager.prototype.serializeComponent = function(comp,
 CrunchJS.Internal.ComponentManager.prototype.deserializeComponent = function(obj) {
 	var constr = this.getConstructor(obj.name);
 
-	return constr.fromObj(obj.comp);
+	var o = constr.fromObj(obj.comp);
+
+	o.setScene(this.getScene());
+	
+	return o;
 };
 
 /**

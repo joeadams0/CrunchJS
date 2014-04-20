@@ -80,14 +80,12 @@ CrunchJS.Components.RenderText.prototype.setSize = function(x, y) {
 	if(this.size.x != x){
 		this.size.x = x;
 		this.hasBeenUpdated();
-		this.updates.size = {};
-    this.updates.size.x = x;
+    this.updates.size = true;
 	}
 	if(this.size.y != y){
 		this.size.y = y;
 		this.hasBeenUpdated();
-		this.updates.size = {};
-    this.updates.size.y = y;
+    this.updates.size = true;
 	}
 };
 
@@ -99,27 +97,35 @@ CrunchJS.Components.RenderText.prototype.setOffset = function(x,y) {
   if(this.offset.x != x){
     this.offset.x = x;
     this.hasBeenUpdated();
-    this.updates.offset = {};
-    this.updates.offset.x=true;
+    this.updates.offset=true;
   }
   if(this.offset.y != y){
     this.offset.y = y;
     this.hasBeenUpdated();
-    this.updates.offset = this.updates.offset ? this.updates.offset : {};
-    this.updates.offset.y=true;
+    this.updates.offset=true;
   }
 };
 
 CrunchJS.Components.RenderText.prototype.getUpdates = function() {
-	return goog.object.filter(this, function(obj, key) {
-		if(!goog.isFunction(obj))
-      if(!goog.isObject(obj))
-			  return this.updates[key];
-      else
-        return true;
-	}, this);
+	var obj = {};
+  
+  if(this.updates.text){
+    obj.text = this.getText();
+  }
+  if(this.updates.style){
+    obj.style = this.getStyle();
+  }  
+  if(this.updates.size){
+    obj.size = this.getSize()
+  }
+  if(this.updates.offset){
+    obj.offset = this.getOffset()
+  }
+
+
+  return obj;
 };
 
 CrunchJS.Components.RenderText.prototype.resetUpdates = function() {
-	this.updates = undefined;
+	this.updates = {};
 };

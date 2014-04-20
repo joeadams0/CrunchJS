@@ -18,7 +18,7 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * API key for PeerJS-Server
 	 * @type {string}
 	 */
-	this.apiKey = 'nhc2blm0184zpvi';
+	this.apiKey = 'x41mtbnpaagzxgvi';
 	
 	/**
 	 * The string ID of this peer
@@ -73,6 +73,8 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	  * @type {Array}
 	  */
 	 this.pingTimes = [];
+
+	 this.player = 2;
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -112,6 +114,14 @@ CrunchJS.Internal.NetworkManager.prototype.everyCommunicationTurn = function() {
 CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
 	CrunchJS.world.log('COMMAND: ' + data.command);
 	this.getScene().fireEvent(data.command, data.data);
+
+	if(data.command==CrunchJS.EngineCommands.Sync){
+		this.getScene().onSyncRequest();
+	}
+
+	if(data.player){
+		this.getScene().fireEvent('set_player', data.player);
+	}
 };
 
 /**
@@ -119,7 +129,7 @@ CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
  * @param {Object} data The event data
  */
 CrunchJS.Internal.NetworkManager.prototype.sendNetworkCommand = function(data) {
-	this.sendMessageToAllPeers({'type':'command', 'data':data});
+	this.sendMessageToAllPeers({type:'command', data:data});
 };
 
 /**
@@ -445,20 +455,36 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		//Tell the peer that you want to connect with him.
 		var message = this.createConnectMessage();
 		conn.send(message);
-		//Save the connection.
-		this.connectedPeers.push(pId);
-		this.connections.push(conn);
-		this.log('PeerJS Connections: ', CrunchJS.LogLevels.DEBUG);
-		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 		if(this.peerId == 'host'){
+			var player = this.player;
+			this.getScene().fireEvent('create_user', player);
 			conn.send({
 				type : 'command',
 				data : {
 					command : CrunchJS.EngineCommands.Sync,
-					data : this.getScene().getSnapshot()
+					data : this.getScene().getSnapshot(),
+					player : player
 				}
-			})
+			});
+			this.player++;
+
+			var mssg = {
+				type : 'command',
+				data : {
+					command : 'create_user',
+					data : player
+				}
+			}
+
+			this.sendMessageToAllPeers(mssg);
+			conn.player = player;
 		}
+
+		//Save the connection.
+		this.connectedPeers.push(pId);
+		this.connections.push(conn);
+		this.log("PeerJS Connections: ", CrunchJS.LogLevels.DEBUG);
+		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
 	}.bind(this));
 	conn.on('close', function(){
 		var position = this.connectedPeers.indexOf(pId);
@@ -466,5 +492,17 @@ CrunchJS.Internal.NetworkManager.prototype.connect = function(pId)
 		this.connections.splice(position, 1);
 		this.log('PeerJS Connections: ', CrunchJS.LogLevels.DEBUG);
 		this.log(this.connectedPeers, CrunchJS.LogLevels.DEBUG);
+
+		this.getScene().fireEvent('destroy_user', conn.player);
+		var mssg = {
+			type : 'command',
+			data : {
+				command : 'destroy_user',
+				data : conn.player
+			}
+		}
+
+		this.sendMessageToAllPeers(mssg);
+
 	}.bind(this));
 };
