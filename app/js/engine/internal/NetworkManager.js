@@ -186,7 +186,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost, sta
  */
 CrunchJS.Internal.NetworkManager.prototype.setTimeoutTurnLogic = function()
 {
-	goog.bind(this.everyCommunicationTurn, this);
+	this.everyCommunicationTurn();
 	setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
 }
 
@@ -321,7 +321,6 @@ CrunchJS.Internal.NetworkManager.prototype.connectMessageLogic = function(data)
 			var d = new Date();
 			var n = d.getTime();
 			this.pingStarts[otherPeer] = n;
-			this.log(n, CrunchJS.LogLevels.DEBUG);
 		}
 	}
 	
