@@ -75,6 +75,14 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 this.pingTimes = [];
 
 	 this.player = 2;
+
+	 /**
+	  * This hash contains the number of acknowledgements received from each peer.
+	  * @type {Object.<string, number>}
+	  */
+	  this.acknowledgements = {};
+
+	  this.maxAck = 0;
 };
 
 goog.inherits(CrunchJS.Internal.NetworkManager, CrunchJS.Internal.Manager);
@@ -130,6 +138,9 @@ CrunchJS.Internal.NetworkManager.prototype.fireEventLogic = function (data) {
  */
 CrunchJS.Internal.NetworkManager.prototype.sendNetworkCommand = function(data) {
 	this.sendMessageToAllPeers({type:'command', data:data});
+	this.log(data, CrunchJS.LogLevels.DEBUG);
+	//Acking own command
+	this.sendAckToHost();
 };
 
 /**
@@ -251,6 +262,8 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 				this.communicationEvents[insertEvent] = [];
 			}
 			this.communicationEvents[insertEvent].push(data['data']);
+			//Acking another command
+			this.sendAckToHost();
 		}
 		else if(data['type'] == 'ping')
 		{
@@ -277,8 +290,42 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			this.communicationTurnLength = data['data'];
 			this.log('Turn length set to: ' + data['data'], CrunchJS.LogLevels.DEBUG);
 		}
+		else if(data['type'] == 'acknowledgement')
+		{
+			var ackPeer = data['data'];
+
+			if(typeof(this.acknowledgements[ackPeer]) === 'undefined')
+			{
+				this.acknowledgements[ackPeer] = this.maxAck;
+			}
+			else
+			{
+				this.acknowledgements[ackPeer] += 1;
+			}
+
+			if(this.acknowledgements[ackPeer] > this.maxAck)
+			{
+				this.maxAck = this.acknowledgements[ackPeer];
+
+			}
+
+			this.log(this.acknowledgements, CrunchJS.LogLevels.DEBUG);
+		}
 	}.bind(this));
 };
+
+/*
+ *
+ */
+CrunchJS.Internal.NetworkManager.prototype.sendAckToHost = function()
+{
+	if(this.isHost() == false)
+	{
+		//Send an acknowledge message to the host
+		var pos = this.connectedPeers.indexOf('host');
+		this.connections[pos].send(this.createAcknowledgementMessage(this.peerId));
+	}
+}
 
 /*
  * Helper for computing the average turn length based on ping times
@@ -388,13 +435,24 @@ CrunchJS.Internal.NetworkManager.prototype.createPingMessage = function()
 
 /**
  * Returns JSON for a 'turn_length' message
+ * @param {integer} length
  * @return {Object} JSON object for a 'turn_length' message
  */
 CrunchJS.Internal.NetworkManager.prototype.createTurnLengthMessage = function (length)
 {
 	return {'type': 'turn_length', 'data': length};
 };
- 
+
+/**
+ * Returns JSON for an 'acknowledgement' message
+ * @param {string} peerAcknowledging peer ID that is acknowledging
+ * @return {Object} JSON object for an 'acknowledgement' message
+ */
+CrunchJS.Internal.NetworkManager.prototype.createAcknowledgementMessage = function (peerAcknowledging)
+{
+	return {'type': 'acknowledgement', 'data': peerAcknowledging};
+};
+
 /**
  * Checks the peer ID to see if this is the host
  * @param {string|undefined} Optional parameter for checking a peer ID of a different peer
