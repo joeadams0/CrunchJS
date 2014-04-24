@@ -403,7 +403,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					});
 					setTimeout(function() {
 						self.fireEvent('ATTACK', d);
-					}, 200);
+					}, 10);
 
 				}
 				else
@@ -435,7 +435,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 				setTimeout(function() {
 					self.fireEvent(CrunchJS.Events.Move, dater);
-				}, 200);
+				}, 10);
 
 				self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
 					command : CrunchJS.Events.Move,

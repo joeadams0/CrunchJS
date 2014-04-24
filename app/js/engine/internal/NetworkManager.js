@@ -43,12 +43,12 @@ CrunchJS.Internal.NetworkManager = function(scene) {
 	 * @type {Array}
 	 */
 	 this.connections = [];
-	 
+
 	/**
 	 * Communication turn length
 	 * @type {number}
 	 */
-	 this.communicationTurnLength = 500;
+	 this.communicationTurnLength = 20;
 	
 	/**
 	 * Current communication turn number
@@ -110,9 +110,9 @@ CrunchJS.Internal.NetworkManager.prototype.everyCommunicationTurn = function() {
 			//Fire event to pass data
 			this.fireEventLogic(currentEvents[i]);
 			delete this.communicationEvents[this.communicationTurn];
-		}
-		
+		}		
 	}
+	this.checkForLostAcks();
 };
 
 /**
@@ -188,7 +188,7 @@ CrunchJS.Internal.NetworkManager.prototype.initialize = function(createHost, sta
 
 	if(startTurns)
 	{
-		setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength * 3);
+		setTimeout(goog.bind(this.setTimeoutTurnLogic, this), this.communicationTurnLength);
 	}
 };
 
@@ -257,7 +257,7 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 		else if(data['type'] == 'command')
 		{
 			//Place data in communication turn queue with delay
-			var insertEvent = this.communicationTurn + 2;
+			var insertEvent = this.communicationTurn + 1;
 			if (typeof this.communicationEvents[insertEvent] === 'undefined') {
 				this.communicationEvents[insertEvent] = [];
 			}
@@ -270,25 +270,23 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 			var otherPeer = data['data'];
 			var d = new Date();
 			var n = d.getTime();
-			this.pingTimes.push(n - this.pingStarts[otherPeer]);
 			
-			//Tell other peers to change turn length
-			var turnlength = this.calculateTurnLength();
-			var message = this.createTurnLengthMessage(turnlength);
+			//Calculated ping time is much higher than actual ping
+			//due to slow JavaScript.  Please keep this in mind.
+			var pingTime = n - this.pingStarts[otherPeer];
+			this.pingTimes.push(pingTime);
+			
+			//Share the inflated turn length with other peers
+			var turnLength = this.calculateTurnLength();
+			var message = this.createTurnLengthMessage(turnLength);
 			this.sendMessageToAllPeers(message);
 
-			setTimeout(function()
-			{
-				this.communicationTurnLength = turnlength;
-				this.log('Turn length set to: ' + turnlength, CrunchJS.LogLevels.DEBUG);
-			}.bind(this), this.communicationTurnLength * 2);
-			this.log('Ping RTT: ' + otherPeer,CrunchJS.LogLevels.DEBUG);
-			this.log(n - this.pingStarts[otherPeer], CrunchJS.LogLevels.DEBUG);
+			//Report average ping to host (this peer)
+			this.log('Inflated average turn length (based on pings): ' + turnLength, CrunchJS.LogLevels.DEBUG);
 		}
 		else if(data['type'] == 'turn_length')
 		{
-			this.communicationTurnLength = data['data'];
-			this.log('Turn length set to: ' + data['data'], CrunchJS.LogLevels.DEBUG);
+			this.log('Inflated average turn length (based on pings): ' + data['data'], CrunchJS.LogLevels.DEBUG);
 		}
 		else if(data['type'] == 'acknowledgement')
 		{
@@ -315,7 +313,7 @@ CrunchJS.Internal.NetworkManager.prototype.onConnectionOnData = function(conn) {
 };
 
 /*
- *
+ * Helper method for sending an acknowledgement to the host
  */
 CrunchJS.Internal.NetworkManager.prototype.sendAckToHost = function()
 {
@@ -327,7 +325,7 @@ CrunchJS.Internal.NetworkManager.prototype.sendAckToHost = function()
 	}
 }
 
-/*
+/**
  * Helper for computing the average turn length based on ping times
  * @return {float} Average turn length
  */
@@ -340,6 +338,39 @@ CrunchJS.Internal.NetworkManager.prototype.calculateTurnLength = function()
 	});
 	return total/this.pingTimes.length;
 
+};
+
+/**
+ * Helper for checking if any peers are behind on acknowledgements.
+ */
+CrunchJS.Internal.NetworkManager.prototype.checkForLostAcks = function()
+{
+	var numberBehind = 0;
+	var lastKey = '';
+	var lastValue = -1;
+	for(var key in this.acknowledgements)
+	{
+		var value = this.acknowledgements[key];
+		if(lastValue != -1)
+		{
+			if(value < lastValue)
+			{
+				//key seems to be behind
+				numberBehind++;
+			}
+			else if(value > lastValue)
+			{
+				//lastKey seems to be behind
+				numberBehind++;
+			}
+		}
+		lastValue = value;
+		lastKey = key;
+	}
+	if(numberBehind > 0)
+	{
+		this.log(numberBehind + ' peer(s) are behind', CrunchJS.LogLevels.DEBUG);
+	}
 };
 
 /**
