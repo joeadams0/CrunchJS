@@ -293,6 +293,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 						new CrunchJS.Components.Body(body),
 
 						new CrunchJS.Components.RenderImage({
+
 							image : tileSet[tile],
 							tint : 0x585858   
 						}),
@@ -304,6 +305,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 				else {
 					id = this.createEntity();
 					this.setEntityName('tile-'+x+'-'+y, id);
+
 
 					this.addComponents(id, 
 						new CrunchJS.Components.Transform(trans),
@@ -434,7 +436,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					});
 					setTimeout(function() {
 						self.fireEvent('ATTACK', d);
-					}, 200);
+					}, 10);
 
 				}
 				else
@@ -466,7 +468,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 				setTimeout(function() {
 					self.fireEvent(CrunchJS.Events.Move, dater);
-				}, 200);
+				}, 10);
 
 				self.fireEvent(CrunchJS.Events.SendNetworkCommand, {
 					command : CrunchJS.Events.Move,
