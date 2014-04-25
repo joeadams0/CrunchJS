@@ -130,7 +130,8 @@ CrunchJS.Systems.PhysicsSystem.prototype.updatePhysComponent = function(ent, wor
 	}
 	return false;
 };
-
+//helper method
+//finds if component has a corresponding body in the physics world
 CrunchJS.Systems.PhysicsSystem.prototype.checkEntExistsInPhys = function(ent, world){
 	var returnBool = false;
 	var node = world.GetBodyList();
@@ -182,21 +183,17 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	var iteration = 1;
 	world.Step(timeStep, iteration);
 };
-//TO DO: Have to adjust how vertexes are added to Box2D world
+
 /**
  * Adds rectangle to Box2D simulation
  * Sets width, height, mass, and placement of object
  * Creates object in Box2D world
- * @param {int} canvaswidth
- * @param {int} canvasheight
+ * @param {int} ent entity number
+ * @param {world} world Box2D world
  */
  CrunchJS.Systems.PhysicsSystem.prototype.addRectangle = function (ent, world){
- 	//create rectangle
-
 	var boxSd = new box2d.BoxDef();
 	boxSd.density = 1.0;
-
-	//boxSd.userData = id;
 
 	boxSd.extents.Set(ent.getRecWidth(), ent.getRecHeight());
 	var boxBd = new box2d.BodyDef();
@@ -208,7 +205,11 @@ CrunchJS.Systems.PhysicsSystem.prototype.update = function (world){
 	world.CreateBody(boxBd)
  };
 
-
+/**
+ * Adds circle to Box2D simulation
+ * @param {int} ent   entity number
+ * @param {world} world Box2D world
+ */
 CrunchJS.Systems.PhysicsSystem.prototype.addCircle = function (ent, world){
 	var circleSd = new box2d.CircleDef();
 	circleSd.density = 1.0;
