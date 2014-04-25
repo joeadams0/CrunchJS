@@ -14,7 +14,7 @@ goog.require('CrunchJS.Component');
  * @extends {CrunchJS.Component}
  */
 CrunchJS.Components.RenderText = function(obj) {
-  goog.base(this);
+  goog.base(this, obj);
 
   /**
    * The actual text to display. use \n for multi-line text
@@ -34,6 +34,10 @@ CrunchJS.Components.RenderText = function(obj) {
   this.offset = obj.offset ? obj.offset : {x: 0, y: 0};
   this.offset.x = this.offset.x ? this.offset.x : 0;
   this.offset.y = this.offset.y ? this.offset.y : 0;
+
+  
+  this.renderable = goog.isDefAndNotNull(obj.renderable) ? obj.renderable : true;
+
 
   this.updates = {};
 };
@@ -103,6 +107,18 @@ CrunchJS.Components.RenderText.prototype.setOffset = function(x,y) {
     this.offset.y = y;
     this.hasBeenUpdated();
     this.updates.offset=true;
+  }
+};
+
+CrunchJS.Components.RenderText.prototype.getRenderable = function() {
+  return this.renderable;
+};
+
+CrunchJS.Components.RenderText.prototype.setRenderable = function(renderable) {
+  if(this.renderable != renderable){
+    this.renderable = renderable;
+    this.updates.renderable = true;
+    this.hasBeenUpdated();
   }
 };
 

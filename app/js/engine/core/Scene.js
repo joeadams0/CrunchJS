@@ -393,6 +393,7 @@ CrunchJS.Scene.prototype.getSim = function() {
  */
 CrunchJS.Scene.prototype.onSync = function(data) {
 
+	CrunchJS.world.log(data);
 	this._entityManager.sync(data.entityManager);
 	this._componentManager.sync(data.componentManager);
 

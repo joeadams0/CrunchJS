@@ -6,6 +6,7 @@
 
 	goog.require('CrunchJS.Component');
 	goog.require('goog.math.Size');
+	goog.require('goog.object');
 
 	/**
 	 * Creates an Occupancy Component. This component is used to define the characteristics of an entity being placed on an occupancy map.
@@ -16,13 +17,24 @@
 	CrunchJS.Components.Occupancy = function(params) {
 		goog.base(this, params);
 
-		if(params && params.size && params.size.width && params.size.height){
-			/**
-			 * Optional size of the occupancy
-			 * @type {Boolean}
-			 */
-			this.size = new goog.math.Size(params.size.width, params.size.height);
+		var defaults = {
+			canSeeThrough : false
 		}
+
+		if(!params)
+			params = {};
+
+
+		goog.object.forEach(defaults, function(val, key) {
+			if(!params[key])
+				params[key] = val;
+		});
+
+		if(params.size)
+			this.size = params.size;
+
+		this.canSeeThrough = params.canSeeThrough;
+
 		this.updates = {};
 	};
 
@@ -50,23 +62,25 @@
 		}
 	};
 
-	CrunchJS.Components.Occupancy.prototype.getUpdates = function() {
-		if(this.updates.size && goog.isDefAndNotNull(this.getSize())){
-			return {
-				width : this.getSize().width,
-				height : this.getSize().height
-			};
-		}
-		return {};
+	CrunchJS.Components.Occupancy.prototype.getCanSeeThrough = function() {
+		return this.canSeeThrough;
 	};
 
-	CrunchJS.Components.Occupancy.prototype.toObj = function() {
-		var obj = goog.base(this, 'toObj', {});
-
-		if(goog.isDefAndNotNull(this.getSize())){
-			obj.size = {};
-			obj.size.width = this.getSize().width;
-			obj.size.height = this.getSize().height;
+	CrunchJS.Components.Occupancy.prototype.setCanSeeThrough = function(canSeeThrough) {
+		if(this.canSeeThrough != canSeeThrough){
+			this.canSeeThrough = canSeeThrough;
+			this.updates.canSeeThrough = true;
+			this.hasBeenUpdated();
 		}
+	};
+
+	CrunchJS.Components.Occupancy.prototype.getUpdates = function() {
+		var obj = {};
+
+		goog.object.forEach(this.updates, function(updated, key) {
+			if(updated)
+				obj[key] = this[key];
+		}, this);
+
 		return obj;
 	};

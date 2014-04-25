@@ -37,6 +37,10 @@ CrunchJS.Components.RenderShape = function(obj) {
   this.offset.x = this.offset.x ? this.offset.x : 0;
   this.offset.y = this.offset.y ? this.offset.y : 0;
 
+  
+  this.renderable = goog.isDefAndNotNull(obj.renderable) ? obj.renderable : true;
+
+
   this.updates={};
 };
 
@@ -121,6 +125,18 @@ CrunchJS.Components.RenderShape.prototype.setOffset = function(x,y) {
     this.hasBeenUpdated();
     this.updates.offset = this.updates.offset ? this.updates.offset : {};
     this.updates.offset.y=true;
+  }
+};
+
+CrunchJS.Components.RenderShape.prototype.getRenderable = function() {
+  return this.renderable;
+};
+
+CrunchJS.Components.RenderShape.prototype.setRenderable = function(renderable) {
+  if(this.renderable != renderable){
+    this.renderable = renderable;
+    this.updates.renderable = true;
+    this.hasBeenUpdated();
   }
 };
 

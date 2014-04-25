@@ -975,7 +975,8 @@ var PIXI = {
         fromImage: {
             length: 1,
             prototype: {}
-        }
+        },
+        tint : {}
     },
     Strip: {
         length: 3,

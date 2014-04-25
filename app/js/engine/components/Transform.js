@@ -200,8 +200,12 @@ CrunchJS.Components.Transform.prototype.distance = function(trans) {
 };
 
 CrunchJS.Components.Transform.prototype.getUpdates = function() {
-	return goog.object.filter(this, function(obj, key) {
-		if(!goog.isFunction(obj))
-			return this.updates[key];
+	var obj = {};
+
+	goog.object.forEach(this.updates, function(updated, key) {
+		if(updated)
+			obj[key] = this[key];
 	}, this);
+
+	return obj;
 };

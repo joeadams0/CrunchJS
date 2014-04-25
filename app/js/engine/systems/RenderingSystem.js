@@ -168,10 +168,13 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite.setInteractive(true);
           sprite.click = goog.bind(this.onStageClick, this);
           sprite.tint = imgRenC.tint;
+          sprite.visible = imgRenC.renderable;
         } else if (shapeRenC != null){  // shapeRendering requires more complex painting right now.
           sprite = this.makePIXIShape(shapeRenC, eId);
+          sprite.visible = shapeRenC.renderable;
         } else {
           sprite = new PIXI.Text(textRenC.text, textRenC.style);
+          sprite.visible = textRenC.renderable;
         }
         this.stage.addChild(sprite); // add the sprite to the PIXI stage
       } else {         // need to make an array of sprites [image, shape, text] in that order
@@ -183,12 +186,16 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite[0].setInteractive(true);
           sprite[0].click = goog.bind(this.onStageClick, this);
           sprite[0].tint = imgRenC.tint;
+          sprite[0].visible = imgRenC.renderable;
         }
         if (shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);
+          sprite[1].visible = shapeRenC.renderable;
+          this.stage.addChild(sprite[1]);
         }
         if (textRenC != null) {
           sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
+          sprite[2].visible = textRenC.renderable;
           this.stage.addChild(sprite[2]);  // add it to the stage
         }
       }
@@ -205,11 +212,15 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           sprite[0].setInteractive(true);
           sprite[0].click = goog.bind(this.onStageClick, this);
           sprite[0].tint = imgRenC.tint;
+          sprite[0].visible = imgRenC.renderable;
           this.stage.addChild(sprite[0]);  // add it to the stage
         } else if (sprite[1] == undefined && shapeRenC != null) {
           sprite[1] = this.makePIXIShape(shapeRenC, eId);
+          sprite[1].visible = shapeRenC.renderable;
+          this.stage.addChild(sprite[1]);
         } else if (sprite[2] == undefined && textRenC != null) {
           sprite[2] = new PIXI.Text(textRenC.text, textRenC.style);
+          sprite[2].visible = textRenC.renderable;
           this.stage.addChild(sprite[2]);  // add it to the stage
         }
         this.sprites[eId] = sprite;   // add the sprite or sprite-list to the stage's sprite-list, because it might have changed
@@ -240,6 +251,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
           };
           screenSize.width = this.translateScale(bSize, 'x');
           screenSize.height = this.translateScale(bSize, 'y');  
+          sprite.tint = imgRenC.tint;
           xRenC = imgRenC;
         } else if (shapeRenC != null) {   // it is a RenderShape PIXI.Graphics
           // first, deal with the sizing of the thing
@@ -273,6 +285,7 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
         // Do the actual visual updating //
         ///////////////////////////////////
         sprite = this.updateSprite(sprite, screenSize, offX, offY, transf);
+        sprite.visible = xRenC.getRenderable();
       }
     } else {         // it should be an array
       if (Object.prototype.toString.call(sprite) != '[object Array]'){ // but it is not an array!!! oh noes!
@@ -314,9 +327,15 @@ CrunchJS.Systems.RenderingSystem.prototype.processEntity = function(f, eId){
                 sprite[p].drawRect(0,0,screenSize.width, screenSize.height);//fill all the available space
               }
             }
+            sprite[p].visible = shapeRenC.renderable;
           }
           if(cName == 'RenderText'){
             sprite[p].setText(textRenC.getText());
+            sprite[p].visible = textRenC.renderable;
+          }
+          if(cName == 'RenderImage'){
+            sprite[p].tint = imgRenC.tint;
+            sprite[p].visible = imgRenC.renderable;
           }
           // actual visual updating
           sprite[p] = this.updateSprite(sprite[p], screenSize, offX, offY, transf);

@@ -33,6 +33,8 @@ CrunchJS.Components.RenderImage = function(obj) {
 
   this.tint = goog.isNumber(obj.tint) ? obj.tint : 0xFFFFFF;
 
+  this.renderable = goog.isDefAndNotNull(obj.renderable) ? obj.renderable : true;
+
   this.updates = {};
 };
 
@@ -110,16 +112,29 @@ CrunchJS.Components.RenderImage.prototype.setTint = function(tint) {
   }
 };
 
+CrunchJS.Components.RenderImage.prototype.getRenderable = function() {
+  return this.renderable;
+};
+
+CrunchJS.Components.RenderImage.prototype.setRenderable = function(renderable) {
+  if(this.renderable != renderable){
+    this.renderable = renderable;
+    this.updates.renderable = true;
+    this.hasBeenUpdated();
+  }
+};
+
 CrunchJS.Components.RenderImage.prototype.getUpdates = function() {
-	return goog.object.filter(this, function(obj, key) {
-		if(!goog.isFunction(obj))
-      if(!goog.isObject(obj))
-			  return this.updates[key];
-      else
-        return true;
-	}, this);
+	var obj = {};
+
+  goog.object.forEach(this.updates, function(updated, key) {
+    if(updated)
+      obj[key] = this[key];
+  }, this);
+
+  return obj;
 };
 
 CrunchJS.Components.RenderImage.prototype.resetUpdates = function() {
-	this.updates = undefined;
+	this.updates = {};
 };

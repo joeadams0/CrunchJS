@@ -472,6 +472,9 @@ CrunchJS.Internal.ComponentManager.prototype.entityDestroyed = function(entityId
  * @param  {Object} data The event data
  */
 CrunchJS.Internal.ComponentManager.prototype.componentUpdated = function(data) {
+	if(data.entityId == null){
+		debugger;
+	}
 	this.addUpdatedComp(data.entityId, data.compName);
 };
 

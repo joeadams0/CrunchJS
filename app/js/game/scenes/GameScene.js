@@ -42,6 +42,8 @@ goog.require('CloseContact.Components.Attack');
 goog.require('CloseContact.Components.GameMaster');
 goog.require('CloseContact.Components.Player');
 goog.require('CloseContact.Components.Projectile');
+goog.require('CloseContact.Components.Map');
+goog.require('CloseContact.Components.FoWComponent');
 
 /**
  * The Game Scene
@@ -87,7 +89,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		CloseContact.Components.Attack,
 		CloseContact.Components.GameMaster,
 		CloseContact.Components.Player,
-		CloseContact.Components.Projectile
+		CloseContact.Components.Projectile,
+		CloseContact.Components.Map,
+		CloseContact.Components.FoWComponent
 	];
 
 	goog.array.forEach(comps, function(comp) {
@@ -106,7 +110,6 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 			actorSystem = new CloseContact.Systems.ActorSystem(),
 			playerSystem = new CloseContact.Systems.PlayerSystem(),
 			projectileSystem = new CloseContact.Systems.ProjectileSystem(),
-			// fogOfWarSystem = new CloseContact.Systems.FogOfWarSystem(),
 			physSys = new CrunchJS.Systems.PhysicsSystem({});
 
 
@@ -119,13 +122,16 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		this.addSystem(actorSystem);
 		this.addSystem(playerSystem);
 		this.addSystem(projectileSystem);
-		// this.addSystem(fogOfWarSystem);
 		this.addSystem(physSys);
 		
 	}
 
 	// If it is the main window
 	else{
+
+		var fogOfWarSystem = new CloseContact.Systems.FogOfWarSystem();
+		this.addSystem(fogOfWarSystem);
+		
 		var sim;
 		//CrunchJS.world.log('TEST', CrunchJS.LogLevels.DEBUG);
 		//Console.log("TESTESTEST");
@@ -215,7 +221,8 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 				height : tiles.length,
 				tileWidth : 10,
 				tileHeight : 10
-			})
+			}),
+			new CloseContact.Components.FoWComponent()
 		);
 
     // add components to the camEntity
@@ -259,44 +266,59 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 					body = {
 						width : 10,
 						height : 10
-					};
-
-				if(tile){
-					this.setEntityName('tile-'+x+'-'+y, id);
-					this.addComponents(id, 
-						new CrunchJS.Components.Transform({
-							x : xStart+x*10,
-							y : yStart+y*10,
-							layer : 0x00000001
-						}),
-						new CrunchJS.Components.Body({
-							width : 10,
-							height : 10
-						}),
-
-						new CrunchJS.Components.RenderImage({
-							image : 'assets/grass.png',
-							//tint : 0x585858 
-						})
-					);					
-					if(tile>1 ){
-						id = this.createEntity();
-
-						this.addComponents(id, 
-							new CrunchJS.Components.Transform(trans),
-							new CrunchJS.Components.Body(body),
-
-							new CrunchJS.Components.RenderImage({
-								image : tileSet[tile],
-								//tint : 0x585858   
-							})
-						);
-					}
-				}
+					};		
 
 				if(tile>=11){
-					this.addComponent(id, new CrunchJS.Components.Occupancy());
+					// Render grass
+					id = this.createEntity();
+					this.setEntityName('tile-'+x+'-'+y, id);
+
+					this.addComponents(id, 
+						new CrunchJS.Components.Transform(trans),
+						new CrunchJS.Components.Body(body),
+
+						new CrunchJS.Components.RenderImage({
+							image : tileSet[1],
+							tint : 0x585858   
+						}),
+
+						new CloseContact.Components.Map()
+					);
+
+					// Render object
+					id = this.createEntity();
+
+					this.addComponents(id, 
+						new CrunchJS.Components.Transform(trans),
+						new CrunchJS.Components.Body(body),
+
+						new CrunchJS.Components.RenderImage({
+							image : tileSet[tile],
+							tint : 0x585858   
+						}),
+						new CrunchJS.Components.Occupancy(),
+						new CloseContact.Components.Map()
+					);
+
+				}	
+				else {
+					id = this.createEntity();
+					this.setEntityName('tile-'+x+'-'+y, id);
+
+					this.addComponents(id, 
+						new CrunchJS.Components.Transform(trans),
+						new CrunchJS.Components.Body(body),
+
+						new CrunchJS.Components.RenderImage({
+							image : tileSet[tile],
+							tint : 0x585858   
+						}),
+
+						new CloseContact.Components.Map()
+					);
 				}
+
+
 
 			}, this);
 		},this);
@@ -324,11 +346,14 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	width : 15,
 		    	height : 15
 		    }),
-		    new CrunchJS.Components.Occupancy(),
+		    new CrunchJS.Components.Occupancy({
+		    	canSeeThrough : true
+		    }),
 
 		    new CloseContact.Components.Actor({
 		    	attackDmg : 20,
-		    	team : 0
+		    	team : 0,
+		    	attackRange : 40 
 		    }),
 		    new CloseContact.Components.Tower()
 		);
@@ -351,11 +376,14 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		    	width : 15,
 		    	height : 15
 		    }),
-		    new CrunchJS.Components.Occupancy(),
+		    new CrunchJS.Components.Occupancy({
+		    	canSeeThrough : true
+		    }),
 
 		    new CloseContact.Components.Actor({
 		    	attackDmg : 20,
-		    	team : 1 
+		    	team : 1,
+		    	attackRange : 40 
 		    }),
 
 		    new CloseContact.Components.Tower()
@@ -389,6 +417,9 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 
 		this.addEventListener('click', function(data) {
 			var target = data.target._entityId;
+
+			gameMaster = self.getComponent(1, "GameMaster");
+			
 			if(target){
 				var player = self.getComponent(data.target._entityId, 'Player');
 
@@ -449,7 +480,7 @@ CloseContact.Scenes.GameScene.prototype.activate = function(data) {
 		});
 
 		this.addEventListener('set_player', function(pId) {
-			gameMaster.setPId(pId);
+			self.getComponent(1,"GameMaster").setPId(pId);
 		});
 
 		this.addEventListener('create_user', function(pId) {
@@ -521,7 +552,9 @@ CloseContact.Scenes.GameScene.prototype.createPlayerEntity = function(pId, team)
 	    new CloseContact.Components.Actor({
 	    	team : team,
 	    	health : 100,
-	    	movementSpeed : 25
+	    	movementSpeed : 25,
+	    	attackRange : 30,
+	    	visionRange : 40
 	    }),
 
 	    new CloseContact.Components.Player({

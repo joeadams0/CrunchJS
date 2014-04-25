@@ -349,7 +349,7 @@ CrunchJS.Internal.EntityManager.prototype.sync = function(data) {
 	this._nextEntityId = data._nextEntityId ;
 	this._enabledEntities = new goog.structs.Set(data._enabledEntities);
 	this._disabledEntities = new goog.structs.Set(data._disabledEntities);
-	this._nameMap = new goog.structs.Map(data._nampMap);
+	this._nameMap = new goog.structs.Map(data._nameMap);
 
 	this._entityPool = data._entityPool;
 	this.entities = data.entities;

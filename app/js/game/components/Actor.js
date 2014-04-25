@@ -25,7 +25,7 @@ CloseContact.Components.Actor = function(params) {
 		attackSpeed : 1,
 		attackRange : 50,
 		team : 0,
-		visionRange : 70
+		visionRange : 60
 	};
 
 	if(!params)
