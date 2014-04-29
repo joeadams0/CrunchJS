@@ -37,6 +37,9 @@ CloseContact.Systems.PhysicsPathMovementSystem.prototype.processEntity = functio
 
 	var currentStep = path.getSteps()[path.getStep()];
 
+	if(!currentStep)
+		return;
+	
 	// If we are at the end of a step
 	if(goog.math.nearlyEquals(currentStep.x, transform.getX(), .5) && goog.math.nearlyEquals(currentStep.y, transform.getY(), .5)){
 		// Last step

@@ -60,6 +60,41 @@ CloseContact.Systems.FogOfWarSystem.prototype.process = function(frame) {
 
 	goog.structs.forEach(actors, function(actor) {
 		if(actor.getTeam() == team){
+
+			goog.structs.forEach(actors, function(a){
+				if(a.getTeam() != team){
+					var tower = this.getScene().getComponent(a.entityId, "Tower");
+
+					if(!tower){
+						
+						var selfActor = actor,
+							transform  = this.getScene().getComponent(actor.entityId, 'Transform'),
+							enemyTrans = this.getScene().getComponent(a.entityId, 'Transform'),
+							renderImg = this.getScene().getComponent(a.entityId, 'RenderImage'),
+							renderText = this.getScene().getComponent(a.entityId, 'RenderText'),
+							renderShape = this.getScene().getComponent(a.entityId, 'RenderShape'),
+							renderable;
+
+						if(transform && selfActor){
+							renderable =  transform.distance(enemyTrans) <= selfActor.getVisionRange();
+						}
+						else{
+							renderable = false;
+						}
+
+						if(renderImg){
+							renderImg.setRenderable(renderable);
+						}
+						if(renderText){
+							renderText.setRenderable(renderable);
+						}
+						if(renderShape){
+							renderShape.setRenderable(renderable);
+						}
+					}
+				}
+			},this);
+
 			var visionRange = actor.getVisionRange()/10,
 				trans = this.getScene().getComponent(actor.entityId, 'Transform'),
 				startTile = occGrid.coordToTile(trans.getX(), trans.getY());
@@ -79,38 +114,6 @@ CloseContact.Systems.FogOfWarSystem.prototype.process = function(frame) {
 			this.mapLight(1, startTile.x, startTile.y, 1, 0, visionRange,0, 1, -1, 0, occGrid);
 			this.mapLight(1, startTile.x, startTile.y, 1, 0, visionRange,1, 0, 0, -1, occGrid);
 			
-		}
-
-		else{
-			var tower = this.getScene().getComponent(actor.entityId, "Tower");
-
-			if(!tower){
-				
-				var selfActor = this.getScene().getComponent(selfEntity, 'Actor'),
-					transform  = this.getScene().getComponent(selfEntity, 'Transform'),
-					enemyTrans = this.getScene().getComponent(actor.entityId, 'Transform'),
-					renderImg = this.getScene().getComponent(actor.entityId, 'RenderImage'),
-					renderText = this.getScene().getComponent(actor.entityId, 'RenderText'),
-					renderShape = this.getScene().getComponent(actor.entityId, 'RenderShape'),
-					renderable;
-
-				if(transform && selfActor){
-					renderable =  transform.distance(enemyTrans) <= selfActor.getVisionRange();
-				}
-				else{
-					renderable = false;
-				}
-
-				if(renderImg){
-					renderImg.setRenderable(renderable);
-				}
-				if(renderText){
-					renderText.setRenderable(renderable);
-				}
-				if(renderShape){
-					renderShape.setRenderable(renderable);
-				}
-			}
 		}
 	}, this);
 };
