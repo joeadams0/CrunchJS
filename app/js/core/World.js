@@ -5,7 +5,6 @@
  */
 // Load all of the vendor stuff if its not compiled
 
-goog.provide('CrunchJS');
 goog.provide('CrunchJS.World');
 goog.provide('CrunchJS.Events');
 goog.provide('CrunchJS.NetworkEvents');
@@ -274,14 +273,6 @@ CrunchJS.World = function(config) {
 
 
 	/**
-	 * True if the engine is a simulation
-	 * @type {Boolean}
-	 * @private
-	 */
-	this._isSim = this._isWebWorker;
-
-
-	/**
 	 * Is the engine running
 	 * @type {Boolean}
 	 * @private
@@ -352,13 +343,6 @@ CrunchJS.World = function(config) {
 	// Step the engine on each tick
 	goog.events.listen(this._clock, goog.Timer.TICK, goog.bind(this.step, this));
 
-	
-	// Create the main channel if a sim and if in a webworker
-	if(this.isSim() && this._isWebWorker){
-	    
-		this.mainEngine = new CrunchJS.Network.RemoteEngine.MainRemoteEngine();
-		
-	}
 
 	if(!COMPILED)
   		CrunchJS.Utils.vendor.go(CrunchJS.Utils.vendor.files);
@@ -406,23 +390,6 @@ CrunchJS.World.prototype.step = function() {
 	this._sceneManager.process(frame);
 
 	this._frameManager.frameOver();
-};
-
-
-/**
- * Gets the main engine
- * @return {CrunchJS.Network.RemoteEngine.MainRemoteEngine} The main channel
- */
-CrunchJS.World.prototype.getMainEngine = function() {
-	return this.mainEngine;
-};
-
-/**
- * Checks if the environment is a simulation
- * @return {Boolean} Returns true if it is a simulation
- */
-CrunchJS.World.prototype.isSim = function() {
-	return this._isSim;
 };
 
 /**
@@ -519,13 +486,22 @@ CrunchJS.World.prototype.log = function(message, level) {
  * @param {Object} message The message
  */
 CrunchJS.World.prototype.write = function(data) {
-	if(this.isSim()){
-		data['prefix'] = 'WW - ' + data.prefix;
-		data['message'] = data.message;
-		this.getMainEngine().write(data);
-	}
-	else{
-		console.log(data.prefix, data.message);
-	}
+	console.log(data.prefix, data.message);
 };
+
+
+
+
+goog.exportSymbol('CrunchJS.World', CrunchJS.World);
+goog.exportSymbol('CrunchJS.World.prototype.run', CrunchJS.World.prototype.run);
+goog.exportSymbol('CrunchJS.World.prototype.pause', CrunchJS.World.prototype.pause);
+goog.exportSymbol('CrunchJS.World.prototype.step', CrunchJS.World.prototype.step);
+goog.exportSymbol('CrunchJS.World.prototype.isRunning', CrunchJS.World.prototype.isRunning);
+goog.exportSymbol('CrunchJS.World.prototype.addScene', CrunchJS.World.prototype.addScene);
+goog.exportSymbol('CrunchJS.World.prototype.removeScene', CrunchJS.World.prototype.isRunning);
+goog.exportSymbol('CrunchJS.World.prototype.getScene', CrunchJS.World.prototype.getScene);
+goog.exportSymbol('CrunchJS.World.prototype.transitionScene', CrunchJS.World.prototype.transitionScene);
+goog.exportSymbol('CrunchJS.World.prototype.getCurrentScene', CrunchJS.World.prototype.getCurrentScene);
+goog.exportSymbol('CrunchJS.World.prototype.fireEvent', CrunchJS.World.prototype.fireEvent);
+goog.exportSymbol('CrunchJS.World.prototype.log', CrunchJS.World.prototype.log);
 

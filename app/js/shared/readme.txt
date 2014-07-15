@@ -1,1 +1,0 @@
-All code in this folder is shared between the main window and the webworker.

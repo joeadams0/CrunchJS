@@ -63,7 +63,7 @@
 
   if(IS_COMPILED) {
 
-    document.write("<script src='..\/app\/jsc\/app.js'><\/script>");
+    document.write("<script src='..\/app\/jsc\/engine.js'><\/script>");
     document.write('<script src="..\/app\/closure-library\/closure\/goog\/base.js"><\/script>');
 
   } else {
@@ -71,7 +71,7 @@
     document.write('<script src="..\/app\/closure-library\/closure\/goog\/base.js"><\/script>');
     document.write('<script src="..\/app\/js\/deps.js"><\/script>');
     document.write('<script>goog.DEBUG = DEBUG;<\/script>');
-    document.write('<script src="..\/app\/js\/main.js"><\/script>');
+    document.write('<script src="..\/app\/js\/bootstrap.js"><\/script>');
 
 
   }

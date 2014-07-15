@@ -29,19 +29,19 @@ module.exports = function (grunt) {
 
     // the base file of your project. The full path will result by concatenating
     // appPath + bootstrapFile
-    bootstrapFile: 'game.js',
+    bootstrapFile: 'bootstrap.js',
 
     // The folder that contains all the externs files.
     externsPath: 'build/externs/',
 
     // define the main namespace of your app.
-    entryPoint: 'CloseContact',
+    entryPoint: 'CrunchJS',
     
     // The path to the installed bower components
     componentPath: 'app/components',
 
     // the compiled file
-    destCompiled: 'app/jsc/game.js',
+    destCompiled: 'app/jsc/engine.js',
 
     // The location of the source map
     sourceMap: 'app/jsc/sourcemap.js.map',
@@ -179,7 +179,7 @@ module.exports = function (grunt) {
             '"' + CONF.componentPath + ' ../../../components"'
           ]
         },
-        src : CONF.appPath + '/game.js',
+        src : CONF.appPath + '/bootstrap.js',
         dest: '' + CONF.appPath + 'deps.js'
       },
       bddTest: {
@@ -369,7 +369,9 @@ module.exports = function (grunt) {
     switch (target){
       default:
         grunt.task.run([
-          'closureDepsWriter:game'
+            'closureDepsWriter:game',
+            'closureDepsWriter:bddTest',
+            'closureDepsWriter:unitTest'
         ]);
         break;
     } 
