@@ -216,7 +216,7 @@ module.exports = function (grunt) {
             '\'CrunchJS.DEBUG=true\'',
             '\'CrunchJS.DATA_SYNC_DEBUG=false\''
           ],
-          warning_level: 'verbose',
+          warning_level: 'VERBOSE',
           jscomp_off: ['checkTypes', 'fileoverviewTags'],
           closure_entry_point: CONF.entryPoint,
           summary_detail_level: 3,
@@ -224,7 +224,7 @@ module.exports = function (grunt) {
           source_map_format: 'V3',
           externs: [CONF.externsPath + '*.js'],
           output_wrapper: CONF.outputWrapper,
-          create_source_map: CONF.sourceMap,
+          create_source_map: CONF.sourceMap
 
         }
       },

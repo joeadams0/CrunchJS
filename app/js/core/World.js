@@ -6,6 +6,7 @@
 // Load all of the vendor stuff if its not compiled
 
 goog.provide('CrunchJS.World');
+goog.provide('CrunchJS.world');
 goog.provide('CrunchJS.Events');
 goog.provide('CrunchJS.NetworkEvents');
 goog.provide('CrunchJS.DEBUG');
@@ -249,8 +250,6 @@ CrunchJS.LogLevels = {
  */
 CrunchJS.World = function(config) {
 
-	goog.provide('CrunchJS.world');
-	
 	/**
 	 * The instance of the engine
 	 * @type {CrunchJS.World}
