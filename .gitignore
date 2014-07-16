@@ -8,3 +8,5 @@ doc
 *.swp
 app/js/deps.js
 docstrap-master
+
+.idea
